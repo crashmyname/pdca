@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDCA Kanban Board - Task Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
     <style>
         :root {
             --primary: #2563eb;
@@ -257,10 +258,10 @@
             color: var(--gray-900);
         }
 
-        .stat-plan { background: var(--primary-light); }
-        .stat-do { background: var(--success-light); }
-        .stat-check { background: var(--warning-light); }
-        .stat-act { background: var(--danger-light); }
+        .stat-plan { background: var(--primary-light); color: var(--primary); }
+        .stat-do { background: var(--success-light); color: var(--success); }
+        .stat-check { background: var(--warning-light); color: var(--warning); }
+        .stat-act { background: var(--danger-light); color: var(--danger); }
 
         /* Filter Bar */
         .filter-bar {
@@ -291,6 +292,7 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--gray-400);
+            pointer-events: none;
         }
 
         .search-input {
@@ -421,10 +423,10 @@
             font-size: 14px;
         }
 
-        .column-plan .column-icon { background: var(--primary-light); }
-        .column-do .column-icon { background: var(--success-light); }
-        .column-check .column-icon { background: var(--warning-light); }
-        .column-act .column-icon { background: var(--danger-light); }
+        .column-plan .column-icon { background: var(--primary-light); color: var(--primary); }
+        .column-do .column-icon { background: var(--success-light); color: var(--success); }
+        .column-check .column-icon { background: var(--warning-light); color: var(--warning); }
+        .column-act .column-icon { background: var(--danger-light); color: var(--danger); }
 
         .column-count {
             font-size: 11px;
@@ -489,11 +491,13 @@
             border: none;
             color: var(--gray-400);
             cursor: pointer;
-            padding: 2px;
+            padding: 4px;
             border-radius: 4px;
             transition: all 0.2s;
             opacity: 0;
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .kanban-card:hover .card-delete {
@@ -503,6 +507,10 @@
         .card-delete:hover {
             color: var(--danger);
             background: var(--danger-light);
+        }
+
+        .card-delete .ti {
+            font-size: 16px;
         }
 
         .card-desc {
@@ -559,6 +567,9 @@
             background: var(--warning-light);
             color: #92400e;
             font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* Modal */
@@ -662,6 +673,9 @@
         .lock-icon {
             font-size: 12px;
             color: var(--gray-400);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .form-grid {
@@ -819,6 +833,48 @@
             border-color: #b91c1c;
         }
 
+        /* Tabler icon sizing */
+        .ti {
+            vertical-align: -0.125em;
+            stroke-width: 2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Ukuran icon di dalam tombol */
+        .btn .ti {
+            font-size: 1.1em;
+            margin-right: 2px;
+        }
+
+        /* Icon di column header */
+        .column-icon .ti {
+            font-size: 16px;
+        }
+
+        /* Icon di badge status */
+        .badge-status .ti {
+            font-size: 12px;
+        }
+
+        /* Icon di notice bar */
+        .notice-bar > .ti {
+            font-size: 1.3em;
+            flex-shrink: 0;
+        }
+
+        /* Icon di search box */
+        .search-icon .ti {
+            font-size: 16px;
+            display: block;
+        }
+
+        /* Stats icon color */
+        .stat-icon .ti {
+            font-size: 18px;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .kanban-board {
@@ -875,20 +931,13 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
-    // ⚠️ Sesuaikan nama fungsi CSRF dengan framework BPJS Anda
-    // Cek dulu: csrf_token(), csrfHeader(), csrf_hash(), dll.
     window.CSRF_TOKEN  = '<?= csrfHeader() ?>';
     window.CSRF_HEADER = 'X-CSRF-TOKEN';
-
-    // Set global untuk SEMUA AJAX request
     $.ajaxSetup({
         headers: {
             [window.CSRF_HEADER]: window.CSRF_TOKEN
         }
     });
-
-    // Debug — cek di console, kalau kosong/literal berarti fungsi CSRF salah
-    console.log('[CSRF]', window.CSRF_HEADER, '=', window.CSRF_TOKEN);
 </script>
 </head>
 <body>
@@ -908,13 +957,13 @@
                     <span id="userName">Operator</span>
                 </div>
                 <button class="btn btn-primary" onclick="openTaskModal()">
-                    + Tambah Task
+                    <i class="ti ti-plus"></i> Tambah Task
                 </button>
                 <button class="btn btn-success" onclick="toggleRegister()" id="registerBtnHeader" style="display:none">
-                    👤 + User Baru
+                    <i class="ti ti-user-plus"></i> User Baru
                 </button>
                 <button class="btn" onclick="toggleLogin()" id="loginBtn">
-                    🔒 Login Leader
+                    <i class="ti ti-lock"></i> Login Leader
                 </button>
             </div>
         </div>
@@ -924,7 +973,7 @@
     <div class="container">
         <!-- Notice Bar -->
         <div class="notice-bar" id="noticeBar">
-            <span>ℹ️</span>
+            <i class="ti ti-info-circle"></i>
             <span>Anda login sebagai <strong>Operator</strong>. Hanya bisa menambah task baru dengan data dasar.</span>
         </div>
 
@@ -933,28 +982,28 @@
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Plan</span>
-                    <span class="stat-icon stat-plan">📋</span>
+                    <span class="stat-icon stat-plan"><i class="ti ti-clipboard-list"></i></span>
                 </div>
                 <div class="stat-value" id="planCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Do</span>
-                    <span class="stat-icon stat-do">⚡</span>
+                    <span class="stat-icon stat-do"><i class="ti ti-bolt"></i></span>
                 </div>
                 <div class="stat-value" id="doCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Check</span>
-                    <span class="stat-icon stat-check">✅</span>
+                    <span class="stat-icon stat-check"><i class="ti ti-circle-check"></i></span>
                 </div>
                 <div class="stat-value" id="checkCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
                     <span class="stat-label">Act</span>
-                    <span class="stat-icon stat-act">🔧</span>
+                    <span class="stat-icon stat-act"><i class="ti ti-tool"></i></span>
                 </div>
                 <div class="stat-value" id="actCount">0</div>
             </div>
@@ -964,7 +1013,7 @@
         <div class="filter-bar">
             <div class="filter-row">
                 <div class="search-box">
-                    <span class="search-icon">🔍</span>
+                    <span class="search-icon"><i class="ti ti-search"></i></span>
                     <input type="text" class="search-input" id="searchInput" placeholder="Cari task..." oninput="handleSearch(this.value)">
                 </div>
                 <select class="filter-select" id="sectionFilter" onchange="handleFilter()">
@@ -977,7 +1026,9 @@
                 </select>
                 <input type="date" class="date-input" id="dateFrom" onchange="handleFilter()" title="Dari Tanggal">
                 <input type="date" class="date-input" id="dateTo" onchange="handleFilter()" title="Sampai Tanggal">
-                <button class="btn btn-sm" onclick="clearFilters()">Reset</button>
+                <button class="btn btn-sm" onclick="clearFilters()">
+                    <i class="ti ti-refresh"></i> Reset
+                </button>
             </div>
         </div>
 
@@ -1001,7 +1052,7 @@
                      ondrop="handleDrop(event)">
                     <div class="column-header">
                         <span class="column-title">
-                            <span class="column-icon">📋</span>
+                            <span class="column-icon"><i class="ti ti-clipboard-list"></i></span>
                             Plan
                         </span>
                         <span class="column-count" id="planBadge">0</span>
@@ -1016,7 +1067,7 @@
                      ondrop="handleDrop(event)">
                     <div class="column-header">
                         <span class="column-title">
-                            <span class="column-icon">⚡</span>
+                            <span class="column-icon"><i class="ti ti-bolt"></i></span>
                             Do
                         </span>
                         <span class="column-count" id="doBadge">0</span>
@@ -1031,7 +1082,7 @@
                      ondrop="handleDrop(event)">
                     <div class="column-header">
                         <span class="column-title">
-                            <span class="column-icon">✅</span>
+                            <span class="column-icon"><i class="ti ti-circle-check"></i></span>
                             Check
                         </span>
                         <span class="column-count" id="checkBadge">0</span>
@@ -1046,7 +1097,7 @@
                      ondrop="handleDrop(event)">
                     <div class="column-header">
                         <span class="column-title">
-                            <span class="column-icon">🔧</span>
+                            <span class="column-icon"><i class="ti ti-tool"></i></span>
                             Act
                         </span>
                         <span class="column-count" id="actBadge">0</span>
@@ -1069,7 +1120,7 @@
                     <!-- Operator Section (Selalu bisa diisi) -->
                      <?= csrf()?>
                     <div class="form-section">
-                        <div class="form-section-title">📝 Data Operator</div>
+                        <div class="form-section-title"><i class="ti ti-notes"></i> Data Operator</div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label required">Nama Operator</label>
@@ -1100,8 +1151,8 @@
                     <!-- Leader Section (Hanya bisa diisi leader) -->
                     <div class="form-section" id="leaderSection">
                         <div class="form-section-title">
-                            🔧 Tindakan & Approval 
-                            <span class="lock-icon">🔒 (Khusus Leader)</span>
+                            <i class="ti ti-tool"></i> Tindakan & Approval 
+                            <span class="lock-icon"><i class="ti ti-lock"></i> (Khusus Leader)</span>
                         </div>
                         <div class="form-grid">
                             <div class="form-group full-width">
@@ -1129,12 +1180,14 @@
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('taskModal')">Batal</button>
                 <button class="btn btn-danger" id="cancelTaskBtn" onclick="cancelTask()" style="display:none">
-                    ❌ Cancel Task
+                    <i class="ti ti-circle-x"></i> Cancel Task
                 </button>
                 <button class="btn btn-success" id="approveTaskBtn" onclick="approveTask()" style="display:none">
-                    ✅ Approve
+                    <i class="ti ti-check"></i> Approve
                 </button>
-                <button class="btn btn-primary" onclick="saveTask()" id="saveBtn">Simpan</button>
+                <button class="btn btn-primary" onclick="saveTask()" id="saveBtn">
+                    <i class="ti ti-device-floppy"></i> Simpan
+                </button>
             </div>
         </div>
     </div>
@@ -1160,7 +1213,9 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('loginModal')">Batal</button>
-                <button class="btn btn-primary" onclick="loginLeader()">Login</button>
+                <button class="btn btn-primary" onclick="loginLeader()">
+                    <i class="ti ti-login"></i> Login
+                </button>
             </div>
         </div>
     </div>
@@ -1200,7 +1255,7 @@
                             <option value="leader">Leader</option>
                         </select>
                         <small style="color:#6b7280;font-size:12px;display:block;margin-top:4px">
-                            ℹ️ Role <strong>Leader</strong> memerlukan approval admin untuk aktivasi penuh.
+                            <i class="ti ti-info-circle"></i> Role <strong>Leader</strong> memerlukan approval admin untuk aktivasi penuh.
                         </small>
                     </div>
                 </form>
@@ -1208,7 +1263,7 @@
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('registerModal')">Batal</button>
                 <button class="btn btn-primary" onclick="registerUser()" id="registerBtn">
-                    📝 Daftar
+                    <i class="ti ti-user-plus"></i> Daftar
                 </button>
             </div>
         </div>
@@ -1322,7 +1377,6 @@
             const raw = localStorage.getItem(USER_STORAGE_KEY);
             if (raw) {
                 const user = JSON.parse(raw);
-                // Normalisasi role agar konsisten
                 if (user && user.role) {
                     user.role = String(user.role).toLowerCase();
                 }
@@ -1351,8 +1405,8 @@
             stage:            (t.stage  || 'plan').toLowerCase(),
             status:           (t.status || 'open').toLowerCase(),
             leaderSignature:  t.ttd_leader || t.leader_signature || '',
-            approvedAt:       t.approved_at      || null,        // ⬅ NEW
-            approvedBy:       t.approved_by      || null,        // ⬅ NEW
+            approvedAt:       t.approved_at      || null,
+            approvedBy:       t.approved_by      || null,
             createdByName:    t.created_by_name  || '',
             createdByRole:    (t.created_by_role || 'operator').toLowerCase(),
             createdAt:        t.created_at       || null,
@@ -1421,7 +1475,6 @@
         const passwordConfirm  = $('#registerPasswordConfirm').val();
         const role             = $('#registerRole').val();
 
-        // ---- Validasi client-side ----
         if (!name || !username || !password || !passwordConfirm) {
             showAlert('warning', 'Form Tidak Lengkap', 'Semua field wajib diisi!');
             return;
@@ -1439,7 +1492,6 @@
             return;
         }
 
-        // ---- Loading ----
         Swal.fire({
             title: 'Mendaftarkan...',
             html: 'Mohon tunggu sebentar',
@@ -1458,10 +1510,9 @@
             closeModal('registerModal');
             $('#registerForm')[0].reset();
 
-            // Sukses → tampilkan konfirmasi & arahkan ke login
             const result = await Swal.fire({
                 icon: 'success',
-                title: 'Registrasi Berhasil! 🎉',
+                title: 'Registrasi Berhasil!',
                 html: `Akun <strong>${escapeHtml(username)}</strong> berhasil dibuat.<br>
                     Silakan login untuk melanjutkan.`,
                 confirmButtonText: 'Login Sekarang',
@@ -1473,7 +1524,6 @@
             });
 
             if (result.isConfirmed) {
-                // Prefill username di modal login
                 $('#loginUsername').val(username);
                 setTimeout(() => {
                     openModal('loginModal');
@@ -1517,10 +1567,8 @@
                 throw new Error('Response login tidak valid (role tidak ditemukan)');
             }
 
-            // ⬇ Normalisasi role ke lowercase
             const role = String(user.role).toLowerCase();
 
-            // ⬇ Hanya admin & leader yang boleh login ke dashboard ini
             if (!['admin', 'leader'].includes(role)) {
                 throw new Error('Akun ini tidak memiliki akses sebagai Leader/Admin');
             }
@@ -1529,7 +1577,7 @@
                 id:       user.id,
                 name:     user.name,
                 username: user.username,
-                role:     role                                    // ⬅ simpan lowercase
+                role:     role
             });
 
             closeModal('loginModal');
@@ -1572,7 +1620,7 @@
             $userName.text(state.currentUser.name);
             $userInfo.find('.user-avatar').text((state.currentUser.name || 'U').charAt(0).toUpperCase());
             $userInfo.css('background', '#dcfce7');
-            $loginBtn.html('👋 Logout');
+            $loginBtn.html('<i class="ti ti-logout"></i> Logout');
 
             const role = state.currentUser.role;
             let label = '';
@@ -1580,22 +1628,22 @@
 
             if (role === 'admin') {
                 label = 'Admin';
-                color = '#7c3aed';     // ungu
+                color = '#7c3aed';
             } else if (role === 'leader') {
                 label = 'Leader';
-                color = '#16a34a';     // hijau
+                color = '#16a34a';
             } else {
                 label = role.charAt(0).toUpperCase() + role.slice(1);
                 color = '#2563eb';
             }
 
             $noticeBar.html(
-                '<span>✅</span><span>Anda login sebagai <strong style="color:' + color + '">' + label + '</strong>. ' +
+                '<i class="ti ti-circle-check"></i>' +
+                '<span>Anda login sebagai <strong style="color:' + color + '">' + label + '</strong>. ' +
                 'Bisa mengisi tindakan, deadline, PIC, dan melakukan drag & drop.</span>'
             );
             $noticeBar.attr('class', 'notice-bar');
 
-            // ⬇⬇⬇ Tombol Daftar hanya muncul untuk ADMIN
             if (role === 'admin') {
                 $registerBtnHeader.show();
             } else {
@@ -1606,11 +1654,13 @@
             $userName.text('Operator');
             $userInfo.find('.user-avatar').text('O');
             $userInfo.css('background', '');
-            $loginBtn.html('🔒 Login Leader');
-            $noticeBar.html('<span>ℹ️</span><span>Anda login sebagai <strong>Operator</strong>. Hanya bisa menambah task baru dengan data dasar.</span>');
+            $loginBtn.html('<i class="ti ti-lock"></i> Login Leader');
+            $noticeBar.html(
+                '<i class="ti ti-info-circle"></i>' +
+                '<span>Anda login sebagai <strong>Operator</strong>. Hanya bisa menambah task baru dengan data dasar.</span>'
+            );
             $noticeBar.attr('class', 'notice-bar warning');
 
-            // Sembunyikan tombol Daftar saat belum login
             $registerBtnHeader.hide();
         }
     }
@@ -1642,7 +1692,6 @@
 
     function getFilteredTasks() {
         return state.tasks.filter(task => {
-            // Sembunyikan cancelled dari board
             if (task.status === 'cancelled') return false;
 
             if (state.searchQuery) {
@@ -1777,7 +1826,6 @@
             pic:              $('#pic').val().trim()
         };
 
-        // Loading state
         Swal.fire({
             title: 'Menyimpan...',
             html: 'Mohon tunggu sebentar',
@@ -1855,26 +1903,22 @@
         $('#tempAction, #permAction, #deadline, #pic').prop('disabled', false);
         $('#leaderSection').css('display', 'block');
 
-        // Show/hide tombol Approve & Cancel berdasarkan kondisi task
         const isDone      = task.status === 'done';
         const isCancelled = task.status === 'cancelled';
         const isAct       = task.stage === 'act';
 
-        // Approve: hanya muncul di stage ACT & belum done/cancelled
         if (isAct && !isDone && !isCancelled) {
             $('#approveTaskBtn').show();
         } else {
             $('#approveTaskBtn').hide();
         }
 
-        // Cancel: muncul kapan saja kecuali sudah done/cancelled
         if (!isDone && !isCancelled) {
             $('#cancelTaskBtn').show();
         } else {
             $('#cancelTaskBtn').hide();
         }
 
-        // Kalau sudah done / cancelled: disable semua field
         if (isDone || isCancelled) {
             $('#operatorName, #taskDate, #section, #problem, #tempAction, #permAction, #deadline, #pic')
                 .prop('disabled', true);
@@ -1928,7 +1972,7 @@
         const title = task ? escapeHtml(task.problem) : 'task ini';
 
         const confirmed = await showConfirm(
-            '✅ Approve Task?',
+            'Approve Task?',
             `Task "<strong>${title}</strong>" akan ditandai <strong>DONE</strong> dan tidak bisa diubah lagi.<br><br>
             <small style="color:#6b7280">Tanda tangan: <strong>${escapeHtml(state.currentUser?.name || 'Leader')}</strong></small>`,
             'Ya, Approve',
@@ -1949,7 +1993,7 @@
             await api(`/tasks/${id}/approve`, { method: 'PATCH' });
             Swal.close();
             closeModal('taskModal');
-            showToast('Task berhasil di-approve ✅', 'success');
+            showToast('Task berhasil di-approve', 'success');
             await loadTasks();
         } catch (err) {
             Swal.close();
@@ -1965,7 +2009,7 @@
         const title = task ? escapeHtml(task.problem) : 'task ini';
 
         const confirmed = await showConfirm(
-            '❌ Batalkan Task?',
+            'Batalkan Task?',
             `Task "<strong>${title}</strong>" akan ditandai <strong>CANCELLED</strong>.<br><br>
             <small style="color:#6b7280">Task tidak akan dihitung sebagai task aktif.</small>`,
             'Ya, Batalkan',
@@ -1998,11 +2042,12 @@
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
 
-        // Info approval kalau sudah approved
         const approvalInfo = task.approvedAt ? `
             <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
             <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px">
-                <div style="color:#166534;font-weight:600;margin-bottom:6px">✅ APPROVED</div>
+                <div style="color:#166534;font-weight:600;margin-bottom:6px">
+                    <i class="ti ti-circle-check"></i> APPROVED
+                </div>
                 <div style="font-size:12px;color:#374151">
                     <div><strong>Tanda Tangan:</strong> ${escapeHtml(task.leaderSignature || '-')}</div>
                     <div><strong>Waktu:</strong> ${task.approvedAt}</div>
@@ -2010,11 +2055,10 @@
             </div>
         ` : '';
 
-        // Info cancelled
         const cancelledInfo = task.status === 'cancelled' ? `
             <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
             <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:12px;color:#991b1b">
-                <strong>❌ TASK DIBATALKAN</strong>
+                <strong><i class="ti ti-circle-x"></i> TASK DIBATALKAN</strong>
             </div>
         ` : '';
 
@@ -2043,7 +2087,7 @@
                 ${cancelledInfo}
                 <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
                 <div style="color:#9ca3af;font-size:12px;text-align:center">
-                    🔒 Login sebagai leader untuk mengedit task ini
+                    <i class="ti ti-lock"></i> Login sebagai leader untuk mengedit task ini
                 </div>
             </div>
         `;
@@ -2100,21 +2144,25 @@
             const isInProgress = task.status === 'in_progress';
             const isActStage = task.stage === 'act';
 
-            // Badge status
             let badgeHtml = '';
             if (isDone) {
                 badgeHtml = `<div class="badge-status badge-approved">
-                    ✅ Approved${task.leaderSignature ? ' · ' + escapeHtml(task.leaderSignature) : ''}
+                    <i class="ti ti-circle-check"></i> Approved${task.leaderSignature ? ' · ' + escapeHtml(task.leaderSignature) : ''}
                 </div>`;
             } else if (isCancelled) {
-                badgeHtml = `<div class="badge-status badge-cancelled">❌ Cancelled</div>`;
+                badgeHtml = `<div class="badge-status badge-cancelled">
+                    <i class="ti ti-circle-x"></i> Cancelled
+                </div>`;
             } else if (isActStage && isInProgress) {
-                badgeHtml = `<div class="badge-status badge-pending-approval">⏳ Menunggu Approval</div>`;
+                badgeHtml = `<div class="badge-status badge-pending-approval">
+                    <i class="ti ti-clock-hour-4"></i> Menunggu Approval
+                </div>`;
             } else if (isInProgress && !isPending) {
-                badgeHtml = `<div class="badge-status badge-in-progress">⚡ In Progress</div>`;
+                badgeHtml = `<div class="badge-status badge-in-progress">
+                    <i class="ti ti-bolt"></i> In Progress
+                </div>`;
             }
 
-            // Class tambahan untuk card
             const cardClasses = [
                 'kanban-card',
                 isLeader ? 'draggable' : '',
@@ -2129,10 +2177,16 @@
                     onclick="${isLeader ? `editTask(${task.id})` : `viewTask(${task.id})`}">
                     <div class="card-header">
                         <div class="card-title">${escapeHtml(task.problem)}</div>
-                        ${isLeader && !isDone && !isCancelled ? `<button class="card-delete" onclick="event.stopPropagation(); deleteTask(${task.id})">×</button>` : ''}
+                        ${isLeader && !isDone && !isCancelled
+                            ? `<button class="card-delete" onclick="event.stopPropagation(); deleteTask(${task.id})" title="Hapus">
+                                <i class="ti ti-trash"></i>
+                               </button>`
+                            : ''}
                     </div>
                     ${badgeHtml}
-                    ${isPending && !isDone && !isCancelled ? '<div class="pending-badge">Menunggu tindakan leader</div>' : ''}
+                    ${isPending && !isDone && !isCancelled
+                        ? '<div class="pending-badge"><i class="ti ti-alert-triangle"></i> Menunggu tindakan leader</div>'
+                        : ''}
                     ${task.tempAction ? `<div class="card-desc">Temp: ${escapeHtml(task.tempAction)}</div>` : ''}
                     ${task.permAction ? `<div class="card-desc">Perm: ${escapeHtml(task.permAction)}</div>` : ''}
                     <div class="card-meta">
@@ -2171,7 +2225,7 @@
         return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
     }
     function getStageIcon(s) {
-        return ({ plan: '📋', do: '⚡', check: '✅', act: '🔧' })[s] || '📋';
+        return ({ plan: 'ti-clipboard-list', do: 'ti-bolt', check: 'ti-circle-check', act: 'ti-tool' })[s] || 'ti-clipboard-list';
     }
     function openModal(id)  { $('#' + id).addClass('active'); }
     function closeModal(id) { $('#' + id).removeClass('active'); }
@@ -2179,12 +2233,6 @@
     // ============================================================
     // SWEETALERT2 HELPERS
     // ============================================================
-
-    /**
-     * Toast notifikasi (pojok kanan atas)
-     * @param {string} message
-     * @param {'success'|'error'|'warning'|'info'|'question'} icon
-     */
     function showToast(message, icon = 'success') {
         SwalToast.fire({
             icon: icon,
@@ -2192,12 +2240,6 @@
         });
     }
 
-    /**
-     * Alert modal (untuk error, warning, info)
-     * @param {'success'|'error'|'warning'|'info'|'question'} icon
-     * @param {string} title
-     * @param {string} text
-     */
     function showAlert(icon, title, text) {
         Swal.fire({
             icon: icon,
@@ -2208,15 +2250,6 @@
         });
     }
 
-    /**
-     * Konfirmasi Ya/Tidak
-     * @param {string} title
-     * @param {string} text  (boleh pakai HTML)
-     * @param {string} confirmText
-     * @param {string} cancelText
-     * @param {'warning'|'question'|'info'|'error'|'success'} icon
-     * @returns {Promise<boolean>}
-     */
     function showConfirm(title, text, confirmText = 'Ya', cancelText = 'Batal', icon = 'warning') {
         return Swal.fire({
             icon: icon,
