@@ -12,6 +12,7 @@ Route::get('/', fn() => view('new-home'));
 // PUBLIC ROUTES (tanpa login)
 // ============================================================
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
 
 // Board bisa dilihat siapa saja
 Route::get('/tasks',        [TaskController::class, 'index']);   // ⬅ PINDAH KELUAR
@@ -32,4 +33,7 @@ Route::group([AuthMiddleware::class], function () {
     Route::patch('/tasks/{id}/stage',    [TaskController::class, 'updateStage']);
     Route::patch('/tasks/{id}/approve',  [TaskController::class, 'approve']);
     Route::delete('/tasks/{id}',         [TaskController::class, 'destroy']);
+
+    Route::patch('/tasks/{id}/cancel', [TaskController::class, 'cancel']);
+    
 });

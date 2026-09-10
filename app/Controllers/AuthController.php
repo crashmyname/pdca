@@ -23,6 +23,17 @@ class AuthController extends BaseController
         ],$login['status']);
     }
 
+    public function register(Request $request, AuthService $service)
+    {
+        $result = $service->register($request->all());
+
+        return Response::json([
+            'status'  => $result['status'],
+            'message' => $result['message'] ?? 'success',
+            'data'    => $result['data'] ?? null,
+        ], $result['status']);
+    }
+
     public function logout()
     {
         Auth::logout();

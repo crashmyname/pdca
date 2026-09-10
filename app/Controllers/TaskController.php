@@ -152,30 +152,70 @@ class TaskController extends BaseController
         try {
             $task = Task::findOrFail($id);
 
-            // ⬇ pakai isLeader() yang sudah di-fix
             if (!$this->isLeader(auth()->user())) {
                 return $this->json(['message' => 'Only leader/admin can change stage'], 403);
             }
 
-            $user     = auth()->user();
-            $userRole = strtolower($user->role);   // ⬅ lowercase untuk konsistensi
+            // Validasi transisi stage
+            $validTransitions = [
+                'PLAN'  => ['DO'],
+                'DO'    => ['CHECK', 'PLAN'],
+                'CHECK' => ['ACT', 'DO'],
+                'ACT'   => [],
+            ];
 
-            $oldStage = $task->stage;
+            $oldStage = strtoupper($task->stage);
+            $newStage = strtoupper($request->stage);
+
+            if (!in_array($newStage, $validTransitions[$oldStage] ?? [], true)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => "Tidak bisa pindah dari {$oldStage} ke {$newStage}"
+                ], 422);
+            }
+
+            // Validasi DO → CHECK butuh tindakan
+            if ($oldStage === 'DO' && $newStage === 'CHECK') {
+                if (empty($task->temporary_action) && empty($task->permanent_action)) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Isi tindakan dulu sebelum pindah ke CHECK'
+                    ], 422);
+                }
+            }
+
+            // AUTO STATUS berdasarkan stage baru
+            $statusMap = [
+                'PLAN'  => 'open',
+                'DO'    => 'in_progress',
+                'CHECK' => 'in_progress',
+                'ACT'   => 'in_progress',
+            ];
+            $newStatus = $statusMap[$newStage] ?? $task->status;
+            $oldStatus = $task->status;
+
+            $user     = auth()->user();
+            $userRole = strtolower($user->role);
 
             $task->update([
-                'stage'            => $request->stage,
-                'stage_updated_at' => date('Y-m-d H:i:s'),
-                'stage_updated_by' => $user->id ?? null,
+                'stage'             => strtolower($request->stage),
+                'stage_updated_at'  => date('Y-m-d H:i:s'),
+                'stage_updated_by'  => $user->id ?? null,
+                'status'            => $newStatus,
+                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_by' => $user->id ?? null,
             ]);
 
             TaskHistory::create([
                 'task_id'         => $task->id,
                 'action'          => 'move_stage',
                 'old_stage'       => $oldStage,
-                'new_stage'       => $request->stage,
+                'new_stage'       => $newStage,
+                'old_status'      => $oldStatus,
+                'new_status'      => $newStatus,
                 'changed_by_name' => $user->name ?? $userRole,
-                'changed_by_role' => $userRole,              // ⬅ pakai role asli, bukan hardcode
-                'notes'           => "Stage changed from {$oldStage} to {$request->stage}",
+                'changed_by_role' => $userRole,
+                'notes'           => "Stage: {$oldStage} → {$newStage}, Status: {$oldStatus} → {$newStatus}",
             ]);
 
             return $this->json($task, 200);
@@ -196,37 +236,65 @@ class TaskController extends BaseController
     // PATCH /api/tasks/{id}/approve - Approve task (Leader)
     public function approve(Request $request, $id)
     {
-        $task = Task::findOrFail($id);
+        try {
+            $task = Task::findOrFail($id);
 
-        // Hanya leader yang bisa approve
-        if (!$this->isLeader(auth()->user())) {
+            if (!$this->isLeader(auth()->user())) {
+                return $this->json(['message' => 'Only leader/admin can approve'], 403);
+            }
+
+            // Validasi: harus di ACT dulu
+            if (strtoupper($task->stage) !== 'ACT') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Task harus di stage ACT dulu sebelum di-approve'
+                ], 422);
+            }
+
+            // Validasi: cegah double approve
+            if ($task->approved_at) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Task sudah pernah di-approve'
+                ], 422);
+            }
+
+            $user     = auth()->user();
+            $userRole = strtolower($user->role);
+            $oldStatus = $task->status;
+
+            $task->update([
+                'status'            => 'done',
+                'leader_signature' => $user->name ?? 'Leader',
+                'approved_at'       => date('Y-m-d H:i:s'),
+                'approved_by'       => $user->id ?? null,
+                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_by' => $user->id ?? null,
+            ]);
+
+            TaskHistory::create([
+                'task_id'         => $task->id,
+                'action'          => 'approve',
+                'old_status'      => $oldStatus,
+                'new_status'      => 'done',
+                'changed_by_name' => $user->name ?? $userRole,
+                'changed_by_role' => $userRole,
+                'notes'           => 'Task approved by ' . ($user->name ?? 'Leader'),
+            ]);
+
+            return $this->json($task, 200);
+
+        } catch (\Throwable $e) {
+            error_log('[TaskController::approve] ' . $e->getMessage()
+                . ' @ ' . $e->getFile() . ':' . $e->getLine());
+
             return $this->json([
-                'message' => 'Only leader can approve task'
-            ], 403);
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
         }
-
-        $task->update([
-            'status' => 'done',
-            'ttd_leader' => auth()->user()->full_name,
-            'approved_at' => Date::Now(),
-            'approved_by' => auth()->user()->id,
-            'status_updated_at' => Date::Now(),
-            'status_updated_by' => auth()->user()->id,
-        ]);
-
-        // Log history
-        TaskHistory::create([
-            'task_id' => $task->id,
-            'action' => 'approve',
-            'old_status' => $task->getOriginal('status'),
-            'new_status' => 'done',
-            'changed_by' => auth()->user()->id,
-            'changed_by_name' => auth()->user()->name,
-            'changed_by_role' => 'leader',
-            'notes' => 'Task approved by ' . auth()->user()->name,
-        ]);
-
-        return response()->json($task);
     }
 
     // DELETE /api/tasks/{id} - Delete task (Leader)
@@ -236,16 +304,67 @@ class TaskController extends BaseController
 
         // Hanya leader yang bisa delete
         if (!$this->isLeader(auth()->user())) {
-            return response()->json([
+            return $this->json([
                 'message' => 'Only leader can delete task'
             ], 403);
         }
 
         $task->delete();
 
-        return response()->json([
+        return $this->json([
             'message' => 'Task deleted successfully'
-        ]);
+        ],200);
+    }
+
+    public function cancel(Request $request, $id)
+    {
+        try {
+            $task = Task::findOrFail($id);
+
+            if (!$this->isLeader(auth()->user())) {
+                return $this->json(['message' => 'Only leader/admin can cancel'], 403);
+            }
+
+            if (strtolower($task->status) === 'done') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Task yang sudah done tidak bisa di-cancel'
+                ], 422);
+            }
+
+            $user     = auth()->user();
+            $userRole = strtolower($user->role);
+            $oldStatus = $task->status;
+
+            $task->update([
+                'status'            => 'cancelled',
+                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_by' => $user->id ?? null,
+            ]);
+
+            TaskHistory::create([
+                'task_id'         => $task->id,
+                'action'          => 'cancel',
+                'old_status'      => $oldStatus,
+                'new_status'      => 'cancelled',
+                'changed_by_name' => $user->name ?? $userRole,
+                'changed_by_role' => $userRole,
+                'notes'           => 'Task cancelled by ' . ($user->name ?? 'Leader'),
+            ]);
+
+            return $this->json($task, 200);
+
+        } catch (\Throwable $e) {
+            error_log('[TaskController::cancel] ' . $e->getMessage()
+                . ' @ ' . $e->getFile() . ':' . $e->getLine());
+
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
+        }
     }
 
     // GET /api/tasks/stats - Get statistics

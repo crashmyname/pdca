@@ -760,6 +760,65 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
+        /* Status Badges */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1;
+        }
+        .badge-approved {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        .badge-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .badge-pending-approval {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        .badge-in-progress {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #93c5fd;
+        }
+
+        /* Card states */
+        .kanban-card.card-approved {
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+            border-color: #86efac;
+        }
+        .kanban-card.card-cancelled {
+            opacity: 0.55;
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        .kanban-card.card-cancelled .card-title {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+
+        /* Tombol danger (cancel) */
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .kanban-board {
@@ -850,6 +909,9 @@
                 </div>
                 <button class="btn btn-primary" onclick="openTaskModal()">
                     + Tambah Task
+                </button>
+                <button class="btn btn-success" onclick="toggleRegister()" id="registerBtnHeader" style="display:none">
+                    👤 + User Baru
                 </button>
                 <button class="btn" onclick="toggleLogin()" id="loginBtn">
                     🔒 Login Leader
@@ -1066,6 +1128,12 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('taskModal')">Batal</button>
+                <button class="btn btn-danger" id="cancelTaskBtn" onclick="cancelTask()" style="display:none">
+                    ❌ Cancel Task
+                </button>
+                <button class="btn btn-success" id="approveTaskBtn" onclick="approveTask()" style="display:none">
+                    ✅ Approve
+                </button>
                 <button class="btn btn-primary" onclick="saveTask()" id="saveBtn">Simpan</button>
             </div>
         </div>
@@ -1093,6 +1161,55 @@
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('loginModal')">Batal</button>
                 <button class="btn btn-primary" onclick="loginLeader()">Login</button>
+            </div>
+        </div>
+    </div>
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Daftar Akun Baru</h3>
+                <button class="modal-close" onclick="closeModal('registerModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label required">Nama Lengkap</label>
+                        <input type="text" class="form-input" id="registerName" required
+                            placeholder="Nama lengkap Anda">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Username</label>
+                        <input type="text" class="form-input" id="registerUsername" required
+                            minlength="3" placeholder="Minimal 3 karakter">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Password</label>
+                        <input type="password" class="form-input" id="registerPassword" required
+                            minlength="6" placeholder="Minimal 6 karakter">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Konfirmasi Password</label>
+                        <input type="password" class="form-input" id="registerPasswordConfirm" required
+                            minlength="6" placeholder="Ulangi password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Daftar Sebagai</label>
+                        <select class="form-select" id="registerRole">
+                            <option value="operator">Operator</option>
+                            <option value="leader">Leader</option>
+                        </select>
+                        <small style="color:#6b7280;font-size:12px;display:block;margin-top:4px">
+                            ℹ️ Role <strong>Leader</strong> memerlukan approval admin untuk aktivasi penuh.
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('registerModal')">Batal</button>
+                <button class="btn btn-primary" onclick="registerUser()" id="registerBtn">
+                    📝 Daftar
+                </button>
             </div>
         </div>
     </div>
@@ -1221,23 +1338,25 @@
     // ============================================================
     function normalizeTask(t) {
         return {
-            id:              t.id,
-            taskCode:        t.task_code        || '',
-            operatorName:    t.operator_name    || '',
-            date:            t.task_date        || '',
-            section:         t.section          || '',
-            problem:         t.problem          || '',
-            tempAction:      t.temporary_action || '',
-            permAction:      t.permanent_action || '',
-            deadline:        t.deadline         || '',
-            pic:             t.pic              || '',
-            stage:           (t.stage  || 'plan').toLowerCase(),
-            status:          (t.status || 'open').toLowerCase(),
-            leaderSignature: t.ttd_leader || t.leader_signature || '',
-            createdByName:   t.created_by_name  || '',
-            createdByRole:   (t.created_by_role || 'operator').toLowerCase(),
-            createdAt:       t.created_at       || null,
-            updatedAt:       t.updated_at       || null
+            id:               t.id,
+            taskCode:         t.task_code        || '',
+            operatorName:     t.operator_name    || '',
+            date:             t.task_date        || '',
+            section:          t.section          || '',
+            problem:          t.problem          || '',
+            tempAction:       t.temporary_action || '',
+            permAction:       t.permanent_action || '',
+            deadline:         t.deadline         || '',
+            pic:              t.pic              || '',
+            stage:            (t.stage  || 'plan').toLowerCase(),
+            status:           (t.status || 'open').toLowerCase(),
+            leaderSignature:  t.ttd_leader || t.leader_signature || '',
+            approvedAt:       t.approved_at      || null,        // ⬅ NEW
+            approvedBy:       t.approved_by      || null,        // ⬅ NEW
+            createdByName:    t.created_by_name  || '',
+            createdByRole:    (t.created_by_role || 'operator').toLowerCase(),
+            createdAt:        t.created_at       || null,
+            updatedAt:        t.updated_at       || null
         };
     }
 
@@ -1260,6 +1379,10 @@
             e.preventDefault();
             loginLeader();
         });
+        $('#registerForm').on('submit', function (e) {
+            e.preventDefault();
+            registerUser();
+        });
         $('.modal').on('click', function (e) {
             if (e.target === this) closeModal(this.id);
         });
@@ -1281,6 +1404,85 @@
             } else {
                 showToast('Gagal memuat task: ' + err.message, 'error');
             }
+        }
+    }
+
+    // ============================================================
+    // REGISTER
+    // ============================================================
+    function toggleRegister() {
+        openModal('registerModal');
+    }
+
+    async function registerUser() {
+        const name             = $('#registerName').val().trim();
+        const username         = $('#registerUsername').val().trim();
+        const password         = $('#registerPassword').val();
+        const passwordConfirm  = $('#registerPasswordConfirm').val();
+        const role             = $('#registerRole').val();
+
+        // ---- Validasi client-side ----
+        if (!name || !username || !password || !passwordConfirm) {
+            showAlert('warning', 'Form Tidak Lengkap', 'Semua field wajib diisi!');
+            return;
+        }
+        if (username.length < 3) {
+            showAlert('warning', 'Username Terlalu Pendek', 'Username minimal 3 karakter.');
+            return;
+        }
+        if (password.length < 6) {
+            showAlert('warning', 'Password Terlalu Pendek', 'Password minimal 6 karakter.');
+            return;
+        }
+        if (password !== passwordConfirm) {
+            showAlert('warning', 'Password Tidak Sama', 'Konfirmasi password tidak cocok!');
+            return;
+        }
+
+        // ---- Loading ----
+        Swal.fire({
+            title: 'Mendaftarkan...',
+            html: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const res = await api('/auth/register', {
+                method: 'POST',
+                body: { name, username, password, role }
+            });
+
+            Swal.close();
+            closeModal('registerModal');
+            $('#registerForm')[0].reset();
+
+            // Sukses → tampilkan konfirmasi & arahkan ke login
+            const result = await Swal.fire({
+                icon: 'success',
+                title: 'Registrasi Berhasil! 🎉',
+                html: `Akun <strong>${escapeHtml(username)}</strong> berhasil dibuat.<br>
+                    Silakan login untuk melanjutkan.`,
+                confirmButtonText: 'Login Sekarang',
+                confirmButtonColor: '#2563eb',
+                showCancelButton: true,
+                cancelButtonText: 'Tutup',
+                cancelButtonColor: '#6b7280',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                // Prefill username di modal login
+                $('#loginUsername').val(username);
+                setTimeout(() => {
+                    openModal('loginModal');
+                    $('#loginPassword').focus();
+                }, 250);
+            }
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Registrasi Gagal', err.message);
         }
     }
 
@@ -1364,6 +1566,7 @@
         const $userName  = $('#userName');
         const $loginBtn  = $('#loginBtn');
         const $noticeBar = $('#noticeBar');
+        const $registerBtnHeader = $('#registerBtnHeader');
 
         if (state.currentUser) {
             $userName.text(state.currentUser.name);
@@ -1391,6 +1594,14 @@
                 'Bisa mengisi tindakan, deadline, PIC, dan melakukan drag & drop.</span>'
             );
             $noticeBar.attr('class', 'notice-bar');
+
+            // ⬇⬇⬇ Tombol Daftar hanya muncul untuk ADMIN
+            if (role === 'admin') {
+                $registerBtnHeader.show();
+            } else {
+                $registerBtnHeader.hide();
+            }
+
         } else {
             $userName.text('Operator');
             $userInfo.find('.user-avatar').text('O');
@@ -1398,6 +1609,9 @@
             $loginBtn.html('🔒 Login Leader');
             $noticeBar.html('<span>ℹ️</span><span>Anda login sebagai <strong>Operator</strong>. Hanya bisa menambah task baru dengan data dasar.</span>');
             $noticeBar.attr('class', 'notice-bar warning');
+
+            // Sembunyikan tombol Daftar saat belum login
+            $registerBtnHeader.hide();
         }
     }
 
@@ -1428,6 +1642,9 @@
 
     function getFilteredTasks() {
         return state.tasks.filter(task => {
+            // Sembunyikan cancelled dari board
+            if (task.status === 'cancelled') return false;
+
             if (state.searchQuery) {
                 const s = [
                     task.operatorName, task.section, task.problem,
@@ -1638,6 +1855,34 @@
         $('#tempAction, #permAction, #deadline, #pic').prop('disabled', false);
         $('#leaderSection').css('display', 'block');
 
+        // Show/hide tombol Approve & Cancel berdasarkan kondisi task
+        const isDone      = task.status === 'done';
+        const isCancelled = task.status === 'cancelled';
+        const isAct       = task.stage === 'act';
+
+        // Approve: hanya muncul di stage ACT & belum done/cancelled
+        if (isAct && !isDone && !isCancelled) {
+            $('#approveTaskBtn').show();
+        } else {
+            $('#approveTaskBtn').hide();
+        }
+
+        // Cancel: muncul kapan saja kecuali sudah done/cancelled
+        if (!isDone && !isCancelled) {
+            $('#cancelTaskBtn').show();
+        } else {
+            $('#cancelTaskBtn').hide();
+        }
+
+        // Kalau sudah done / cancelled: disable semua field
+        if (isDone || isCancelled) {
+            $('#operatorName, #taskDate, #section, #problem, #tempAction, #permAction, #deadline, #pic')
+                .prop('disabled', true);
+            $('#saveBtn').prop('disabled', true);
+        } else {
+            $('#saveBtn').prop('disabled', false);
+        }
+
         openModal('taskModal');
     }
 
@@ -1675,9 +1920,103 @@
         }
     }
 
+    async function approveTask() {
+        const id = $('#taskId').val();
+        if (!id) return;
+
+        const task = state.tasks.find(t => t.id === id);
+        const title = task ? escapeHtml(task.problem) : 'task ini';
+
+        const confirmed = await showConfirm(
+            '✅ Approve Task?',
+            `Task "<strong>${title}</strong>" akan ditandai <strong>DONE</strong> dan tidak bisa diubah lagi.<br><br>
+            <small style="color:#6b7280">Tanda tangan: <strong>${escapeHtml(state.currentUser?.name || 'Leader')}</strong></small>`,
+            'Ya, Approve',
+            'Batal',
+            'question'
+        );
+        if (!confirmed) return;
+
+        Swal.fire({
+            title: 'Memproses...',
+            html: 'Menyimpan approval',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            await api(`/tasks/${id}/approve`, { method: 'PATCH' });
+            Swal.close();
+            closeModal('taskModal');
+            showToast('Task berhasil di-approve ✅', 'success');
+            await loadTasks();
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Approve', err.message);
+        }
+    }
+
+    async function cancelTask() {
+        const id = $('#taskId').val();
+        if (!id) return;
+
+        const task = state.tasks.find(t => t.id === id);
+        const title = task ? escapeHtml(task.problem) : 'task ini';
+
+        const confirmed = await showConfirm(
+            '❌ Batalkan Task?',
+            `Task "<strong>${title}</strong>" akan ditandai <strong>CANCELLED</strong>.<br><br>
+            <small style="color:#6b7280">Task tidak akan dihitung sebagai task aktif.</small>`,
+            'Ya, Batalkan',
+            'Batal',
+            'warning'
+        );
+        if (!confirmed) return;
+
+        Swal.fire({
+            title: 'Memproses...',
+            html: 'Membatalkan task',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            await api(`/tasks/${id}/cancel`, { method: 'PATCH' });
+            Swal.close();
+            closeModal('taskModal');
+            showToast('Task berhasil dibatalkan', 'info');
+            await loadTasks();
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Cancel', err.message);
+        }
+    }
+
     function viewTask(id) {
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
+
+        // Info approval kalau sudah approved
+        const approvalInfo = task.approvedAt ? `
+            <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
+            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px">
+                <div style="color:#166534;font-weight:600;margin-bottom:6px">✅ APPROVED</div>
+                <div style="font-size:12px;color:#374151">
+                    <div><strong>Tanda Tangan:</strong> ${escapeHtml(task.leaderSignature || '-')}</div>
+                    <div><strong>Waktu:</strong> ${task.approvedAt}</div>
+                </div>
+            </div>
+        ` : '';
+
+        // Info cancelled
+        const cancelledInfo = task.status === 'cancelled' ? `
+            <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
+            <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:12px;color:#991b1b">
+                <strong>❌ TASK DIBATALKAN</strong>
+            </div>
+        ` : '';
 
         const html = `
             <div style="text-align:left;font-size:14px;line-height:1.7">
@@ -1687,7 +2026,7 @@
                     <tr><td style="padding:4px 0;color:#6b7280">Tanggal</td><td>${escapeHtml(task.date)}</td></tr>
                     <tr><td style="padding:4px 0;color:#6b7280">Seksi</td><td><span style="background:#f3f4f6;padding:2px 8px;border-radius:6px">${escapeHtml(task.section)}</span></td></tr>
                     <tr><td style="padding:4px 0;color:#6b7280">Stage</td><td><strong>${task.stage.toUpperCase()}</strong></td></tr>
-                    <tr><td style="padding:4px 0;color:#6b7280">Status</td><td>${task.status.toUpperCase()}</td></tr>
+                    <tr><td style="padding:4px 0;color:#6b7280">Status</td><td><strong>${task.status.toUpperCase()}</strong></td></tr>
                 </table>
                 <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
                 <div style="color:#6b7280;font-size:12px;margin-bottom:4px">MASALAH</div>
@@ -1700,6 +2039,8 @@
                     <tr><td style="padding:4px 0;color:#6b7280;width:40%">Deadline</td><td>${task.deadline ? formatDate(task.deadline) : '<em style="color:#9ca3af">-</em>'}</td></tr>
                     <tr><td style="padding:4px 0;color:#6b7280">PIC</td><td>${escapeHtml(task.pic) || '<em style="color:#9ca3af">-</em>'}</td></tr>
                 </table>
+                ${approvalInfo}
+                ${cancelledInfo}
                 <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
                 <div style="color:#9ca3af;font-size:12px;text-align:center">
                     🔒 Login sebagai leader untuk mengedit task ini
@@ -1753,29 +2094,58 @@
             }
 
             $container.html(items.map(task => {
-                const isPending = !task.tempAction && !task.permAction && !task.deadline && !task.pic;
-                return `
-                    <div class="kanban-card ${isLeader ? 'draggable' : ''} ${isPending ? 'card-pending' : ''}"
-                        ${isLeader ? `draggable="true" ondragstart="handleDragStart(event, ${task.id})" ondragend="handleDragEnd(event)"` : ''}
-                        onclick="${isLeader ? `editTask(${task.id})` : `viewTask(${task.id})`}">
-                        <div class="card-header">
-                            <div class="card-title">${escapeHtml(task.problem)}</div>
-                            ${isLeader ? `<button class="card-delete" onclick="event.stopPropagation(); deleteTask(${task.id})">×</button>` : ''}
-                        </div>
-                        ${isPending ? '<div class="pending-badge">Menunggu tindakan leader</div>' : ''}
-                        ${task.tempAction ? `<div class="card-desc">Temp: ${escapeHtml(task.tempAction)}</div>` : ''}
-                        ${task.permAction ? `<div class="card-desc">Perm: ${escapeHtml(task.permAction)}</div>` : ''}
-                        <div class="card-meta">
-                            <span class="card-tag">${escapeHtml(task.section)}</span>
-                            ${task.pic ? `<span class="card-tag">PIC: ${escapeHtml(task.pic)}</span>` : ''}
-                        </div>
-                        <div class="card-footer">
-                            <span class="card-operator">${escapeHtml(task.operatorName)}</span>
-                            <span class="card-date">${task.deadline ? `Deadline: ${formatDate(task.deadline)}` : formatDate(task.date)}</span>
-                        </div>
+            const isPending  = !task.tempAction && !task.permAction && !task.deadline && !task.pic;
+            const isDone     = task.status === 'done';
+            const isCancelled = task.status === 'cancelled';
+            const isInProgress = task.status === 'in_progress';
+            const isActStage = task.stage === 'act';
+
+            // Badge status
+            let badgeHtml = '';
+            if (isDone) {
+                badgeHtml = `<div class="badge-status badge-approved">
+                    ✅ Approved${task.leaderSignature ? ' · ' + escapeHtml(task.leaderSignature) : ''}
+                </div>`;
+            } else if (isCancelled) {
+                badgeHtml = `<div class="badge-status badge-cancelled">❌ Cancelled</div>`;
+            } else if (isActStage && isInProgress) {
+                badgeHtml = `<div class="badge-status badge-pending-approval">⏳ Menunggu Approval</div>`;
+            } else if (isInProgress && !isPending) {
+                badgeHtml = `<div class="badge-status badge-in-progress">⚡ In Progress</div>`;
+            }
+
+            // Class tambahan untuk card
+            const cardClasses = [
+                'kanban-card',
+                isLeader ? 'draggable' : '',
+                isPending && !isDone && !isCancelled ? 'card-pending' : '',
+                isDone ? 'card-approved' : '',
+                isCancelled ? 'card-cancelled' : ''
+            ].filter(Boolean).join(' ');
+
+            return `
+                <div class="${cardClasses}"
+                    ${isLeader ? `draggable="true" ondragstart="handleDragStart(event, ${task.id})" ondragend="handleDragEnd(event)"` : ''}
+                    onclick="${isLeader ? `editTask(${task.id})` : `viewTask(${task.id})`}">
+                    <div class="card-header">
+                        <div class="card-title">${escapeHtml(task.problem)}</div>
+                        ${isLeader && !isDone && !isCancelled ? `<button class="card-delete" onclick="event.stopPropagation(); deleteTask(${task.id})">×</button>` : ''}
                     </div>
-                `;
-            }).join(''));
+                    ${badgeHtml}
+                    ${isPending && !isDone && !isCancelled ? '<div class="pending-badge">Menunggu tindakan leader</div>' : ''}
+                    ${task.tempAction ? `<div class="card-desc">Temp: ${escapeHtml(task.tempAction)}</div>` : ''}
+                    ${task.permAction ? `<div class="card-desc">Perm: ${escapeHtml(task.permAction)}</div>` : ''}
+                    <div class="card-meta">
+                        <span class="card-tag">${escapeHtml(task.section)}</span>
+                        ${task.pic ? `<span class="card-tag">PIC: ${escapeHtml(task.pic)}</span>` : ''}
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-operator">${escapeHtml(task.operatorName)}</span>
+                        <span class="card-date">${task.deadline ? `Deadline: ${formatDate(task.deadline)}` : formatDate(task.date)}</span>
+                    </div>
+                </div>
+            `;
+        }).join(''));
         });
     }
 
