@@ -1,0 +1,83 @@
+/* ===== Desktop (default) ===== */
+#notifContainer {
+  width: 100%;
+  overflow-x: auto;
+  padding: 0;
+}
+
+#notifTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+#notifTable th,
+#notifTable td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* ===== Tablet (smaller desktop, 769px - 1024px) ===== */
+@media (max-width: 1024px) {
+  #notifContainer {
+    padding: 0 12px;
+  }
+
+  #notifTable th,
+  #notifTable td {
+    padding: 6px 10px;
+  }
+}
+
+/* ===== Mobile (max 768px) ===== */
+@media (max-width: 768px) {
+  #notifContainer {
+    overflow-x: hidden !important;
+    padding: 0 12px;
+  }
+
+  #notifTable {
+    display: block;
+    width: 100%;
+  }
+
+  #notifTable thead {
+    display: none;
+  }
+
+  #notifTable tbody {
+    display: block;
+  }
+
+  #notifTable tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  #notifTable td {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border: none;
+  }
+
+  #notifTable td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+  }
+
+  #notifTable .card-mobile {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto 12px auto;
+    box-sizing: border-box;
+  }
+}

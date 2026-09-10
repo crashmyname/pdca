@@ -1,0 +1,21 @@
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Matikan directory listing (biar isi folder tidak kelihatan)
+    Options -Indexes
+
+    # Blokir akses langsung ke file sensitif
+    <FilesMatch "\.(env|htaccess|ini|log|sql|bak|config)$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+
+    # Blokir akses langsung ke folder selain public
+    RewriteRule ^(Controller|app|bootstrap|database|logs|Model|bin|Helpers|routes|resources\.php|vendor) - [F,L]
+
+    # Kalau file/folder tidak ada, lempar ke index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

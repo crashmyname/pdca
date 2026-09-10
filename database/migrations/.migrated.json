@@ -1,0 +1,8 @@
+[
+    "2025_06_30_131244_create_user_table.php",
+    "2026_04_23_093908_create_jobs_table.php",
+    "2026_09_03_160818_create_tasks_table.php",
+    "2026_09_03_161755_create_task_histories_table.php",
+    "2026_09_03_161920_create_attachments_table.php",
+    "2026_09_03_162013_create_notifications_table.php"
+]
