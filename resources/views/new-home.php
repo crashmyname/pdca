@@ -1179,6 +1179,9 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('taskModal')">Batal</button>
+                <button class="btn" id="historyTaskBtn" onclick="viewHistory()" style="display:none">
+                    <i class="ti ti-history"></i> History
+                </button>
                 <button class="btn btn-danger" id="cancelTaskBtn" onclick="cancelTask()" style="display:none">
                     <i class="ti ti-circle-x"></i> Cancel Task
                 </button>
@@ -1799,6 +1802,10 @@
         $('#pic').prop('disabled', !isLeader);
         $('#leaderSection').css('display', isLeader ? 'block' : 'none');
 
+        $('#historyTaskBtn').hide();
+        $('#approveTaskBtn').hide();
+        $('#cancelTaskBtn').hide();
+
         openModal('taskModal');
     }
 
@@ -1919,6 +1926,8 @@
             $('#cancelTaskBtn').hide();
         }
 
+        $('#historyTaskBtn').show();
+
         if (isDone || isCancelled) {
             $('#operatorName, #taskDate, #section, #problem, #tempAction, #permAction, #deadline, #pic')
                 .prop('disabled', true);
@@ -2038,6 +2047,120 @@
         }
     }
 
+    async function viewHistory() {
+        const id = $('#taskId').val();
+        if (!id) return;
+
+        const task = state.tasks.find(t => t.id === id);
+        const title = task ? escapeHtml(task.problem) : 'Task';
+
+        Swal.fire({
+            title: 'Memuat history...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        let histories = [];
+        try {
+            const res = await api(`/tasks/${id}/history`);
+            histories = Array.isArray(res) ? res : (res?.data || []);
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Memuat History', err.message);
+            return;
+        }
+
+        Swal.close();
+
+        const iconMap = {
+            'create':       { icon: 'ti-plus',            color: '#2563eb', bg: '#eff6ff', label: 'Dibuat' },
+            'update':       { icon: 'ti-pencil',          color: '#7c3aed', bg: '#f5f3ff', label: 'Diupdate' },
+            'move_stage':   { icon: 'ti-arrow-right',     color: '#0891b2', bg: '#ecfeff', label: 'Pindah Stage' },
+            'approve':      { icon: 'ti-circle-check',    color: '#16a34a', bg: '#f0fdf4', label: 'Approved' },
+            'cancel':       { icon: 'ti-circle-x',        color: '#dc2626', bg: '#fef2f2', label: 'Cancelled' },
+            'delete':       { icon: 'ti-trash',           color: '#dc2626', bg: '#fef2f2', label: 'Dihapus' },
+            'restore':      { icon: 'ti-restore',         color: '#16a34a', bg: '#f0fdf4', label: 'Direstore' },
+        };
+
+        if (histories.length === 0) {
+            Swal.fire({
+                title: 'History Task',
+                html: `<div style="text-align:center;padding:20px;color:#9ca3af">
+                    <i class="ti ti-history" style="font-size:48px;opacity:0.3"></i>
+                    <div style="margin-top:12px">Belum ada history untuk task ini</div>
+                </div>`,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#2563eb'
+            });
+            return;
+        }
+
+        const timelineHtml = histories.map((h, idx) => {
+            const meta = iconMap[h.action] || { icon: 'ti-activity', color: '#6b7280', bg: '#f3f4f6', label: h.action };
+            const isLast = idx === histories.length - 1;
+
+            let changeHtml = '';
+            if (h.oldStage && h.newStage && h.oldStage !== h.newStage) {
+                changeHtml += `
+                    <div style="font-size:12px;margin-top:4px;color:#374151">
+                        <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStage||'').toUpperCase()}</span>
+                        <i class="ti ti-arrow-right" style="margin:0 6px;color:#9ca3af"></i>
+                        <span style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;font-weight:600">${(h.newStage||'').toUpperCase()}</span>
+                    </div>`;
+            }
+            if (h.oldStatus && h.newStatus && h.oldStatus !== h.newStatus) {
+                changeHtml += `
+                    <div style="font-size:12px;margin-top:4px;color:#374151">
+                        <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStatus||'').toUpperCase()}</span>
+                        <i class="ti ti-arrow-right" style="margin:0 6px;color:#9ca3af"></i>
+                        <span style="background:#dcfce7;padding:2px 6px;border-radius:4px;color:#166534;font-weight:600">${(h.newStatus||'').toUpperCase()}</span>
+                    </div>`;
+            }
+
+            return `
+                <div style="display:flex;gap:12px;position:relative;padding-bottom:${isLast ? '0' : '20px'}">
+                    <div style="flex-shrink:0;position:relative">
+                        <div style="width:36px;height:36px;border-radius:50%;background:${meta.bg};color:${meta.color};display:flex;align-items:center;justify-content:center;position:relative;z-index:2">
+                            <i class="ti ${meta.icon}" style="font-size:18px"></i>
+                        </div>
+                        ${!isLast ? `<div style="position:absolute;left:50%;top:36px;bottom:-20px;width:2px;background:#e5e7eb;transform:translateX(-50%)"></div>` : ''}
+                    </div>
+                    <div style="flex:1;padding-top:2px">
+                        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+                            <div style="font-weight:600;color:${meta.color};font-size:13px">${meta.label}</div>
+                            <div style="font-size:11px;color:#9ca3af;white-space:nowrap">${formatDateTime(h.createdAt)}</div>
+                        </div>
+                        <div style="font-size:12px;color:#6b7280;margin-top:2px">
+                            oleh <strong style="color:#374151">${escapeHtml(h.changedByName || '-')}</strong>
+                            ${h.changedByRole ? `<span style="background:#f3f4f6;padding:1px 6px;border-radius:6px;font-size:10px;margin-left:4px">${escapeHtml(h.changedByRole)}</span>` : ''}
+                        </div>
+                        ${changeHtml}
+                        ${h.notes ? `<div style="font-size:12px;color:#6b7280;margin-top:6px;font-style:italic">${escapeHtml(h.notes)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        Swal.fire({
+            title: 'History Task',
+            html: `
+                <div style="text-align:left;max-height:60vh;overflow-y:auto;padding:4px 8px">
+                    <div style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
+                        <div style="color:#6b7280;margin-bottom:4px">Task:</div>
+                        <div style="font-weight:600;color:#111827">${title}</div>
+                        <div style="font-size:12px;color:#6b7280;margin-top:4px">
+                            <i class="ti ti-hash"></i> ${escapeHtml(task?.taskCode || '-')}
+                        </div>
+                    </div>
+                    <div>${timelineHtml}</div>
+                </div>
+            `,
+            width: 650,
+            confirmButtonText: 'Tutup',
+            confirmButtonColor: '#2563eb'
+        });
+    }
+
     function viewTask(id) {
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
@@ -2098,6 +2221,18 @@
             width: 600,
             confirmButtonText: 'Tutup',
             confirmButtonColor: '#2563eb'
+        });
+    }
+
+    function formatDateTime(d) {
+        if (!d) return '-';
+        const date = new Date(d.replace(' ', 'T'));
+        return date.toLocaleString('id-ID', {
+            day:    '2-digit',
+            month:  'short',
+            year:   'numeric',
+            hour:   '2-digit',
+            minute: '2-digit'
         });
     }
 

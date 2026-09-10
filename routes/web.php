@@ -33,6 +33,7 @@ Route::group([AuthMiddleware::class], function () {
     Route::patch('/tasks/{id}/stage',    [TaskController::class, 'updateStage']);
     Route::patch('/tasks/{id}/approve',  [TaskController::class, 'approve']);
     Route::delete('/tasks/{id}',         [TaskController::class, 'destroy']);
+    Route::get('/tasks/{id}/history', [TaskController::class, 'history']);
 
     Route::patch('/tasks/{id}/cancel', [TaskController::class, 'cancel']);
     

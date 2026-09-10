@@ -367,6 +367,51 @@ class TaskController extends BaseController
         }
     }
 
+    public function history($id)
+    {
+        try {
+            $task = Task::query()->withTrashed()->where('id', '=', $id)->first();
+
+            if (!$task) {
+                return $this->json(['success' => false, 'message' => 'Task tidak ditemukan'], 404);
+            }
+
+            $histories = TaskHistory::query()
+                ->where('task_id', '=', $id)
+                ->orderBy('created_at', 'desc')
+                ->get(\PDO::FETCH_ASSOC);
+
+            // Normalisasi untuk frontend
+            $data = array_map(function ($h) {
+                return [
+                    'id'            => (int) $h['id'],
+                    'action'        => $h['action'] ?? '',
+                    'oldStage'      => $h['old_stage']       ?? null,
+                    'newStage'      => $h['new_stage']       ?? null,
+                    'oldStatus'     => $h['old_status']      ?? null,
+                    'newStatus'     => $h['new_status']      ?? null,
+                    'changedByName' => $h['changed_by_name'] ?? null,
+                    'changedByRole' => isset($h['changed_by_role']) ? strtolower($h['changed_by_role']) : null,
+                    'notes'         => $h['notes']           ?? null,
+                    'createdAt'     => $h['created_at']      ?? null,
+                ];
+            }, $histories);
+
+            return $this->json($data, 200);
+
+        } catch (\Throwable $e) {
+            error_log('[TaskController::history] ' . $e->getMessage()
+                . ' @ ' . $e->getFile() . ':' . $e->getLine());
+
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+            ], 500);
+        }
+    }
+
     // GET /api/tasks/stats - Get statistics
     public function stats()
     {
