@@ -2,6 +2,7 @@
 
 use App\Controllers\AuthController;
 use App\Controllers\TaskController;
+use App\Controllers\UtilsController;
 use Bpjs\Framework\Helpers\AuthMiddleware;
 use Bpjs\Framework\Helpers\Route;
 use Bpjs\Framework\Helpers\View;
@@ -19,6 +20,8 @@ Route::get('/tasks/stats',  [TaskController::class, 'stats']);
 Route::get('/tasks/{id}',   [TaskController::class, 'show']);
 
 Route::post('/tasks', [TaskController::class, 'store']);
+Route::get('/endpoint/employee',[UtilsController::class, 'getEmployee']);
+Route::get('/endpoint/dept',[UtilsController::class, 'getAllDept']);
 
 // ============================================================
 // PROTECTED ROUTES AUTH
