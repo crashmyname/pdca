@@ -412,6 +412,89 @@ class TaskController extends BaseController
         }
     }
 
+    // GET /tasks/report - Aggregated report data
+    public function report(Request $request)
+    {
+        try {
+            $query = Task::query();
+
+            if ($request->date_from) {
+                $query->where('task_date', '>=', $request->date_from);
+            }
+            if ($request->date_to) {
+                $query->where('task_date', '<=', $request->date_to);
+            }
+            if ($request->section && $request->section !== 'all') {
+                $query->where('section', '=', $request->section);
+            }
+            if ($request->stage && $request->stage !== 'all') {
+                $query->where('stage', '=', $request->stage);
+            }
+            if ($request->status && $request->status !== 'all') {
+                $query->where('status', '=', $request->status);
+            }
+
+            $tasks = $query->orderBy('task_date', 'desc')
+                        ->orderBy('created_at', 'desc')
+                        ->get(\PDO::FETCH_ASSOC);
+
+            $total = count($tasks);
+            $byStage = ['plan' => 0, 'do' => 0, 'check' => 0, 'act' => 0];
+            $byStatus = ['open' => 0, 'in_progress' => 0, 'done' => 0, 'cancelled' => 0];
+            $bySection = [];
+
+            foreach ($tasks as $t) {
+                $stage  = strtolower($t['stage']  ?? 'plan');
+                $status = strtolower($t['status'] ?? 'open');
+                $section = $t['section'] ?? '-';
+
+                $byStage[$stage]   = ($byStage[$stage] ?? 0) + 1;
+                $byStatus[$status] = ($byStatus[$status] ?? 0) + 1;
+                $bySection[$section] = ($bySection[$section] ?? 0) + 1;
+            }
+
+            $normalized = array_map(function ($t) {
+                return [
+                    'id'              => (int) $t['id'],
+                    'taskCode'        => $t['task_code']       ?? '',
+                    'operatorName'    => $t['operator_name']   ?? '',
+                    'date'            => $t['task_date']       ?? '',
+                    'section'         => $t['section']         ?? '',
+                    'problem'         => $t['problem']         ?? '',
+                    'tempAction'      => $t['temporary_action']?? '',
+                    'permAction'      => $t['permanent_action']?? '',
+                    'deadline'        => $t['deadline']        ?? '',
+                    'pic'             => $t['pic']             ?? '',
+                    'stage'           => strtolower($t['stage']  ?? 'plan'),
+                    'status'          => strtolower($t['status'] ?? 'open'),
+                    'approvedAt'      => $t['approved_at']     ?? null,
+                    'leaderSignature' => $t['ttd_leader']      ?? '',
+                ];
+            }, $tasks);
+
+            return $this->json([
+                'summary' => [
+                    'total'      => $total,
+                    'by_stage'   => $byStage,
+                    'by_status'  => $byStatus,
+                    'by_section' => $bySection,
+                ],
+                'tasks'  => $normalized,
+                'period' => [
+                    'from' => $request->date_from ?: null,
+                    'to'   => $request->date_to   ?: null,
+                ],
+            ], 200);
+
+        } catch (\Throwable $e) {
+            error_log('[TaskController::report] ' . $e->getMessage());
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // GET /api/tasks/stats - Get statistics
     public function stats()
     {

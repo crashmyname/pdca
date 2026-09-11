@@ -327,6 +327,248 @@
             border-color: var(--primary);
         }
 
+        /* ==================== Task Report Styles ==================== */
+        .tr-section {
+            margin-bottom: 16px;
+            page-break-inside: avoid;
+        }
+        .tr-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tr-info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .tr-info-table td {
+            padding: 8px 10px;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .tr-info-table .tr-label {
+            background: #f9fafb;
+            color: #6b7280;
+            font-weight: 600;
+            width: 15%;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .tr-info-table .tr-value {
+            color: #111827;
+            width: 35%;
+        }
+        .tr-content-box {
+            background: #f9fafb;
+            border-left: 4px solid #d1d5db;
+            border-radius: 4px;
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            min-height: 50px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .tr-box-problem {
+            background: #fef2f2;
+            border-left-color: #dc2626;
+            color: #7f1d1d;
+        }
+        .tr-box-temp {
+            background: #fffbeb;
+            border-left-color: #d97706;
+            color: #78350f;
+        }
+        .tr-box-perm {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #14532d;
+        }
+        .tr-box-approval {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #14532d;
+        }
+        .tr-empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .tr-approval-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .tr-approval-grid .tr-label-inline {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Print specific — hanya task report */
+        @media print {
+            /* Sembunyikan semua */
+            body * { visibility: hidden; }
+
+            /* Tampilkan hanya konten report yang sedang aktif */
+            body.print-report #reportContent,
+            body.print-report #reportContent * { visibility: visible; }
+
+            body.print-task-report #taskReportContent,
+            body.print-task-report #taskReportContent * { visibility: visible; }
+
+            body.print-report #reportContent,
+            body.print-task-report #taskReportContent {
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                border: none;
+                padding: 0;
+            }
+        }
+
+        /* Report Modal */
+        .report-filter {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .report-filter .filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        /* Summary Cards Grid */
+        .report-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .report-stat-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        .report-stat-card .report-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.5px;
+        }
+        .report-stat-card .report-stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .report-stat-card.plan  { background: #eff6ff; border-color: #bfdbfe; }
+        .report-stat-card.plan  .report-stat-value { color: #2563eb; }
+        .report-stat-card.do    { background: #f0fdf4; border-color: #bbf7d0; }
+        .report-stat-card.do    .report-stat-value { color: #16a34a; }
+        .report-stat-card.check { background: #fffbeb; border-color: #fde68a; }
+        .report-stat-card.check .report-stat-value { color: #d97706; }
+        .report-stat-card.act   { background: #fef2f2; border-color: #fecaca; }
+        .report-stat-card.act   .report-stat-value { color: #dc2626; }
+
+        /* Status pills */
+        .status-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .status-open        { background: #dbeafe; color: #1e40af; }
+        .status-in_progress { background: #fef3c7; color: #92400e; }
+        .status-done        { background: #dcfce7; color: #166534; }
+        .status-cancelled   { background: #fee2e2; color: #991b1b; }
+
+        .stage-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Report table */
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .report-table th {
+            background: #f3f4f6;
+            color: #374151;
+            font-weight: 600;
+            padding: 8px 6px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .report-table td {
+            padding: 8px 6px;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .report-table tr:nth-child(even) td {
+            background: #fafafa;
+        }
+
+        /* Section breakdown */
+        .section-breakdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .section-breakdown-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .section-breakdown-bar > div {
+            height: 100%;
+            background: #2563eb;
+            border-radius: 4px;
+            transition: width 0.4s;
+        }
+
+        /* Print mode */
+        @media print {
+            body * { visibility: hidden; }
+            #reportContent, #reportContent * { visibility: visible; }
+            #reportContent {
+                position: absolute;
+                left: 0; top: 0;
+                width: 100%;
+                border: none;
+            }
+        }
+
         /* Kanban Board */
         .board-container {
             background: white;
@@ -929,6 +1171,7 @@
             }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
     window.CSRF_TOKEN  = '<?= csrfHeader() ?>';
@@ -958,6 +1201,9 @@
                 </div>
                 <button class="btn btn-primary" onclick="openTaskModal()">
                     <i class="ti ti-plus"></i> Tambah Task
+                </button>
+                <button class="btn" onclick="openReport()" id="reportBtnHeader" style="display:none">
+                    <i class="ti ti-file-analytics"></i> Report
                 </button>
                 <button class="btn btn-success" onclick="toggleRegister()" id="registerBtnHeader" style="display:none">
                     <i class="ti ti-user-plus"></i> User Baru
@@ -1179,6 +1425,9 @@
             </div>
             <div class="modal-footer">
                 <button class="btn" onclick="closeModal('taskModal')">Batal</button>
+                <button class="btn" id="reportTaskBtn" onclick="openTaskReportFromEdit()" style="display:none">
+                    <i class="ti ti-file-description"></i> Report
+                </button>
                 <button class="btn" id="historyTaskBtn" onclick="viewHistory()" style="display:none">
                     <i class="ti ti-history"></i> History
                 </button>
@@ -1267,6 +1516,272 @@
                 <button class="btn" onclick="closeModal('registerModal')">Batal</button>
                 <button class="btn btn-primary" onclick="registerUser()" id="registerBtn">
                     <i class="ti ti-user-plus"></i> Daftar
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content" style="max-width: 1100px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-file-analytics"></i> Laporan PDCA
+                </h3>
+                <button class="modal-close" onclick="closeModal('reportModal')">×</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Filter Bar -->
+                <div class="report-filter">
+                    <div class="filter-row">
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Dari Tanggal</label>
+                            <input type="date" class="form-input" id="reportDateFrom">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Sampai Tanggal</label>
+                            <input type="date" class="form-input" id="reportDateTo">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Seksi</label>
+                            <select class="form-select" id="reportSection">
+                                <option value="all">Semua Seksi</option>
+                                <option value="Produksi">Produksi</option>
+                                <option value="Quality Control">Quality Control</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Logistik">Logistik</option>
+                                <option value="Engineering">Engineering</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Stage</label>
+                            <select class="form-select" id="reportStage">
+                                <option value="all">Semua Stage</option>
+                                <option value="plan">Plan</option>
+                                <option value="do">Do</option>
+                                <option value="check">Check</option>
+                                <option value="act">Act</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="reportStatus">
+                                <option value="all">Semua Status</option>
+                                <option value="open">Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="done">Done</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary" onclick="loadReportData()">
+                                <i class="ti ti-filter"></i> Terapkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Content (yang akan jadi PDF) -->
+                <div id="reportContent" style="background:white;padding:20px;border:1px solid #e5e7eb;border-radius:8px;margin-top:16px">
+
+                    <!-- Header Laporan -->
+                    <div style="text-align:center;border-bottom:2px solid #1f2937;padding-bottom:16px;margin-bottom:20px">
+                        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px">
+                            <div style="width:44px;height:44px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:20px">P</div>
+                            <div style="text-align:left">
+                                <div style="font-size:20px;font-weight:700;color:#1f2937">PDCA KANBAN BOARD</div>
+                                <div style="font-size:12px;color:#6b7280">Continuous Improvement System</div>
+                            </div>
+                        </div>
+                        <div style="font-size:15px;font-weight:600;color:#374151;margin-top:8px">LAPORAN TASK</div>
+                        <div style="font-size:12px;color:#6b7280" id="reportPeriod">Periode: Semua Data</div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div id="reportSummary" class="report-summary-grid"></div>
+
+                    <!-- Section Breakdown -->
+                    <div id="reportSectionBreakdown" style="margin-top:20px"></div>
+
+                    <!-- Task Table -->
+                    <div style="margin-top:20px">
+                        <div style="font-size:14px;font-weight:600;color:#1f2937;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">
+                            Detail Task
+                        </div>
+                        <div id="reportTableWrapper" style="overflow-x:auto"></div>
+                    </div>
+
+                    <!-- Signature Area -->
+                    <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px">
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">Dibuat oleh,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="reportCreatedBy">-</div>
+                            <div style="color:#9ca3af;font-size:10px">Admin/Leader</div>
+                        </div>
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">Diperiksa oleh,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600">____________________</div>
+                            <div style="color:#9ca3af;font-size:10px">Supervisor</div>
+                        </div>
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">Disetujui oleh,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600">____________________</div>
+                            <div style="color:#9ca3af;font-size:10px">Manager</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align:center;font-size:10px;color:#9ca3af;margin-top:24px;border-top:1px solid #e5e7eb;padding-top:8px">
+                        Dicetak: <span id="reportGeneratedAt"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('reportModal')">Tutup</button>
+                <button class="btn" onclick="printReport()">
+                    <i class="ti ti-printer"></i> Print
+                </button>
+                <button class="btn btn-danger" onclick="exportPDF()">
+                    <i class="ti ti-file-type-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Report Per Task Modal -->
+    <div class="modal" id="taskReportModal">
+        <div class="modal-content" style="max-width: 850px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-file-description"></i> Laporan Detail Task
+                </h3>
+                <button class="modal-close" onclick="closeModal('taskReportModal')">×</button>
+            </div>
+            <div class="modal-body" style="background:#f9fafb">
+
+                <!-- Report Content (yang jadi PDF) -->
+                <div id="taskReportContent" style="background:white;padding:24px;border-radius:8px">
+
+                    <!-- Header Laporan -->
+                    <div style="border-bottom:2px solid #1f2937;padding-bottom:16px;margin-bottom:20px">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="width:48px;height:48px;background:#2563eb;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:22px">P</div>
+                            <div style="flex:1">
+                                <div style="font-size:18px;font-weight:700;color:#1f2937">PDCA KANBAN BOARD</div>
+                                <div style="font-size:12px;color:#6b7280">Continuous Improvement System</div>
+                            </div>
+                            <div style="text-align:right">
+                                <div style="font-size:11px;color:#6b7280">Nomor</div>
+                                <div style="font-size:14px;font-weight:700;color:#2563eb" id="trTaskCode">-</div>
+                            </div>
+                        </div>
+                        <div style="text-align:center;font-size:15px;font-weight:600;color:#374151;margin-top:12px;letter-spacing:1px">
+                            LAPORAN TASK PERBAIKAN
+                        </div>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div style="display:flex;gap:8px;margin-bottom:16px;justify-content:center" id="trStatusBadges"></div>
+
+                    <!-- Info Umum -->
+                    <div class="tr-section">
+                        <div class="tr-section-title">
+                            <i class="ti ti-info-circle"></i> Informasi Umum
+                        </div>
+                        <table class="tr-info-table">
+                            <tr>
+                                <td class="tr-label">Operator</td>
+                                <td class="tr-value" id="trOperatorName">-</td>
+                                <td class="tr-label">Tanggal Task</td>
+                                <td class="tr-value" id="trTaskDate">-</td>
+                            </tr>
+                            <tr>
+                                <td class="tr-label">Seksi</td>
+                                <td class="tr-value" id="trSection">-</td>
+                                <td class="tr-label">PIC</td>
+                                <td class="tr-value" id="trPic">-</td>
+                            </tr>
+                            <tr>
+                                <td class="tr-label">Stage</td>
+                                <td class="tr-value" id="trStage">-</td>
+                                <td class="tr-label">Status</td>
+                                <td class="tr-value" id="trStatus">-</td>
+                            </tr>
+                            <tr>
+                                <td class="tr-label">Deadline</td>
+                                <td class="tr-value" id="trDeadline">-</td>
+                                <td class="tr-label">Dibuat</td>
+                                <td class="tr-value" id="trCreatedAt">-</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <!-- Masalah -->
+                    <div class="tr-section">
+                        <div class="tr-section-title" style="color:#dc2626;border-bottom-color:#fecaca">
+                            <i class="ti ti-alert-triangle"></i> Deskripsi Masalah
+                        </div>
+                        <div class="tr-content-box tr-box-problem" id="trProblem">-</div>
+                    </div>
+
+                    <!-- Tindakan Temporary -->
+                    <div class="tr-section">
+                        <div class="tr-section-title" style="color:#d97706;border-bottom-color:#fde68a">
+                            <i class="ti ti-clock-hour-4"></i> Tindakan Temporary
+                        </div>
+                        <div class="tr-content-box tr-box-temp" id="trTempAction">-</div>
+                    </div>
+
+                    <!-- Tindakan Permanent -->
+                    <div class="tr-section">
+                        <div class="tr-section-title" style="color:#16a34a;border-bottom-color:#bbf7d0">
+                            <i class="ti ti-shield-check"></i> Tindakan Permanent
+                        </div>
+                        <div class="tr-content-box tr-box-perm" id="trPermAction">-</div>
+                    </div>
+
+                    <!-- Approval Info (kalau sudah approved) -->
+                    <div class="tr-section" id="trApprovalSection" style="display:none">
+                        <div class="tr-section-title" style="color:#16a34a;border-bottom-color:#86efac">
+                            <i class="ti ti-circle-check"></i> Approval
+                        </div>
+                        <div class="tr-content-box tr-box-approval" id="trApprovalContent"></div>
+                    </div>
+
+                    <!-- Tanda Tangan -->
+                    <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px;page-break-inside:avoid">
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">Dibuat oleh,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignOperator">-</div>
+                            <div style="color:#9ca3af;font-size:10px">Operator</div>
+                        </div>
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">PIC,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignPic">-</div>
+                            <div style="color:#9ca3af;font-size:10px">Penanggung Jawab</div>
+                        </div>
+                        <div style="text-align:center;width:30%">
+                            <div style="color:#6b7280;margin-bottom:60px">Disetujui oleh,</div>
+                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignLeader">-</div>
+                            <div style="color:#9ca3af;font-size:10px">Leader/Admin</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="text-align:center;font-size:10px;color:#9ca3af;margin-top:24px;border-top:1px solid #e5e7eb;padding-top:8px">
+                        Dicetak: <span id="trGeneratedAt"></span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('taskReportModal')">Tutup</button>
+                <button class="btn" onclick="printTaskReport()">
+                    <i class="ti ti-printer"></i> Print
+                </button>
+                <button class="btn btn-danger" onclick="exportTaskPDF()">
+                    <i class="ti ti-file-type-pdf"></i> Export PDF
                 </button>
             </div>
         </div>
@@ -1618,6 +2133,7 @@
         const $loginBtn  = $('#loginBtn');
         const $noticeBar = $('#noticeBar');
         const $registerBtnHeader = $('#registerBtnHeader');
+        const $reportBtnHeader   = $('#reportBtnHeader');
 
         if (state.currentUser) {
             $userName.text(state.currentUser.name);
@@ -1628,16 +2144,19 @@
             const role = state.currentUser.role;
             let label = '';
             let color = '';
-
+            $reportBtnHeader.show();
             if (role === 'admin') {
                 label = 'Admin';
                 color = '#7c3aed';
+                $registerBtnHeader.show();
             } else if (role === 'leader') {
                 label = 'Leader';
                 color = '#16a34a';
+                $registerBtnHeader.show();
             } else {
                 label = role.charAt(0).toUpperCase() + role.slice(1);
                 color = '#2563eb';
+                $registerBtnHeader.hide();
             }
 
             $noticeBar.html(
@@ -1651,6 +2170,7 @@
                 $registerBtnHeader.show();
             } else {
                 $registerBtnHeader.hide();
+                $reportBtnHeader.hide();
             }
 
         } else {
@@ -1803,6 +2323,7 @@
         $('#leaderSection').css('display', isLeader ? 'block' : 'none');
 
         $('#historyTaskBtn').hide();
+        $('#reportTaskBtn').hide();
         $('#approveTaskBtn').hide();
         $('#cancelTaskBtn').hide();
 
@@ -1927,6 +2448,7 @@
         }
 
         $('#historyTaskBtn').show();
+        $('#reportTaskBtn').show();
 
         if (isDone || isCancelled) {
             $('#operatorName, #taskDate, #section, #problem, #tempAction, #permAction, #deadline, #pic')
@@ -2161,6 +2683,401 @@
         });
     }
 
+    // ============================================================
+    // REPORT
+    // ============================================================
+    let reportData = null;
+
+    function openReport() {
+        if (!canDragDrop()) {
+            showAlert('warning', 'Akses Ditolak', 'Silakan login sebagai leader/admin untuk melihat report.');
+            return;
+        }
+
+        // Set default date range: bulan ini
+        const now = new Date();
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+        const fmt = d => d.toISOString().split('T')[0];
+        if (!$('#reportDateFrom').val()) $('#reportDateFrom').val(fmt(firstDay));
+        if (!$('#reportDateTo').val())   $('#reportDateTo').val(fmt(lastDay));
+
+        openModal('reportModal');
+        loadReportData();
+    }
+
+    async function loadReportData() {
+        Swal.fire({
+            title: 'Memuat laporan...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const res = await api('/tasks/report', {
+                query: {
+                    date_from: $('#reportDateFrom').val() || '',
+                    date_to:   $('#reportDateTo').val()   || '',
+                    section:   $('#reportSection').val(),
+                    stage:     $('#reportStage').val(),
+                    status:    $('#reportStatus').val(),
+                }
+            });
+
+            reportData = res;
+            renderReport(res);
+            Swal.close();
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Memuat Laporan', err.message);
+        }
+    }
+
+    function renderReport(data) {
+        const summary = data.summary || {};
+        const tasks   = data.tasks   || [];
+        const period  = data.period  || {};
+
+        // Period text
+        let periodText = 'Periode: Semua Data';
+        if (period.from && period.to) {
+            periodText = `Periode: ${formatDate(period.from)} — ${formatDate(period.to)}`;
+        } else if (period.from) {
+            periodText = `Periode: Sejak ${formatDate(period.from)}`;
+        } else if (period.to) {
+            periodText = `Periode: Sampai ${formatDate(period.to)}`;
+        }
+        $('#reportPeriod').text(periodText);
+
+        // Summary cards
+        const byStage = summary.by_stage || {};
+        $('#reportSummary').html(`
+            <div class="report-stat-card plan">
+                <div class="report-stat-label">Plan</div>
+                <div class="report-stat-value">${byStage.plan || 0}</div>
+            </div>
+            <div class="report-stat-card do">
+                <div class="report-stat-label">Do</div>
+                <div class="report-stat-value">${byStage.do || 0}</div>
+            </div>
+            <div class="report-stat-card check">
+                <div class="report-stat-label">Check</div>
+                <div class="report-stat-value">${byStage.check || 0}</div>
+            </div>
+            <div class="report-stat-card act">
+                <div class="report-stat-label">Act</div>
+                <div class="report-stat-value">${byStage.act || 0}</div>
+            </div>
+        `);
+
+        // Section breakdown
+        const bySection = summary.by_section || {};
+        const sectionKeys = Object.keys(bySection).sort((a, b) => bySection[b] - bySection[a]);
+        const maxSection = Math.max(1, ...Object.values(bySection));
+
+        let sectionHtml = `
+            <div style="font-size:14px;font-weight:600;color:#1f2937;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">
+                Distribusi per Seksi
+            </div>`;
+
+        if (sectionKeys.length === 0) {
+            sectionHtml += `<div style="text-align:center;color:#9ca3af;font-size:12px;padding:12px">Tidak ada data</div>`;
+        } else {
+            sectionKeys.forEach(key => {
+                const count = bySection[key];
+                const pct   = Math.round((count / maxSection) * 100);
+                sectionHtml += `
+                    <div class="section-breakdown-item">
+                        <div style="width:140px;font-weight:500;color:#374151">${escapeHtml(key)}</div>
+                        <div class="section-breakdown-bar"><div style="width:${pct}%"></div></div>
+                        <div style="width:40px;text-align:right;font-weight:600;color:#2563eb">${count}</div>
+                    </div>`;
+            });
+        }
+        $('#reportSectionBreakdown').html(sectionHtml);
+
+        // Status summary
+        const byStatus = summary.by_status || {};
+
+        // Table
+        let tableHtml = '';
+        if (tasks.length === 0) {
+            tableHtml = `<div style="text-align:center;color:#9ca3af;font-size:12px;padding:20px;border:1px dashed #e5e7eb;border-radius:8px">Tidak ada task pada periode ini</div>`;
+        } else {
+            tableHtml = `
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th style="width:30px">No</th>
+                            <th style="width:130px">Kode</th>
+                            <th style="width:90px">Tanggal</th>
+                            <th style="width:100px">Seksi</th>
+                            <th>Masalah</th>
+                            <th style="width:70px">Stage</th>
+                            <th style="width:90px">Status</th>
+                            <th style="width:90px">PIC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tasks.map((t, i) => `
+                            <tr>
+                                <td style="text-align:center">${i + 1}</td>
+                                <td><strong>${escapeHtml(t.taskCode)}</strong></td>
+                                <td>${formatDate(t.date)}</td>
+                                <td>${escapeHtml(t.section)}</td>
+                                <td>${escapeHtml(t.problem)}</td>
+                                <td style="text-align:center">
+                                    <span class="stage-pill">${t.stage}</span>
+                                </td>
+                                <td style="text-align:center">
+                                    <span class="status-pill status-${t.status}">${t.status}</span>
+                                </td>
+                                <td>${escapeHtml(t.pic || '-')}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align:right;font-weight:600">TOTAL</td>
+                            <td colspan="4" style="font-weight:600">
+                                ${tasks.length} task — 
+                                <span class="status-pill status-done">${byStatus.done || 0} done</span>
+                                <span class="status-pill status-in_progress">${byStatus.in_progress || 0} progress</span>
+                                <span class="status-pill status-open">${byStatus.open || 0} open</span>
+                                <span class="status-pill status-cancelled">${byStatus.cancelled || 0} cancelled</span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+        }
+        $('#reportTableWrapper').html(tableHtml);
+
+        // Footer meta
+        $('#reportCreatedBy').text(state.currentUser?.name || '-');
+        $('#reportGeneratedAt').text(new Date().toLocaleString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        }));
+    }
+
+    // ============================================================
+    // EXPORT PDF
+    // ============================================================
+    async function exportPDF() {
+        const element = document.getElementById('reportContent');
+        if (!element) return;
+
+        const periodFrom = $('#reportDateFrom').val() || 'all';
+        const periodTo   = $('#reportDateTo').val()   || 'all';
+        const filename   = `laporan-pdca-${periodFrom}-${periodTo}.pdf`;
+
+        Swal.fire({
+            title: 'Menyiapkan PDF...',
+            html: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            await html2pdf().set({
+                margin:      [10, 10, 10, 10],
+                filename:    filename,
+                image:       { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+            }).from(element).save();
+
+            Swal.close();
+            showToast('PDF berhasil diunduh', 'success');
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Export PDF', err.message);
+        }
+    }
+
+    function printReport() {
+        document.body.classList.add('print-report');
+        setTimeout(() => {
+            window.print();
+            setTimeout(() => document.body.classList.remove('print-report'), 1000);
+        }, 100);
+    }
+
+    // ============================================================
+    // TASK REPORT (Per Task)
+    // ============================================================
+    function openTaskReportFromEdit() {
+        const id = $('#taskId').val();
+        if (!id) return;
+        openTaskReport(parseInt(id, 10));
+    }
+
+    function openTaskReport(id) {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) {
+            showAlert('error', 'Error', 'Task tidak ditemukan');
+            return;
+        }
+
+        // ============================================================
+        // Header Info
+        // ============================================================
+        $('#trTaskCode').text(task.taskCode || '-');
+        $('#trOperatorName').text(task.operatorName || '-');
+        $('#trTaskDate').text(task.date ? formatDateLong(task.date) : '-');
+        $('#trSection').text(task.section || '-');
+        $('#trPic').text(task.pic || '-');
+        $('#trStage').text((task.stage || '-').toUpperCase());
+        $('#trStatus').text((task.status || '-').toUpperCase());
+        $('#trDeadline').text(task.deadline ? formatDateLong(task.deadline) : '-');
+        $('#trCreatedAt').text(task.createdAt ? formatDateTime(task.createdAt) : '-');
+
+        // ============================================================
+        // Status Badges
+        // ============================================================
+        let badges = [];
+        const isDone      = task.status === 'done';
+        const isCancelled = task.status === 'cancelled';
+        const isInProgress = task.status === 'in_progress';
+
+        if (isDone) {
+            badges.push(`<span class="badge-status badge-approved"><i class="ti ti-circle-check"></i> APPROVED</span>`);
+        } else if (isCancelled) {
+            badges.push(`<span class="badge-status badge-cancelled"><i class="ti ti-circle-x"></i> CANCELLED</span>`);
+        } else if (task.stage === 'act' && isInProgress) {
+            badges.push(`<span class="badge-status badge-pending-approval"><i class="ti ti-clock-hour-4"></i> MENUNGGU APPROVAL</span>`);
+        } else if (isInProgress) {
+            badges.push(`<span class="badge-status badge-in-progress"><i class="ti ti-bolt"></i> IN PROGRESS</span>`);
+        } else {
+            badges.push(`<span class="badge-status" style="background:#dbeafe;color:#1e40af;border:1px solid #93c5fd"><i class="ti ti-flag"></i> OPEN</span>`);
+        }
+        badges.push(`<span class="stage-pill">STAGE: ${(task.stage || '').toUpperCase()}</span>`);
+        $('#trStatusBadges').html(badges.join(''));
+
+        // ============================================================
+        // Content Boxes
+        // ============================================================
+        $('#trProblem').html(
+            task.problem
+                ? escapeHtml(task.problem)
+                : '<span class="tr-empty">Tidak ada deskripsi masalah</span>'
+        );
+        $('#trTempAction').html(
+            task.tempAction
+                ? escapeHtml(task.tempAction)
+                : '<span class="tr-empty">Belum ada tindakan temporary</span>'
+        );
+        $('#trPermAction').html(
+            task.permAction
+                ? escapeHtml(task.permAction)
+                : '<span class="tr-empty">Belum ada tindakan permanent</span>'
+        );
+
+        // ============================================================
+        // Approval Section
+        // ============================================================
+        if (task.approvedAt || task.leaderSignature) {
+            $('#trApprovalSection').show();
+            $('#trApprovalContent').html(`
+                <div class="tr-approval-grid">
+                    <div>
+                        <span class="tr-label-inline">Tanda Tangan:</span>
+                        <strong>${escapeHtml(task.leaderSignature || '-')}</strong>
+                    </div>
+                    <div>
+                        <span class="tr-label-inline">Waktu Approval:</span>
+                        <strong>${task.approvedAt ? formatDateTime(task.approvedAt) : '-'}</strong>
+                    </div>
+                </div>
+            `);
+        } else {
+            $('#trApprovalSection').hide();
+        }
+
+        // ============================================================
+        // Signature Area
+        // ============================================================
+        $('#trSignOperator').text(task.operatorName || '-');
+        $('#trSignPic').text(task.pic || '-');
+        $('#trSignLeader').text(task.leaderSignature || '-');
+
+        // ============================================================
+        // Footer
+        // ============================================================
+        $('#trGeneratedAt').text(new Date().toLocaleString('id-ID', {
+            day: '2-digit', month: 'long', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        }));
+
+        // Show modal
+        openModal('taskReportModal');
+    }
+
+    // ============================================================
+    // EXPORT PDF — Per Task
+    // ============================================================
+    async function exportTaskPDF() {
+        const element = document.getElementById('taskReportContent');
+        if (!element) return;
+
+        const taskCode = $('#trTaskCode').text() || 'task';
+        const filename = `laporan-${taskCode}.pdf`;
+
+        Swal.fire({
+            title: 'Menyiapkan PDF...',
+            html: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            await html2pdf().set({
+                margin:      [10, 10, 10, 10],
+                filename:    filename,
+                image:       { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+            }).from(element).save();
+
+            Swal.close();
+            showToast('PDF berhasil diunduh', 'success');
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Export PDF', err.message);
+        }
+    }
+
+    // ============================================================
+    // PRINT — Per Task
+    // ============================================================
+    function printTaskReport() {
+        document.body.classList.add('print-task-report');
+        setTimeout(() => {
+            window.print();
+            // Hapus class setelah print dialog ditutup
+            setTimeout(() => document.body.classList.remove('print-task-report'), 1000);
+        }, 100);
+    }
+
+    // ============================================================
+    // Helper: Format Tanggal Panjang (Indonesian)
+    // ============================================================
+    function formatDateLong(d) {
+        if (!d) return '-';
+        const date = new Date(d);
+        return date.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
     function viewTask(id) {
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
@@ -2219,8 +3136,16 @@
             title: 'Detail Task',
             html: html,
             width: 600,
-            confirmButtonText: 'Tutup',
-            confirmButtonColor: '#2563eb'
+            showCancelButton: true,
+            confirmButtonText: '<i class="ti ti-file-description"></i> Report',
+            cancelButtonText: 'Tutup',
+            confirmButtonColor: '#2563eb',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true
+        }).then(result => {
+            if (result.isConfirmed) {
+                openTaskReport(id);
+            }
         });
     }
 
