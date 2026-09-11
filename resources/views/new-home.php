@@ -327,6 +327,43 @@
             border-color: var(--primary);
         }
 
+        /* QR Code signature */
+        .signature-box {
+            text-align: center;
+            width: 30%;
+            page-break-inside: avoid;
+        }
+        .signature-box .sig-label {
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        .signature-qrcode {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 6px;
+        }
+        .signature-qrcode img,
+        .signature-qrcode canvas {
+            display: block;
+            width: 80px !important;
+            height: 80px !important;
+        }
+        .signature-qrcode[data-signature=""] {
+            display: none;
+        }
+        .signature-box .sig-name {
+            border-top: 1px solid #374151;
+            padding-top: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .signature-box .sig-role {
+            color: #9ca3af;
+            font-size: 10px;
+        }
+
         /* ==================== Task Report Styles ==================== */
         .tr-section {
             margin-bottom: 16px;
@@ -1172,6 +1209,7 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
     window.CSRF_TOKEN  = '<?= csrfHeader() ?>';
@@ -1613,22 +1651,29 @@
                     </div>
 
                     <!-- Signature Area -->
-                    <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px">
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">Dibuat oleh,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="reportCreatedBy">-</div>
-                            <div style="color:#9ca3af;font-size:10px">Admin/Leader</div>
+                    <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px;page-break-inside:avoid">
+
+                        <div class="signature-box">
+                            <div class="sig-label">Dibuat oleh,</div>
+                            <div class="signature-qrcode" data-type="report-creator" data-signature=""></div>
+                            <div class="sig-name" id="reportCreatedBy">-</div>
+                            <div class="sig-role">Admin/Leader</div>
                         </div>
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">Diperiksa oleh,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600">____________________</div>
-                            <div style="color:#9ca3af;font-size:10px">Supervisor</div>
+
+                        <div class="signature-box">
+                            <div class="sig-label">Diperiksa oleh,</div>
+                            <div class="signature-qrcode" data-type="report-checker" data-signature=""></div>
+                            <div class="sig-name">____________________</div>
+                            <div class="sig-role">Supervisor</div>
                         </div>
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">Disetujui oleh,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600">____________________</div>
-                            <div style="color:#9ca3af;font-size:10px">Manager</div>
+
+                        <div class="signature-box">
+                            <div class="sig-label">Disetujui oleh,</div>
+                            <div class="signature-qrcode" data-type="report-approver" data-signature=""></div>
+                            <div class="sig-name">____________________</div>
+                            <div class="sig-role">Manager</div>
                         </div>
+
                     </div>
 
                     <!-- Footer -->
@@ -1751,21 +1796,28 @@
 
                     <!-- Tanda Tangan -->
                     <div style="margin-top:32px;display:flex;justify-content:space-between;font-size:12px;page-break-inside:avoid">
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">Dibuat oleh,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignOperator">-</div>
-                            <div style="color:#9ca3af;font-size:10px">Operator</div>
+
+                        <div class="signature-box">
+                            <div class="sig-label">Dibuat oleh,</div>
+                            <div class="signature-qrcode" data-type="operator" data-signature=""></div>
+                            <div class="sig-name" id="trSignOperator">-</div>
+                            <div class="sig-role">Operator</div>
                         </div>
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">PIC,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignPic">-</div>
-                            <div style="color:#9ca3af;font-size:10px">Penanggung Jawab</div>
+
+                        <div class="signature-box">
+                            <div class="sig-label">PIC,</div>
+                            <div class="signature-qrcode" data-type="pic" data-signature=""></div>
+                            <div class="sig-name" id="trSignPic">-</div>
+                            <div class="sig-role">Penanggung Jawab</div>
                         </div>
-                        <div style="text-align:center;width:30%">
-                            <div style="color:#6b7280;margin-bottom:60px">Disetujui oleh,</div>
-                            <div style="border-top:1px solid #374151;padding-top:4px;font-weight:600" id="trSignLeader">-</div>
-                            <div style="color:#9ca3af;font-size:10px">Leader/Admin</div>
+
+                        <div class="signature-box">
+                            <div class="sig-label">Disetujui oleh,</div>
+                            <div class="signature-qrcode" data-type="leader" data-signature=""></div>
+                            <div class="sig-name" id="trSignLeader">-</div>
+                            <div class="sig-role">Leader/Admin</div>
                         </div>
+
                     </div>
 
                     <!-- Footer -->
@@ -2750,7 +2802,9 @@
         }
         $('#reportPeriod').text(periodText);
 
-        // Summary cards
+        // ============================================================
+        // Summary Cards
+        // ============================================================
         const byStage = summary.by_stage || {};
         $('#reportSummary').html(`
             <div class="report-stat-card plan">
@@ -2771,10 +2825,12 @@
             </div>
         `);
 
-        // Section breakdown
-        const bySection = summary.by_section || {};
+        // ============================================================
+        // Section Breakdown
+        // ============================================================
+        const bySection   = summary.by_section || {};
         const sectionKeys = Object.keys(bySection).sort((a, b) => bySection[b] - bySection[a]);
-        const maxSection = Math.max(1, ...Object.values(bySection));
+        const maxSection  = Math.max(1, ...Object.values(bySection));
 
         let sectionHtml = `
             <div style="font-size:14px;font-weight:600;color:#1f2937;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px">
@@ -2797,10 +2853,11 @@
         }
         $('#reportSectionBreakdown').html(sectionHtml);
 
-        // Status summary
+        // ============================================================
+        // Task Table
+        // ============================================================
         const byStatus = summary.by_status || {};
 
-        // Table
         let tableHtml = '';
         if (tasks.length === 0) {
             tableHtml = `<div style="text-align:center;color:#9ca3af;font-size:12px;padding:20px;border:1px dashed #e5e7eb;border-radius:8px">Tidak ada task pada periode ini</div>`;
@@ -2854,20 +2911,39 @@
         }
         $('#reportTableWrapper').html(tableHtml);
 
-        // Footer meta
-        $('#reportCreatedBy').text(state.currentUser?.name || '-');
+        // ============================================================
+        // Footer Meta
+        // ============================================================
+        const creatorName = state.currentUser?.name || '-';
+        $('#reportCreatedBy').text(creatorName);
         $('#reportGeneratedAt').text(new Date().toLocaleString('id-ID', {
             day: '2-digit', month: 'long', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
         }));
+
+        // ============================================================
+        // Render QR Code
+        // ============================================================
+        setTimeout(() => {
+            renderSignatureQRCodes('#reportContent', {
+                'report-creator':  creatorName !== '-' ? creatorName : '',
+                'report-checker':  '',
+                'report-approver': '',
+            });
+        }, 200);
     }
 
-    // ============================================================
-    // EXPORT PDF
-    // ============================================================
     async function exportPDF() {
         const element = document.getElementById('reportContent');
         if (!element) return;
+
+        // Re-render QR Code
+        const creatorName = state.currentUser?.name || '';
+        renderSignatureQRCodes('#reportContent', {
+            'report-creator':  creatorName,
+            'report-checker':  '',
+            'report-approver': '',
+        });
 
         const periodFrom = $('#reportDateFrom').val() || 'all';
         const periodTo   = $('#reportDateTo').val()   || 'all';
@@ -2940,8 +3016,8 @@
         // Status Badges
         // ============================================================
         let badges = [];
-        const isDone      = task.status === 'done';
-        const isCancelled = task.status === 'cancelled';
+        const isDone       = task.status === 'done';
+        const isCancelled  = task.status === 'cancelled';
         const isInProgress = task.status === 'in_progress';
 
         if (isDone) {
@@ -2999,11 +3075,18 @@
         }
 
         // ============================================================
-        // Signature Area
+        // Signature Fallback
         // ============================================================
-        $('#trSignOperator').text(task.operatorName || '-');
-        $('#trSignPic').text(task.pic || '-');
-        $('#trSignLeader').text(task.leaderSignature || '-');
+        const sigOperator = task.operatorName || '';
+        const sigPic      = task.pic          || '';
+        const sigLeader   = task.leaderSignature
+                        || task.approvedByName
+                        || task.createdByName
+                        || 'Not Signed';
+
+        $('#trSignOperator').text(sigOperator || '-');
+        $('#trSignPic').text(sigPic || '-');
+        $('#trSignLeader').text(sigLeader || '-');
 
         // ============================================================
         // Footer
@@ -3015,14 +3098,40 @@
 
         // Show modal
         openModal('taskReportModal');
+
+        // ============================================================
+        // Render QR Code — setelah modal terbuka
+        // ============================================================
+        setTimeout(() => {
+            renderSignatureQRCodes('#taskReportContent', {
+                operator: sigOperator,
+                pic:      sigPic,
+                leader:   sigLeader,
+            });
+        }, 200);
     }
 
-    // ============================================================
-    // EXPORT PDF — Per Task
-    // ============================================================
     async function exportTaskPDF() {
         const element = document.getElementById('taskReportContent');
         if (!element) return;
+
+        // Re-render QR Code sebelum capture
+        const id = parseInt($('#taskId').val() || '0', 10);
+        const task = state.tasks.find(t => t.id === id);
+        if (task) {
+            const sigOperator = task.operatorName || '';
+            const sigPic      = task.pic          || '';
+            const sigLeader   = task.leaderSignature
+                            || task.approvedByName
+                            || task.createdByName
+                            || 'Not Signed';
+
+            renderSignatureQRCodes('#taskReportContent', {
+                operator: sigOperator,
+                pic:      sigPic,
+                leader:   sigLeader,
+            });
+        }
 
         const taskCode = $('#trTaskCode').text() || 'task';
         const filename = `laporan-${taskCode}.pdf`;
@@ -3146,6 +3255,60 @@
             if (result.isConfirmed) {
                 openTaskReport(id);
             }
+        });
+    }
+
+    // ============================================================
+    // QR CODE SIGNATURE
+    // ============================================================
+    function renderQRCode(containerEl, text) {
+        if (!containerEl) return;
+
+        const value = String(text || '').trim();
+
+        // Sembunyikan kalau kosong
+        if (!value) {
+            containerEl.innerHTML = '';
+            containerEl.dataset.signature = '';
+            return;
+        }
+
+        // Cek library
+        if (typeof QRCode === 'undefined') {
+            console.warn('[QRCode] library belum di-load. Tambahkan CDN di <head>.');
+            containerEl.innerHTML = '';
+            containerEl.dataset.signature = '';
+            return;
+        }
+
+        try {
+            // Bersihkan isi lama
+            containerEl.innerHTML = '';
+            containerEl.dataset.signature = value;
+
+            new QRCode(containerEl, {
+                text: value,
+                width: 80,
+                height: 80,
+                colorDark: '#1f2937',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        } catch (e) {
+            console.warn('[QRCode] gagal render:', value, e);
+            containerEl.innerHTML = '';
+            containerEl.dataset.signature = '';
+        }
+    }
+
+    function renderSignatureQRCodes(containerSelector, signatures) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        container.querySelectorAll('.signature-qrcode').forEach(el => {
+            const type = el.dataset.type || '';
+            const text = signatures[type] || '';
+            renderQRCode(el, text);
         });
     }
 
