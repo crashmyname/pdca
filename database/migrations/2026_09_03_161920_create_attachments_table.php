@@ -21,7 +21,8 @@ class CreateAttachmentsTable
         $table->integer('file_size')->nullable();
         $table->bigInteger('uploaded_by')->notNullable();
         $table->string('uploaded_by_name')->nullable();
-        $table->timestamps();
+        $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
+        $table->timestamp('updated_at')->default('CURRENT_TIMESTAMP');
         $table->softDeletes();
         
         //  Add indexes
