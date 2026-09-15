@@ -90,7 +90,6 @@ class TaskController extends BaseController
             return $this->json($task, 201);
 
         } catch (\Throwable $e) {
-            // ⬅ pakai \Throwable, bukan \Exception, supaya Error juga ketangkep
             error_log('[TaskController::store] ' . $e->getMessage()
                 . ' @ ' . $e->getFile() . ':' . $e->getLine());
 

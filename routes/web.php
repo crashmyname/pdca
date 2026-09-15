@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\AuthController;
+use App\Controllers\TaskAttachmentController;
 use App\Controllers\TaskController;
 use App\Controllers\UtilsController;
 use Bpjs\Framework\Helpers\AuthMiddleware;
@@ -39,4 +40,9 @@ Route::group([AuthMiddleware::class], function () {
     Route::patch('/tasks/{id}/cancel', [TaskController::class, 'cancel']);
     Route::get('/tasks/report', [TaskController::class, 'report']);
     
+    Route::get('/tasks/{task}/attachments', [TaskAttachmentController::class, 'index']);
+    Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store']);
+    Route::delete('/tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy']);
+    // Route::prefix('/tasks/{task}', function(){
+    // });
 });

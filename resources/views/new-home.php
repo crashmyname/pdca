@@ -168,6 +168,14 @@
             background: white; cursor: pointer; transition: all 0.2s;
         }
         .filter-select:focus, .date-input:focus { outline: none; border-color: var(--primary); }
+        .quick-date-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .btn-quick-date { padding: 6px 12px; font-size: 12px; }
+        .btn-quick-date.btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
 
         /* Select2 Theme */
         .select2-container--default .select2-selection--single {
@@ -832,6 +840,121 @@
             }
         }
     </style>
+    <style>
+        /* Documents Upload */
+        .doc-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 640px) { .doc-upload-grid { grid-template-columns: 1fr; } }
+
+        .doc-upload-card {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            background: white;
+            transition: all 0.2s;
+        }
+        .doc-upload-card.has-file { border-color: #86efac; background: #f0fdf4; }
+
+        .doc-upload-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .doc-upload-header .doc-title { font-weight: 600; color: var(--gray-800); flex: 1; }
+        .doc-upload-header .doc-status {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            color: var(--gray-500);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .doc-upload-card.has-file .doc-status { background: #dcfce7; color: #166534; }
+
+        .doc-dropzone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius-xs);
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+        .doc-dropzone:hover, .doc-dropzone.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .doc-dropzone .doc-icon { font-size: 26px; color: var(--gray-400); display: block; margin-bottom: 6px; }
+        .doc-dropzone .doc-hint { font-size: 12px; color: var(--gray-600); font-weight: 500; }
+        .doc-dropzone .doc-sub { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+
+        .doc-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: var(--radius-xs);
+            border: 1px solid #bbf7d0;
+        }
+        .doc-info { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+        .doc-info-icon { font-size: 20px; color: var(--success); flex-shrink: 0; }
+        .doc-info-text { min-width: 0; }
+        .doc-info-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-800);
+            display: block;
+            text-decoration: none;
+            /* ⬇️ WAJIB untuk wrap */
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            /* Batasi maksimal 3 baris biar tidak terlalu tinggi */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.35;
+        }
+        .doc-info-name:hover { color: var(--primary); text-decoration: underline; }
+        .doc-info-meta { font-size: 10px; color: var(--gray-500); }
+        .doc-actions { display: flex; gap: 4px; flex-shrink: 0; }
+        .doc-actions .btn { padding: 4px 6px; }
+
+        .doc-progress-bar {
+            height: 4px;
+            background: var(--gray-100);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .doc-progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0;
+            transition: width 0.2s;
+        }
+        .doc-upload-card.locked .doc-actions {
+            display: none !important;
+        }
+        .doc-upload-card.locked .doc-dropzone {
+            cursor: not-allowed;
+            opacity: 0.55;
+            pointer-events: none;
+        }
+        .doc-upload-card.locked .doc-status {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -934,6 +1057,23 @@
                     <i class="ti ti-refresh"></i> Reset
                 </button>
             </div>
+            <div class="filter-row" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-200)">
+                <span style="font-size:11px;color:var(--gray-500);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">Quick Filter:</span>
+                <div class="quick-date-filters">
+                    <button class="btn btn-sm btn-quick-date btn-primary" data-range="today" onclick="setQuickDate('today')">
+                        <i class="ti ti-calendar-event"></i> Hari Ini
+                    </button>
+                    <button class="btn btn-sm btn-quick-date" data-range="week" onclick="setQuickDate('week')">
+                        <i class="ti ti-calendar-week"></i> 7 Hari
+                    </button>
+                    <button class="btn btn-sm btn-quick-date" data-range="month" onclick="setQuickDate('month')">
+                        <i class="ti ti-calendar-month"></i> Bulan Ini
+                    </button>
+                    <button class="btn btn-sm btn-quick-date" data-range="all" onclick="setQuickDate('all')">
+                        <i class="ti ti-calendar"></i> Semua
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Kanban Board -->
@@ -1029,6 +1169,121 @@
                                 <label class="form-label required">Masalah</label>
                                 <textarea class="form-textarea" id="problem" required placeholder="Deskripsikan masalah yang terjadi..."></textarea>
                             </div>
+                        </div>
+                    </div>
+                    <div class="form-section" id="documentsSection">
+                        <div class="form-section-title">
+                            <i class="ti ti-paperclip"></i> Dokumen Pendukung
+                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Wajib 3 file untuk approve</span>
+                        </div>
+
+                        <div class="doc-upload-grid">
+
+                            <!-- 4M -->
+                            <div class="doc-upload-card" data-type="4m">
+                                <div class="doc-upload-header">
+                                    <i class="ti ti-file-text"></i>
+                                    <span class="doc-title">4M</span>
+                                    <span class="doc-status" id="docStatus4m">Belum ada</span>
+                                </div>
+                                <div class="doc-dropzone" id="docDrop4m" onclick="pickFile('4m')"
+                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
+                                    ondrop="handleDocDrop(event, '4m')">
+                                    <i class="ti ti-cloud-upload doc-icon"></i>
+                                    <div class="doc-hint">Klik atau seret file ke sini</div>
+                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
+                                </div>
+                                <div class="doc-preview" id="docPreview4m" style="display:none">
+                                    <div class="doc-info">
+                                        <i class="ti ti-file doc-info-icon"></i>
+                                        <div class="doc-info-text">
+                                            <a href="#" target="_blank" id="docLink4m" class="doc-info-name">-</a>
+                                            <div class="doc-info-meta" id="docMeta4m">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="doc-actions">
+                                        <button type="button" class="btn btn-sm" onclick="pickFile('4m')" title="Ganti">
+                                            <i class="ti ti-refresh"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('4m')" title="Hapus">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="file" id="docInput4m" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, '4m')">
+                            </div>
+
+                            <!-- Logbook -->
+                            <div class="doc-upload-card" data-type="logbook">
+                                <div class="doc-upload-header">
+                                    <i class="ti ti-notebook"></i>
+                                    <span class="doc-title">Logbook</span>
+                                    <span class="doc-status" id="docStatusLogbook">Belum ada</span>
+                                </div>
+                                <div class="doc-dropzone" id="docDropLogbook" onclick="pickFile('logbook')"
+                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
+                                    ondrop="handleDocDrop(event, 'logbook')">
+                                    <i class="ti ti-cloud-upload doc-icon"></i>
+                                    <div class="doc-hint">Klik atau seret file ke sini</div>
+                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
+                                </div>
+                                <div class="doc-preview" id="docPreviewLogbook" style="display:none">
+                                    <div class="doc-info">
+                                        <i class="ti ti-file doc-info-icon"></i>
+                                        <div class="doc-info-text">
+                                            <a href="#" target="_blank" id="docLinkLogbook" class="doc-info-name">-</a>
+                                            <div class="doc-info-meta" id="docMetaLogbook">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="doc-actions">
+                                        <button type="button" class="btn btn-sm" onclick="pickFile('logbook')" title="Ganti">
+                                            <i class="ti ti-refresh"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('logbook')" title="Hapus">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="file" id="docInputLogbook" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, 'logbook')">
+                            </div>
+
+                            <!-- Nursecall -->
+                            <div class="doc-upload-card" data-type="nursecall">
+                                <div class="doc-upload-header">
+                                    <i class="ti ti-bell"></i>
+                                    <span class="doc-title">Nursecall</span>
+                                    <span class="doc-status" id="docStatusNursecall">Belum ada</span>
+                                </div>
+                                <div class="doc-dropzone" id="docDropNursecall" onclick="pickFile('nursecall')"
+                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
+                                    ondrop="handleDocDrop(event, 'nursecall')">
+                                    <i class="ti ti-cloud-upload doc-icon"></i>
+                                    <div class="doc-hint">Klik atau seret file ke sini</div>
+                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
+                                </div>
+                                <div class="doc-preview" id="docPreviewNursecall" style="display:none">
+                                    <div class="doc-info">
+                                        <i class="ti ti-file doc-info-icon"></i>
+                                        <div class="doc-info-text">
+                                            <a href="#" target="_blank" id="docLinkNursecall" class="doc-info-name">-</a>
+                                            <div class="doc-info-meta" id="docMetaNursecall">-</div>
+                                        </div>
+                                    </div>
+                                    <div class="doc-actions">
+                                        <button type="button" class="btn btn-sm" onclick="pickFile('nursecall')" title="Ganti">
+                                            <i class="ti ti-refresh"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('nursecall')" title="Hapus">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <input type="file" id="docInputNursecall" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, 'nursecall')">
+                            </div>
+                        </div>
+
+                        <div class="doc-progress-bar" id="docProgressBar" style="display:none">
+                            <div class="doc-progress-fill" id="docProgressFill"></div>
                         </div>
                     </div>
                     <div class="form-section" id="leaderSection">
@@ -1359,6 +1614,12 @@
                         <div class="tr-content-box tr-box-perm" id="trPermAction">-</div>
                     </div>
 
+                    <div class="tr-section" id="trAttachmentSection" style="display:none">
+                        <div class="tr-section-title" style="color:#2563eb;border-bottom-color:#bfdbfe">
+                            <i class="ti ti-paperclip"></i> Dokumen Pendukung
+                        </div>
+                        <div id="trAttachmentList" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"></div>
+                    </div>
                     <div class="tr-section" id="trApprovalSection" style="display:none">
                         <div class="tr-section-title" style="color:#16a34a;border-bottom-color:#86efac">
                             <i class="ti ti-circle-check"></i> Approval
@@ -1449,6 +1710,7 @@
     let sectionsList    = [];
     let sectionsLoaded  = false;
     let select2Inited   = false;
+    let taskAttachments = {};
 
     const USER_STORAGE_KEY = 'pdca_user_info';
 
@@ -1551,7 +1813,8 @@
             createdByName: t.created_by_name || '',
             createdByRole: (t.created_by_role || 'operator').toLowerCase(),
             createdAt: t.created_at || null,
-            updatedAt: t.updated_at || null
+            updatedAt: t.updated_at || null,
+            attachments: t.attachments || [],
         };
     }
 
@@ -1606,6 +1869,7 @@
         setupEventListeners();
         restoreUser();
         updateUserInterface();
+        setQuickDate('today');
         await loadSections();
         await loadTasks();
     });
@@ -1976,6 +2240,7 @@
         state.sectionFilter = $('#sectionFilter').val();
         state.dateFrom = $('#dateFrom').val() || null;
         state.dateTo = $('#dateTo').val() || null;
+        detectActiveQuickDate();
         render();
     }
     function clearFilters() {
@@ -1987,6 +2252,7 @@
         $('#sectionFilter').val('all');
         $('#dateFrom').val('');
         $('#dateTo').val('');
+        setQuickDate('today');
         render();
     }
 
@@ -2088,11 +2354,16 @@
         $('#taskId').val('');
         $('#taskDate').val(new Date().toISOString().split('T')[0]);
 
+        taskAttachments = {};
+        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
+        $('.doc-upload-card').removeClass('locked');
+
         $('#tempAction').prop('disabled', !isLeader);
         $('#permAction').prop('disabled', !isLeader);
         $('#deadline').prop('disabled', !isLeader);
         $('#pic').prop('disabled', !isLeader);
         $('#leaderSection').css('display', isLeader ? 'block' : 'none');
+        $('#documentsSection').css('display', isLeader ? 'block' : 'none');
 
         $('#historyTaskBtn').hide();
         $('#reportTaskBtn').hide();
@@ -2186,6 +2457,13 @@
         $('#modalTitle').text('Edit Task (Leader)');
         $('#taskId').val(task.id);
 
+        taskAttachments = {};
+        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
+
+        $('#approveTaskBtn').prop('disabled', true);
+
+        loadAttachments(task.id);
+
         setTimeout(() => {
             const $sel = $('#operatorName');
             const name = task.operatorName || '';
@@ -2222,8 +2500,11 @@
         const isCancelled = task.status === 'cancelled';
         const isAct = task.stage === 'act';
 
-        if (isAct && !isDone && !isCancelled) $('#approveTaskBtn').show();
-        else $('#approveTaskBtn').hide();
+        if (isAct && !isDone && !isCancelled) {
+            $('#approveTaskBtn').show().prop('disabled', true);
+        } else {
+            $('#approveTaskBtn').hide();
+        }
 
         if (!isDone && !isCancelled) $('#cancelTaskBtn').show();
         else $('#cancelTaskBtn').hide();
@@ -2271,6 +2552,23 @@
     async function approveTask() {
         const id = $('#taskId').val();
         if (!id) return;
+
+        const missing = [];
+        ['4m', 'logbook', 'nursecall'].forEach(t => {
+            if (!taskAttachments[t]) missing.push(DOC_LABEL[t]);
+        });
+
+        if (missing.length > 0) {
+            showAlert(
+                'warning',
+                'Dokumen Belum Lengkap',
+                'Upload dokumen berikut sebelum approve:<br><br>' +
+                '<ul style="text-align:left;padding-left:20px;margin:8px 0">' +
+                missing.map(m => `<li><strong>${m}</strong></li>`).join('') +
+                '</ul>'
+            );
+            return;
+        }
 
         const task = state.tasks.find(t => t.id === id);
         const title = task ? escapeHtml(task.problem) : 'task ini';
@@ -2759,6 +3057,24 @@
         const isDone = task.status === 'done';
         const isCancelled = task.status === 'cancelled';
         const isInProgress = task.status === 'in_progress';
+        const atts = Object.values(taskAttachments).filter(Boolean);
+        if (atts.length > 0) {
+            $('#trAttachmentSection').show();
+            $('#trAttachmentList').html(atts.map(a => {
+                const url = API_BASE.replace(/\/$/, '') + '/storage/public/' + a.file_path;
+                const isImg = (a.mime_type || '').startsWith('image/');
+                return `<div style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center;background:#fff">
+                    <a href="${url}" target="_blank" style="text-decoration:none;color:#2563eb;font-size:12px;font-weight:600">
+                        <i class="ti ${isImg ? 'ti-photo' : 'ti-file-text'}" style="font-size:20px;display:block;margin-bottom:4px"></i>
+                        ${escapeHtml(DOC_LABEL[a.file_type])}
+                    </a>
+                    <div style="font-size:10px;color:#6b7280;margin-top:2px">${formatFileSize(a.file_size)}</div>
+                </div>`;
+            }).join(''));
+        } else {
+            $('#trAttachmentSection').hide();
+        }
+
 
         if (isDone) badges.push(`<span class="badge-status badge-approved"><i class="ti ti-circle-check"></i> APPROVED</span>`);
         else if (isCancelled) badges.push(`<span class="badge-status badge-cancelled"><i class="ti ti-circle-x"></i> CANCELLED</span>`);
@@ -3209,6 +3525,218 @@
     }
 
     // ============================================================
+    // ATTACHMENT UPLOAD
+    // ============================================================
+    const DOC_LABEL = { '4m': '4M', 'logbook': 'Logbook', 'nursecall': 'Nursecall' };
+    const DOC_MAX_SIZE = 4 * 1024 * 1024;
+    const DOC_MIMES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+
+    function getDocEls(type) {
+        const t = String(type || '').toLowerCase();
+        const KEY_MAP = {
+            '4m':       '4m',
+            'logbook':  'Logbook',
+            'nursecall':'Nursecall',
+        };
+        const key = KEY_MAP[t];
+        if (!key) return null;
+
+        return {
+            card:    $(`.doc-upload-card[data-type="${t}"]`),
+            status:  $(`#docStatus${key}`),
+            drop:    $(`#docDrop${key}`),
+            preview: $(`#docPreview${key}`),
+            input:   $(`#docInput${key}`),
+            link:    $(`#docLink${key}`),
+            meta:    $(`#docMeta${key}`),
+        };
+    }
+
+    function isTaskLocked() {
+        const id = parseInt($('#taskId').val() || '0', 10);
+        if (!id) return false;
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return false;
+        return task.status === 'done' || task.status === 'cancelled';
+    }
+
+    function applyDocLockState() {
+        $('.doc-upload-card').toggleClass('locked', isTaskLocked());
+    }
+
+    function pickFile(type) {
+        if (isTaskLocked()) {
+            showToast('Task sudah di-approve, dokumen tidak bisa diubah', 'warning');
+            return;
+        }
+        const els = getDocEls(type);
+        if (els) els.input.trigger('click');
+    }
+
+    function handleDocDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('drag-over');
+    }
+    function handleDocDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+    function handleDocDrop(e, type) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+        const file = e.dataTransfer.files?.[0];
+        if (file) uploadDoc(type, file);
+    }
+    function handleFileSelect(e, type) {
+        const file = e.target.files?.[0];
+        if (file) uploadDoc(type, file);
+        e.target.value = '';
+    }
+
+    async function uploadDoc(type, file) {
+        type = String(type || '').toLowerCase();
+
+        if (file.size > DOC_MAX_SIZE) {
+            showAlert('warning', 'File Terlalu Besar', 'Maksimum 4 MB. File Anda: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
+            return;
+        }
+        if (!DOC_MIMES.includes(file.type)) {
+            showAlert('warning', 'Format Tidak Didukung', 'Hanya PDF / JPG / PNG.');
+            return;
+        }
+
+        const taskId = $('#taskId').val();
+        if (!taskId) {
+            showAlert('warning', 'Simpan Task Dulu', 'Simpan task terlebih dahulu sebelum upload dokumen.');
+            return;
+        }
+
+        $('#docProgressBar').show();
+        $('#docProgressFill').css('width', '0%');
+
+        const fd = new FormData();
+        fd.append('file_type', type);
+        fd.append('file', file);
+
+        try {
+            const token = window.CSRF_TOKEN || $('meta[name="csrf-token"]').attr('content') || '';
+            await $.ajax({
+                url: API_BASE + `/tasks/${taskId}/attachments`,
+                type: 'POST',
+                data: fd,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                xhr: function () {
+                    const xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener('progress', function (e) {
+                        if (e.lengthComputable) {
+                            const pct = (e.loaded / e.total) * 100;
+                            $('#docProgressFill').css('width', pct + '%');
+                        }
+                    });
+                    return xhr;
+                },
+                headers: { 'X-CSRF-TOKEN': token }
+            });
+
+            await loadAttachments(taskId);
+
+            showToast(DOC_LABEL[type] + ' berhasil diupload', 'success');
+
+        } catch (err) {
+            const msg = err?.responseJSON?.message || err?.responseText || err?.statusText || err?.message || 'Upload gagal';
+            showAlert('error', 'Upload Gagal', msg);
+        } finally {
+            setTimeout(() => {
+                $('#docProgressBar').hide();
+                $('#docProgressFill').css('width', '0%');
+            }, 600);
+        }
+    }
+
+    function renderDocPreview(type, att) {
+        type = String(type || '').toLowerCase();
+        const els = getDocEls(type);
+        if (!els || !els.card.length) return;
+
+        if (!att) {
+            els.card.removeClass('has-file');
+            els.status.text('Belum ada');
+            els.drop.show();
+            els.preview.hide();
+            return;
+        }
+
+        els.card.addClass('has-file');
+        els.status.text('✓ Tersedia');
+        els.drop.hide();
+        els.preview.show();
+
+        const fileUrl = API_BASE.replace(/\/$/, '') + '/storage/' + (att.file_path || '');
+        els.link.attr('href', fileUrl).text(att.original_name || att.stored_name || '-');
+        els.meta.text(formatFileSize(att.file_size) + ' · ' + (att.uploaded_by_name || '-'));
+    }
+
+    async function removeDoc(type) {
+        type = String(type || '').toLowerCase();
+
+        const taskId = $('#taskId').val();
+        if (!taskId) return;
+
+        const confirmed = await showConfirm(
+            'Hapus Dokumen?',
+            `Hapus file <strong>${DOC_LABEL[type]}</strong>?`,
+            'Ya, Hapus', 'Batal', 'warning'
+        );
+        if (!confirmed) return;
+
+        try {
+            await api(`/tasks/${taskId}/attachments/${type}`, { method: 'DELETE' });
+            delete taskAttachments[type];
+            renderDocPreview(type, null);
+            showToast(DOC_LABEL[type] + ' dihapus', 'info');
+            updateApproveButtonState();
+        } catch (err) {
+            showAlert('error', 'Gagal Hapus', err.message);
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (!bytes) return '0 B';
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+    }
+
+    async function loadAttachments(taskId) {
+        taskAttachments = {};
+        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
+
+        if (!taskId) {
+            updateApproveButtonState();
+            return;
+        }
+
+        try {
+            const res = await api(`/tasks/${taskId}/attachments`);
+            const list = Array.isArray(res) ? res : (res?.data || []);
+
+            list.forEach(att => {
+                const type = String(att.file_type || '').toLowerCase();
+                if (!DOC_LABEL[type]) return;
+
+                att.file_type = type;
+                taskAttachments[type] = att;
+                renderDocPreview(type, att);
+            });
+        } catch (err) {
+            console.warn('[attachments] gagal load:', err);
+        } finally {
+            updateApproveButtonState();
+        }
+    }
+
+    // ============================================================
     // UTIL
     // ============================================================
     function escapeHtml(s) {
@@ -3226,6 +3754,26 @@
     }
     function openModal(id) { $('#' + id).addClass('active'); }
     function closeModal(id) { $('#' + id).removeClass('active'); }
+    function updateApproveButtonState() {
+        const $btn = $('#approveTaskBtn');
+        if (!$btn.length || !$btn.is(':visible')) return;
+
+        const missing = [];
+        ['4m', 'logbook', 'nursecall'].forEach(t => {
+            const att = taskAttachments[t];
+            if (!att || !att.file_path) missing.push(DOC_LABEL[t]);
+        });
+
+        if (missing.length === 0) {
+            $btn.prop('disabled', false)
+                .attr('title', 'Approve task ini')
+                .html('<i class="ti ti-check"></i> Approve');
+        } else {
+            $btn.prop('disabled', true)
+                .attr('title', 'Upload dulu: ' + missing.join(', '))
+                .html('<i class="ti ti-lock"></i> Approve');
+        }
+    }
 
     // ============================================================
     // SWEETALERT HELPERS
@@ -3256,6 +3804,77 @@
             cancelButtonColor: '#6b7280',
             reverseButtons: true
         }).then(result => result.isConfirmed);
+    }
+    // ============================================================
+    // DATE HELPERS
+    // ============================================================
+    function fmtDate(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${dd}`;
+    }
+    function getTodayStr() { return fmtDate(new Date()); }
+
+    function setActiveQuickDate(range) {
+        $('.btn-quick-date').each(function () {
+            const $b = $(this);
+            if ($b.data('range') === range) {
+                $b.addClass('btn-primary');
+            } else {
+                $b.removeClass('btn-primary');
+            }
+        });
+    }
+
+    function setQuickDate(range) {
+        const today = new Date();
+        let from = '', to = '';
+
+        if (range === 'today') {
+            from = to = fmtDate(today);
+        } else if (range === 'week') {
+            const start = new Date(today);
+            start.setDate(start.getDate() - 6);
+            from = fmtDate(start);
+            to = fmtDate(today);
+        } else if (range === 'month') {
+            const start = new Date(today.getFullYear(), today.getMonth(), 1);
+            const end   = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            from = fmtDate(start);
+            to = fmtDate(end);
+        } else if (range === 'all') {
+            from = ''; to = '';
+        }
+
+        $('#dateFrom').val(from);
+        $('#dateTo').val(to);
+        state.dateFrom = from || null;
+        state.dateTo   = to   || null;
+
+        setActiveQuickDate(range);
+        render();
+    }
+
+    function detectActiveQuickDate() {
+        const from = $('#dateFrom').val() || '';
+        const to   = $('#dateTo').val()   || '';
+        const today = getTodayStr();
+
+        if (from === today && to === today) { setActiveQuickDate('today'); return; }
+
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - 6);
+        if (from === fmtDate(weekStart) && to === today) { setActiveQuickDate('week'); return; }
+
+        const now = new Date();
+        const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const mEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        if (from === fmtDate(mStart) && to === fmtDate(mEnd)) { setActiveQuickDate('month'); return; }
+
+        if (!from && !to) { setActiveQuickDate('all'); return; }
+
+        setActiveQuickDate(null);
     }
     </script>
 </body>

@@ -13,12 +13,14 @@ class CreateAttachmentsTable
         //  Define columns here
         $table->id();
         $table->bigInteger('task_id');
-        $table->string('file_name');
+        $table->enum('file_type',['4m', 'logbook', 'nursecall'])->nullable();
+        $table->string('original_name');
+        $table->string('stored_name');
         $table->string('file_path');
-        $table->string('file_type')->nullable();
+        $table->string('mime_type');
         $table->integer('file_size')->nullable();
+        $table->bigInteger('uploaded_by')->notNullable();
         $table->string('uploaded_by_name')->nullable();
-        $table->enum('uploaded_by_role', ['operator', 'leader', 'admin'])->default('operator');
         $table->timestamps();
         $table->softDeletes();
         

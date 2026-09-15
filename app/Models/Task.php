@@ -14,4 +14,9 @@ class Task extends BaseModel
     protected bool $softDelete = true;
     protected string $deletedAtColumn = 'deleted_at';
     protected bool $timestamps = true;
+
+    public function attachments()
+    {
+        return $this->hasMany(TaskAttachment::class,'task_id','id');
+    }
 }
