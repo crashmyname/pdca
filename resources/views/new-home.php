@@ -2401,11 +2401,9 @@
                 $registerBtnHeader.show();
             } else if (role === 'leader') {
                 label = 'Leader'; color = '#16a34a';
-                $registerBtnHeader.show();
             } else {
                 label = role.charAt(0).toUpperCase() + role.slice(1);
                 color = '#2563eb';
-                $registerBtnHeader.hide();
             }
 
             $reportBtnHeader.show();
