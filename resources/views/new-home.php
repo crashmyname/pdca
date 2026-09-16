@@ -986,6 +986,9 @@
                     <div class="user-avatar">O</div>
                     <span id="userName">Operator</span>
                 </div>
+                <button class="btn" onclick="openProfileModal()" id="profileBtn" style="display:none">
+                    <i class="ti ti-user-cog"></i> Profile
+                </button>
                 <button class="btn btn-primary" onclick="openTaskModal()">
                     <i class="ti ti-plus"></i> Tambah Task
                 </button>
@@ -1403,6 +1406,86 @@
                 <button class="btn" onclick="closeModal('registerModal')">Batal</button>
                 <button class="btn btn-primary" onclick="registerUser()" id="registerBtn">
                     <i class="ti ti-user-plus"></i> Daftar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-user-cog"></i> Profile Saya
+                </h3>
+                <button class="modal-close" onclick="closeModal('profileModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm">
+                    <!-- Info Profil -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="ti ti-user"></i> Informasi Akun
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Nama Lengkap</label>
+                            <input type="text" class="form-input" id="profileName" required minlength="2" placeholder="Nama lengkap">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Username</label>
+                            <input type="text" class="form-input" id="profileUsername" required minlength="3" placeholder="Minimal 3 karakter">
+                            <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                <i class="ti ti-info-circle"></i> Username harus unik, tidak boleh sama dengan user lain.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Role</label>
+                            <input type="text" class="form-input" id="profileRole" disabled>
+                        </div>
+                    </div>
+
+                    <!-- Ganti Password -->
+                    <div class="form-section">
+                        <div class="form-section-title">
+                            <i class="ti ti-lock"></i> Ganti Password
+                            <span class="lock-icon" style="margin-left:auto">
+                                <i class="ti ti-info-circle"></i> Kosongkan jika tidak diubah
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password Lama</label>
+                            <div style="position:relative">
+                                <input type="password" class="form-input" id="profileOldPassword" placeholder="Masukkan password saat ini" style="padding-right:40px">
+                                <button type="button" class="btn-toggle-pw" onclick="togglePwVisibility('profileOldPassword', this)" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:4px 8px">
+                                    <i class="ti ti-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password Baru</label>
+                            <div style="position:relative">
+                                <input type="password" class="form-input" id="profileNewPassword" placeholder="Minimal 6 karakter" style="padding-right:40px">
+                                <button type="button" class="btn-toggle-pw" onclick="togglePwVisibility('profileNewPassword', this)" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:4px 8px">
+                                    <i class="ti ti-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Konfirmasi Password Baru</label>
+                            <div style="position:relative">
+                                <input type="password" class="form-input" id="profileConfirmPassword" placeholder="Ulangi password baru" style="padding-right:40px">
+                                <button type="button" class="btn-toggle-pw" onclick="togglePwVisibility('profileConfirmPassword', this)" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9ca3af;padding:4px 8px">
+                                    <i class="ti ti-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('profileModal')">Batal</button>
+                <button class="btn btn-primary" onclick="saveProfile()" id="saveProfileBtn">
+                    <i class="ti ti-device-floppy"></i> Simpan
                 </button>
             </div>
         </div>
@@ -2132,6 +2215,123 @@
     }
 
     // ============================================================
+    // PROFILE
+    // ============================================================
+    function openProfileModal() {
+        if (!state.currentUser) {
+            showAlert('warning', 'Belum Login', 'Silakan login terlebih dahulu.');
+            return;
+        }
+
+        $('#profileName').val(state.currentUser.name || '');
+        $('#profileUsername').val(state.currentUser.username || '');
+        $('#profileRole').val((state.currentUser.role || '').toUpperCase());
+        $('#profileOldPassword').val('');
+        $('#profileNewPassword').val('');
+        $('#profileConfirmPassword').val('');
+
+        openModal('profileModal');
+    }
+
+    function togglePwVisibility(inputId, btn) {
+        const $input = $('#' + inputId);
+        const isPw = $input.attr('type') === 'password';
+        $input.attr('type', isPw ? 'text' : 'password');
+        $(btn).find('i').attr('class', isPw ? 'ti ti-eye-off' : 'ti ti-eye');
+    }
+
+    async function saveProfile() {
+        const name     = $('#profileName').val().trim();
+        const username = $('#profileUsername').val().trim();
+        const oldPw    = $('#profileOldPassword').val();
+        const newPw    = $('#profileNewPassword').val();
+        const confirmPw= $('#profileConfirmPassword').val();
+
+        // ── Validasi info profil ──
+        if (!name || name.length < 2) {
+            showAlert('warning', 'Nama Tidak Valid', 'Nama minimal 2 karakter.');
+            return;
+        }
+        if (!username || username.length < 3) {
+            showAlert('warning', 'Username Tidak Valid', 'Username minimal 3 karakter.');
+            return;
+        }
+
+        // ── Validasi ganti password (hanya jika ada isinya) ──
+        const wantsChangePw = !!(oldPw || newPw || confirmPw);
+
+        if (wantsChangePw) {
+            if (!oldPw) {
+                showAlert('warning', 'Password Lama Kosong', 'Masukkan password lama untuk mengganti password.');
+                return;
+            }
+            if (!newPw || newPw.length < 6) {
+                showAlert('warning', 'Password Baru Tidak Valid', 'Password baru minimal 6 karakter.');
+                return;
+            }
+            if (newPw !== confirmPw) {
+                showAlert('warning', 'Password Tidak Sama', 'Konfirmasi password baru tidak cocok.');
+                return;
+            }
+            if (newPw === oldPw) {
+                showAlert('warning', 'Password Sama', 'Password baru harus berbeda dengan password lama.');
+                return;
+            }
+        }
+
+        // ── Bangun payload ──
+        const payload = { name, username };
+        if (wantsChangePw) {
+            payload.old_password = oldPw;
+            payload.new_password = newPw;
+        }
+
+        Swal.fire({
+            title: 'Menyimpan...',
+            html: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        try {
+            const res = await api('/auth/profile', { method: 'PUT', body: payload });
+
+            // Update localStorage dengan data terbaru
+            const updated = res?.user || res?.data || { ...state.currentUser, name, username };
+            saveUser({
+                id:       updated.id       || state.currentUser.id,
+                name:     updated.name     || name,
+                username: updated.username || username,
+                role:     updated.role     || state.currentUser.role,
+            });
+
+            Swal.close();
+            closeModal('profileModal');
+            updateUserInterface();
+            showToast('Profile berhasil diupdate', 'success');
+
+            // Kalau ganti password, sarankan login ulang
+            if (wantsChangePw) {
+                setTimeout(async () => {
+                    const again = await showConfirm(
+                        'Password Diubah',
+                        'Password berhasil diubah. Disarankan login ulang untuk keamanan. Login sekarang?',
+                        'Ya, Login Ulang', 'Nanti', 'question'
+                    );
+                    if (again) {
+                        clearUser();
+                        window.location.reload();
+                    }
+                }, 600);
+            }
+
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Menyimpan', err.message);
+        }
+    }
+
+    // ============================================================
     // AUTH
     // ============================================================
     function toggleLogin() {
@@ -2191,6 +2391,7 @@
             $userInfo.find('.user-avatar').text((state.currentUser.name || 'U').charAt(0).toUpperCase());
             $userInfo.css('background', '#dcfce7');
             $loginBtn.html('<i class="ti ti-logout"></i> Logout');
+            $('#profileBtn').show(); 
 
             const role = state.currentUser.role;
             let label = '', color = '';
@@ -2226,6 +2427,7 @@
             $noticeBar.attr('class', 'notice-bar warning');
             $registerBtnHeader.hide();
             $reportBtnHeader.hide();
+            $('#profileBtn').hide();
         }
     }
 

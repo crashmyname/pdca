@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\User;
 use App\Services\AuthService;
 use Bpjs\Framework\Helpers\Auth;
 use Bpjs\Framework\Helpers\BaseController;
@@ -32,6 +33,65 @@ class AuthController extends BaseController
             'message' => $result['message'] ?? 'success',
             'data'    => $result['data'] ?? null,
         ], $result['status']);
+    }
+
+    public function update(Request $req)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $this->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $me = User::find($user->id);
+        if (!$me) {
+            return $this->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        $req->validate([
+            'name'     => 'required|min:2',
+            'username' => 'required|min:3',
+        ]);
+
+        $name     = trim($req->input('name'));
+        $username = trim($req->input('username'));
+        $oldPw    = $req->input('old_password');
+        $newPw    = $req->input('new_password');
+
+        $dup = User::query()
+            ->where('username', '=', $username)
+            ->where('id', '!=', $me->id)
+            ->first();
+
+        if ($dup) {
+            return $this->json(['message' => 'Username sudah dipakai user lain'], 422);
+        }
+
+        if ($oldPw || $newPw) {
+            if (!$oldPw || !$newPw) {
+                return $this->json(['message' => 'Password lama & baru wajib diisi'], 422);
+            }
+            if (!password_verify($oldPw, $me->password)) {
+                return $this->json(['message' => 'Password lama salah'], 422);
+            }
+            if (strlen($newPw) < 6) {
+                return $this->json(['message' => 'Password baru minimal 6 karakter'], 422);
+            }
+            $me->password = password_hash($newPw, PASSWORD_BCRYPT);
+        }
+
+        $me->name     = $name;
+        $me->username = $username;
+        $me->save();
+
+        return $this->json([
+            'message' => 'Profile berhasil diupdate',
+            'user' => [
+                'id'       => $me->id,
+                'name'     => $me->name,
+                'username' => $me->username,
+                'role'     => strtolower($me->role ?? 'leader'),
+            ]
+        ], 200);
     }
 
     public function logout()

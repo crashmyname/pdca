@@ -29,6 +29,7 @@ Route::get('/endpoint/dept',[UtilsController::class, 'getAllDept']);
 // ============================================================
 Route::group([AuthMiddleware::class], function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::put('/auth/profile',[AuthController::class, 'update']);
 
     // Hanya leader/admin yang bisa ubah data
     Route::put('/tasks/{id}',            [TaskController::class, 'update']);
@@ -43,6 +44,4 @@ Route::group([AuthMiddleware::class], function () {
     Route::get('/tasks/{task}/attachments', [TaskAttachmentController::class, 'index']);
     Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store']);
     Route::delete('/tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy']);
-    // Route::prefix('/tasks/{task}', function(){
-    // });
 });
