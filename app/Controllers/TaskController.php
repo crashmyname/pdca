@@ -143,9 +143,6 @@ class TaskController extends BaseController
             ], 422);
         }
 
-        // ══════════════════════════════════════════════════════
-        // 1. SNAPSHOT SEBELUM UPDATE
-        // ══════════════════════════════════════════════════════
         $trackedFields = [
             'operator_name', 'task_date', 'section', 'problem',
             'category', 'pic_section',
@@ -157,9 +154,6 @@ class TaskController extends BaseController
             $oldValues[$f] = $task->$f ?? null;
         }
 
-        // ══════════════════════════════════════════════════════
-        // 2. BUILD PAYLOAD (logika asli Anda — tetap dipertahankan)
-        // ══════════════════════════════════════════════════════
         $payload = [
             'category'         => $request->category    ?: $task->category,
             'pic_section'      => $request->pic_section ?: $task->pic_section,
@@ -175,15 +169,9 @@ class TaskController extends BaseController
         if ($request->section)       $payload['section']       = $request->section;
         if ($request->problem)       $payload['problem']       = $request->problem;
 
-        // ══════════════════════════════════════════════════════
-        // 3. SIMPAN
-        // ══════════════════════════════════════════════════════
         $task->update($payload);
-        $task->refresh(); // ambil nilai terbaru dari DB
+        $task->refresh();
 
-        // ══════════════════════════════════════════════════════
-        // 4. HITUNG FIELD YANG BENAR-BENAR BERUBAH
-        // ══════════════════════════════════════════════════════
         $changedOld = [];
         $changedNew = [];
 
@@ -191,7 +179,6 @@ class TaskController extends BaseController
             $ov = $oldValues[$f];
             $nv = $task->$f ?? null;
 
-            // Normalisasi: null vs '' vs '0' dianggap sama
             $ovNorm = ($ov === '' || $ov === null) ? null : (string) $ov;
             $nvNorm = ($nv === '' || $nv === null) ? null : (string) $nv;
 
@@ -201,9 +188,6 @@ class TaskController extends BaseController
             }
         }
 
-        // ══════════════════════════════════════════════════════
-        // 5. SIMPAN HISTORY (hanya kalau ada perubahan)
-        // ══════════════════════════════════════════════════════
         if (!empty($changedOld) || !empty($changedNew)) {
             TaskHistory::create([
                 'task_id'         => $task->id,
@@ -253,6 +237,30 @@ class TaskController extends BaseController
                     return $this->json([
                         'success' => false,
                         'message' => 'Isi tindakan dulu sebelum pindah ke CHECK'
+                    ], 422);
+                }
+            }
+
+            if($oldStage === 'CHECK' && $newStage === 'ACT'){
+                $required = [
+                    'category' => $task->cateogry,
+                    'pic_section' => $task->pic_section,
+                    'temporary_action' => $task->temporary_action,
+                    'permanent_action' => $task->permanent_action,
+                    'deadline' => $task->deadline,
+                    'pic' => $task->pic
+                ];
+
+                $missing = [];
+                foreach($required as $req => $label){
+                    if(empty($task->field)) $missing[] = $label;
+                }
+
+                if(!empty($mising)){
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Form belum lengkap: ' . implode(', ', $missing),
+                        'missing' => $missing,
                     ], 422);
                 }
             }

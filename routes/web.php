@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\AuthController;
+use App\Controllers\SsoController;
 use App\Controllers\TaskAttachmentController;
 use App\Controllers\TaskController;
 use App\Controllers\UtilsController;
@@ -23,7 +24,22 @@ Route::get('/tasks/{id}',   [TaskController::class, 'show']);
 Route::post('/tasks', [TaskController::class, 'store']);
 Route::get('/endpoint/employee',[UtilsController::class, 'getEmployee']);
 Route::get('/endpoint/dept',[UtilsController::class, 'getAllDept']);
-
+Route::get('/sso/callback',[SsoController::class,'callback'])->name('callback');
+Route::get('/auth/me',[AuthController::class,'me'])->name('auth.me');
+Route::get('/csrf-token', function () {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    header('Content-Type: application/json');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    
+    echo json_encode([
+        'token' => csrf(),
+        'header' => csrfHeader(),
+    ]);
+    exit;
+});
 // ============================================================
 // PROTECTED ROUTES AUTH
 // ============================================================

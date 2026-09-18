@@ -24,6 +24,24 @@ class AuthController extends BaseController
         ],$login['status']);
     }
 
+    public function me(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return $this->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        return $this->json([
+            'user' => [
+                'id'       => $user->id,
+                'name'     => $user->name,
+                'username' => $user->username,
+                'role'     => $user->role,
+                'email'    => $user->email ?? '',
+            ],
+        ], 200);
+    }
+
     public function register(Request $request, AuthService $service)
     {
         $result = $service->register($request->all());
