@@ -49,11 +49,6 @@ class AuthService
         $password = (string)($data['password'] ?? '');
         $role     = strtolower($data['role'] ?? 'operator');
 
-        // Role hanya boleh operator (publik) — jangan izinkan self-register jadi admin
-        if (!in_array($role, ['operator', 'leader'], true)) {
-            $role = 'operator';
-        }
-
         if ($name === '' || $username === '' || $password === '') {
             return ['status' => 422, 'message' => 'Nama, username, dan password wajib diisi'];
         }

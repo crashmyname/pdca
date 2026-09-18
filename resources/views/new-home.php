@@ -823,6 +823,88 @@
                 print-color-adjust: exact !important;
             }
         }
+        @media print {
+            /* ── Halaman A4 dengan margin tipis ── */
+            @page {
+                size: A4 portrait;
+                margin: 8mm;
+            }
+
+            /* ── Scale konten agar selalu fit 1 halaman ── */
+            body.print-report #reportContent,
+            body.print-task-report #taskReportContent {
+                /* Trik: pakai zoom untuk Chrome/Edge/Safari */
+                zoom: 1;
+
+                /* Fallback untuk Firefox yang belum support zoom: */
+                /* (kompensasi agar lebar tetap pas) */
+                width: auto !important;
+                padding: 0 !important;
+            }
+
+            /* ── Perkecil padding & font supaya hemat ruang ── */
+            .tr-section {
+                margin-bottom: 8px !important;
+            }
+
+            .tr-section-title {
+                font-size: 11px !important;
+                padding-bottom: 4px !important;
+                margin-bottom: 6px !important;
+            }
+
+            .tr-content-box {
+                padding: 8px 10px !important;
+                font-size: 11px !important;
+                min-height: auto !important;
+            }
+
+            .tr-info-table td {
+                padding: 4px 6px !important;
+                font-size: 11px !important;
+            }
+
+            .signature-qrcode,
+            .signature-qrcode img,
+            .signature-qrcode canvas {
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            /* ── Hilangkan margin-top besar di tabel signature ── */
+            body.print-report #reportContent > table:last-of-type,
+            body.print-task-report #taskReportContent > table:last-of-type {
+                margin-top: 12px !important;
+            }
+
+            /* ── Table report — kecilkan supaya hemat ── */
+            .report-table th,
+            .report-table td {
+                padding: 4px !important;
+                font-size: 10px !important;
+            }
+
+            .report-stat-card {
+                padding: 6px !important;
+            }
+            .report-stat-card .report-stat-value {
+                font-size: 18px !important;
+            }
+
+            /* ── JANGAN pakai page-break-inside: avoid terlalu banyak ── */
+            /* Elemen ini sering "mentok" dan dorong ke halaman 2 */
+            .tr-section {
+                page-break-inside: auto !important;
+            }
+            .signature-box {
+                page-break-inside: avoid !important;  /* signature tetap jangan kepotong */
+            }
+
+            /* ── Hilangkan scrollbar dari overflow-x:auto ── */
+            #reportTableWrapper {
+                overflow: visible !important;
+            }
+        }
     </style>
     <style>
         .radio-card-group {

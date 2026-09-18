@@ -272,10 +272,10 @@ class TaskController extends BaseController
 
             $task->update([
                 'stage'             => strtolower($request->stage),
-                'stage_updated_at'  => date('Y-m-d H:i:s'),
+                'stage_updated_at'  => Date::Now(),
                 'stage_updated_by'  => $user->id ?? null,
                 'status'            => $newStatus,
-                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
             ]);
 
@@ -339,9 +339,9 @@ class TaskController extends BaseController
             $task->update([
                 'status'            => 'done',
                 'leader_signature' => $user->name ?? 'Leader',
-                'approved_at'       => date('Y-m-d H:i:s'),
+                'approved_at'       => Date::Now(),
                 'approved_by'       => $user->id ?? null,
-                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
             ]);
 
@@ -411,7 +411,7 @@ class TaskController extends BaseController
 
             $task->update([
                 'status'            => 'cancelled',
-                'status_updated_at' => date('Y-m-d H:i:s'),
+                'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
             ]);
 

@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "bpjs/framework",
-            "version": "2.5.5",
+            "version": "2.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/crashmyname/bpjs-fw.git",
-                "reference": "cd19482686aea68e1b89befe6b77e192f4410b7b"
+                "reference": "6d82856c09ce68c205b208822d4a037a621a0a8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/crashmyname/bpjs-fw/zipball/cd19482686aea68e1b89befe6b77e192f4410b7b",
-                "reference": "cd19482686aea68e1b89befe6b77e192f4410b7b",
+                "url": "https://api.github.com/repos/crashmyname/bpjs-fw/zipball/6d82856c09ce68c205b208822d4a037a621a0a8d",
+                "reference": "6d82856c09ce68c205b208822d4a037a621a0a8d",
                 "shasum": ""
             },
             "require": {
@@ -49,9 +49,9 @@
             "description": "framework support for bpjs",
             "support": {
                 "issues": "https://github.com/crashmyname/bpjs-fw/issues",
-                "source": "https://github.com/crashmyname/bpjs-fw/tree/2.5.5"
+                "source": "https://github.com/crashmyname/bpjs-fw/tree/2.5.6"
             },
-            "time": "2026-09-11T07:12:05+00:00"
+            "time": "2026-09-18T07:58:33+00:00"
         },
         {
             "name": "composer/pcre",
@@ -236,23 +236,23 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v7.1.0",
+            "version": "v7.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/php-jwt.git",
-                "reference": "b374a5d1a4f1f67fadc2165cdb284645945e2fc0"
+                "reference": "9bc93bd7e3ee5bead4cd23c365ec12f3c1fb0a6a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/php-jwt/zipball/b374a5d1a4f1f67fadc2165cdb284645945e2fc0",
-                "reference": "b374a5d1a4f1f67fadc2165cdb284645945e2fc0",
+                "url": "https://api.github.com/repos/googleapis/php-jwt/zipball/9bc93bd7e3ee5bead4cd23c365ec12f3c1fb0a6a",
+                "reference": "9bc93bd7e3ee5bead4cd23c365ec12f3c1fb0a6a",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.0"
             },
             "require-dev": {
-                "guzzlehttp/guzzle": "^7.4",
+                "guzzlehttp/guzzle": "^7.4||^8.0",
                 "phpfastcache/phpfastcache": "^9.2",
                 "phpseclib/phpseclib": "~3.0",
                 "phpspec/prophecy-phpunit": "^2.0",
@@ -296,9 +296,9 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/php-jwt/issues",
-                "source": "https://github.com/googleapis/php-jwt/tree/v7.1.0"
+                "source": "https://github.com/googleapis/php-jwt/tree/v7.1.1"
             },
-            "time": "2026-06-11T17:54:14+00:00"
+            "time": "2026-09-14T17:48:47+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -628,16 +628,16 @@
         },
         {
             "name": "phpoffice/phpspreadsheet",
-            "version": "3.10.7",
+            "version": "3.10.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PhpSpreadsheet.git",
-                "reference": "450a28a2c050d8f983e663c0bc8918e0cdae5708"
+                "reference": "fee9c1ca8d9f1f676f007ac1ab134ce43624bd52"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/450a28a2c050d8f983e663c0bc8918e0cdae5708",
-                "reference": "450a28a2c050d8f983e663c0bc8918e0cdae5708",
+                "url": "https://api.github.com/repos/PHPOffice/PhpSpreadsheet/zipball/fee9c1ca8d9f1f676f007ac1ab134ce43624bd52",
+                "reference": "fee9c1ca8d9f1f676f007ac1ab134ce43624bd52",
                 "shasum": ""
             },
             "require": {
@@ -728,9 +728,9 @@
             ],
             "support": {
                 "issues": "https://github.com/PHPOffice/PhpSpreadsheet/issues",
-                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/3.10.7"
+                "source": "https://github.com/PHPOffice/PhpSpreadsheet/tree/3.10.8"
             },
-            "time": "2026-07-12T19:47:52+00:00"
+            "time": "2026-09-17T04:27:19+00:00"
         },
         {
             "name": "psr/http-message",
