@@ -17,6 +17,8 @@ class CreateTasksTable
         $table->date('task_date');
         $table->string('section');
         $table->text('problem');
+        $table->enum('category',['man','machine','material','methode'])->nullable();
+        $table->string('pic_section',15)->nullable();
         $table->text('temporary_action')->nullable();
         $table->text('permanent_action')->nullable();
         $table->date('deadline')->nullable();
@@ -31,7 +33,7 @@ class CreateTasksTable
         $table->timestamp('approved_at')->nullable();
         $table->bigInteger('approved_by')->nullable();
         $table->string('created_by_name')->nullable();
-        $table->enum('created_by_role', ['operator', 'leader', 'admin'])->default('operator');
+        $table->enum('created_by_role', ['admin', 'team_leader' , 'group_leader', 'manager' , 'operator'])->default('operator');
         $table->string('created_by')->nullable();
         $table->string('updated_by')->nullable();
         $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');

@@ -18,6 +18,8 @@ class CreateTaskHistoriesTable
         $table->string('new_stage')->nullable();
         $table->string('old_status')->nullable();
         $table->string('new_status')->nullable();
+        $table->json('old_values')->nullable();
+        $table->json('new_values')->nullable();
         $table->string('changed_by_name')->nullable();
         $table->string('changed_by_role')->nullable();
         $table->text('notes')->nullable();

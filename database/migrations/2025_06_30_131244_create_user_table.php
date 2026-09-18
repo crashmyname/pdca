@@ -17,23 +17,24 @@ class CreateUserTable
         $table->string('username',150)->notNullable()->unique();
         $table->string('unique_user',150)->nullable();
         $table->string('password');
-        $table->enum('role', ['admin', 'leader', 'operator'])->default('operator');
-        $table->timestamps(); // Menggantikan timestamp manual
-        $table->rememberToken(); // Optional: untuk fitur remember me
+        $table->enum('role', ['admin', 'team_leader' , 'group_leader', 'manager' , 'operator'])->default('operator');
+        $table->timestamps();
+        $table->rememberToken();
 
         $sql = $table->buildCreateSQL();
         try {
             $pdo->exec($sql);
             echo "Table 'user' berhasil dibuat\n";
             $stmt = $pdo->prepare("
-                INSERT INTO users (name, username, unique_user, password)
-                VALUES (:name, :username, :unique_user, :password)
+                INSERT INTO users (name, username, unique_user, password,role)
+                VALUES (:name, :username, :unique_user, :password, :role)
             ");
 
             $stmt->execute([
                 ':name' => 'Administrator',
                 ':username' => 'admin',
                 ':unique_user' => 'adminxxx',
+                ':role' => 'admin',
                 ':password' => password_hash('admin123', PASSWORD_BCRYPT)
             ]);
 

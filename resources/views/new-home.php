@@ -46,7 +46,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: white;
             border-bottom: 1px solid var(--gray-200);
@@ -169,10 +168,7 @@
         }
         .filter-select:focus, .date-input:focus { outline: none; border-color: var(--primary); }
         .quick-date-filters {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
+            display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
         }
         .btn-quick-date { padding: 6px 12px; font-size: 12px; }
         .btn-quick-date.btn-primary { background: var(--primary); border-color: var(--primary); color: white; }
@@ -216,6 +212,11 @@
         .select2-search--dropdown .select2-search__field { font-family: inherit !important; }
         .select2-container--default .select2-selection--single .select2-selection__rendered.select2-loading {
             color: var(--gray-400); font-style: italic;
+        }
+        /* Batasi tinggi dropdown & enable scroll saat ribuan option */
+        .select2-results__options {
+            max-height: 320px !important;
+            overflow-y: auto !important;
         }
 
         /* QR Code signature */
@@ -687,7 +688,6 @@
             .modal-footer .btn { width: 100%; justify-content: center; }
         }
 
-        /* Toast */
         .toast {
             position: fixed; bottom: 24px; right: 24px;
             background: white; border: 1px solid var(--gray-200);
@@ -702,7 +702,6 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Badges */
         .badge-status {
             display: inline-flex; align-items: center; gap: 4px;
             font-size: 10px; padding: 3px 8px; border-radius: 8px;
@@ -724,7 +723,6 @@
         }
         .kanban-card.card-cancelled .card-title { text-decoration: line-through; color: #9ca3af; }
 
-        /* Icons */
         .ti { vertical-align: -0.125em; stroke-width: 2; display: inline-flex; align-items: center; justify-content: center; }
         .btn .ti { font-size: 1.1em; margin-right: 2px; }
         .column-icon .ti { font-size: 16px; }
@@ -733,7 +731,6 @@
         .search-icon .ti { font-size: 16px; display: block; }
         .stat-icon .ti { font-size: 18px; }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .kanban-board { grid-template-columns: repeat(2, 1fr); }
         }
@@ -752,16 +749,9 @@
             .stats-grid { grid-template-columns: 1fr; }
         }
 
-        /* ==================================================== */
-        /* PRINT — FINAL FIXED                                  */
-        /* ==================================================== */
         @media print {
-            /* Sembunyikan SEMUA direct child of body */
-            body > * {
-                display: none !important;
-            }
+            body > * { display: none !important; }
 
-            /* Tampilkan HANYA modal yang aktif */
             body.print-report #reportModal.active,
             body.print-task-report #taskReportModal.active {
                 display: block !important;
@@ -779,7 +769,6 @@
                 animation: none !important;
             }
 
-            /* Modal content full width */
             body.print-report #reportModal.active .modal-content,
             body.print-task-report #taskReportModal.active .modal-content {
                 display: block !important;
@@ -793,7 +782,6 @@
                 margin: 0 !important;
             }
 
-            /* Sembunyikan header & footer modal + filter report */
             body.print-report #reportModal.active .modal-header,
             body.print-report #reportModal.active .modal-footer,
             body.print-report #reportModal.active .report-filter,
@@ -802,7 +790,6 @@
                 display: none !important;
             }
 
-            /* Modal body — no padding */
             body.print-report #reportModal.active .modal-body,
             body.print-task-report #taskReportModal.active .modal-body {
                 display: block !important;
@@ -811,7 +798,6 @@
                 overflow: visible !important;
             }
 
-            /* Report content — no shadow / border */
             body.print-report #reportModal.active #reportContent,
             body.print-task-report #taskReportModal.active #taskReportContent {
                 display: block !important;
@@ -822,7 +808,6 @@
                 margin: 0 !important;
             }
 
-            /* Anti page-break di tengah elemen penting */
             .tr-section,
             .signature-box,
             .tr-info-table tr,
@@ -833,7 +818,6 @@
                 page-break-after: avoid;
             }
 
-            /* Warna tetap ter-print */
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -841,7 +825,85 @@
         }
     </style>
     <style>
-        /* Documents Upload */
+        .radio-card-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 8px;
+        }
+        .radio-card-group.pic-section-group {
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        }
+        .radio-card {
+            cursor: pointer;
+            position: relative;
+            display: block;
+        }
+        .radio-card input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .radio-card-content {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 10px 6px;
+            text-align: center;
+            transition: all 0.2s;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            min-height: 64px;
+        }
+        .radio-card-content .ti {
+            font-size: 20px;
+            color: var(--gray-500);
+            transition: all 0.2s;
+        }
+        .radio-card-content .radio-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-700);
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .radio-card:hover .radio-card-content {
+            border-color: var(--gray-400);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        .radio-card input:checked + .radio-card-content {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .radio-card input:checked + .radio-card-content .ti { color: var(--primary); }
+        .radio-card input:checked + .radio-card-content .radio-label { color: var(--primary-dark); }
+        .radio-card input:disabled + .radio-card-content {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: var(--gray-50);
+        }
+
+        .cat-man      { background: #dbeafe; color: #1e40af; }
+        .cat-machine  { background: #fef3c7; color: #92400e; }
+        .cat-material { background: #dcfce7; color: #166534; }
+        .cat-methode  { background: #f3e8ff; color: #6b21a8; }
+
+        .picsec-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-weight: 600;
+            background: #ecfeff;
+            color: #155e75;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
         .doc-upload-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -913,11 +975,9 @@
             color: var(--gray-800);
             display: block;
             text-decoration: none;
-            /* ⬇️ WAJIB untuk wrap */
             white-space: normal;
             word-break: break-word;
             overflow-wrap: anywhere;
-            /* Batasi maksimal 3 baris biar tidak terlalu tinggi */
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -959,6 +1019,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         window.CSRF_TOKEN  = '<?= csrfHeader() ?>';
@@ -971,7 +1032,6 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <div class="header-left">
@@ -986,6 +1046,9 @@
                     <div class="user-avatar">O</div>
                     <span id="userName">Operator</span>
                 </div>
+                <button class="btn" onclick="openRoleInfo()" id="roleInfoBtn" title="Informasi Role & Akses">
+                    <i class="ti ti-shield-lock"></i> Info Role
+                </button>
                 <button class="btn" onclick="openProfileModal()" id="profileBtn" style="display:none">
                     <i class="ti ti-user-cog"></i> Profile
                 </button>
@@ -1005,14 +1068,12 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <div class="container">
         <div class="notice-bar" id="noticeBar">
             <i class="ti ti-info-circle"></i>
             <span>Anda login sebagai <strong>Operator</strong>. Hanya bisa menambah task baru dengan data dasar.</span>
         </div>
 
-        <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
@@ -1044,7 +1105,6 @@
             </div>
         </div>
 
-        <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="filter-row">
                 <div class="search-box">
@@ -1079,7 +1139,6 @@
             </div>
         </div>
 
-        <!-- Kanban Board -->
         <div class="board-container">
             <div class="board-header">
                 <div>
@@ -1174,6 +1233,60 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-section" id="classificationSection">
+                        <div class="form-section-title">
+                            <i class="ti ti-category"></i> Klasifikasi Masalah
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label required">Category</label>
+                            <div class="radio-card-group" id="categoryGroup">
+                                <label class="radio-card">
+                                    <input type="radio" name="category" value="man">
+                                    <div class="radio-card-content">
+                                        <i class="ti ti-user"></i>
+                                        <span class="radio-label">Man</span>
+                                    </div>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="category" value="machine">
+                                    <div class="radio-card-content">
+                                        <i class="ti ti-engine"></i>
+                                        <span class="radio-label">Machine</span>
+                                    </div>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="category" value="material">
+                                    <div class="radio-card-content">
+                                        <i class="ti ti-box"></i>
+                                        <span class="radio-label">Material</span>
+                                    </div>
+                                </label>
+                                <label class="radio-card">
+                                    <input type="radio" name="category" value="methode">
+                                    <div class="radio-card-content">
+                                        <i class="ti ti-checklist"></i>
+                                        <span class="radio-label">Methode</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top:16px">
+                            <label class="form-label required">PIC Section</label>
+                            <div class="radio-card-group pic-section-group" id="picSectionGroup">
+                                <label class="radio-card"><input type="radio" name="pic_section" value="mdf"><div class="radio-card-content"><span class="radio-label">MDF</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="pe"><div class="radio-card-content"><span class="radio-label">PE</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="pc"><div class="radio-card-content"><span class="radio-label">PC</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="inj"><div class="radio-card-content"><span class="radio-label">INJ</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="st"><div class="radio-card-content"><span class="radio-label">ST</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="qc"><div class="radio-card-content"><span class="radio-label">QC</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="whp"><div class="radio-card-content"><span class="radio-label">WHP</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="prc"><div class="radio-card-content"><span class="radio-label">PRC</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="log"><div class="radio-card-content"><span class="radio-label">LOG</span></div></label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-section" id="documentsSection">
                         <div class="form-section-title">
                             <i class="ti ti-paperclip"></i> Dokumen Pendukung
@@ -1181,8 +1294,6 @@
                         </div>
 
                         <div class="doc-upload-grid">
-
-                            <!-- 4M -->
                             <div class="doc-upload-card" data-type="4m">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-file-text"></i>
@@ -1216,7 +1327,6 @@
                                 <input type="file" id="docInput4m" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, '4m')">
                             </div>
 
-                            <!-- Logbook -->
                             <div class="doc-upload-card" data-type="logbook">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-notebook"></i>
@@ -1250,7 +1360,6 @@
                                 <input type="file" id="docInputLogbook" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, 'logbook')">
                             </div>
 
-                            <!-- Nursecall -->
                             <div class="doc-upload-card" data-type="nursecall">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-bell"></i>
@@ -1309,7 +1418,12 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">PIC</label>
-                                <input type="text" class="form-input" id="pic" disabled placeholder="Nama PIC">
+                                <select class="form-select" id="pic" disabled>
+                                    <option value="">-- Pilih PIC --</option>
+                                </select>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Ketik nama untuk mencari
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -1394,7 +1508,9 @@
                         <label class="form-label">Daftar Sebagai</label>
                         <select class="form-select" id="registerRole">
                             <option value="operator">Operator</option>
-                            <option value="leader">Leader</option>
+                            <option value="team_leader">Team Leader</option>
+                            <option value="group_leader">Group Leader</option>
+                            <option value="manager">Manager</option>
                         </select>
                         <small style="color:#6b7280;font-size:12px;display:block;margin-top:4px">
                             <i class="ti ti-info-circle"></i> Role <strong>Leader</strong> memerlukan approval admin untuk aktivasi penuh.
@@ -1422,7 +1538,6 @@
             </div>
             <div class="modal-body">
                 <form id="profileForm">
-                    <!-- Info Profil -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="ti ti-user"></i> Informasi Akun
@@ -1444,7 +1559,6 @@
                         </div>
                     </div>
 
-                    <!-- Ganti Password -->
                     <div class="form-section">
                         <div class="form-section-title">
                             <i class="ti ti-lock"></i> Ganti Password
@@ -1569,7 +1683,6 @@
                         <div id="reportTableWrapper" style="overflow-x:auto"></div>
                     </div>
 
-                    <!-- Signature Area (Table-based) -->
                     <table style="width:100%;margin-top:32px;font-size:12px;border-collapse:collapse;page-break-inside:avoid">
                         <tr>
                             <td style="width:33.33%;vertical-align:top;text-align:center;padding:0 6px">
@@ -1661,6 +1774,14 @@
                                 <td class="tr-label">PIC</td>
                                 <td class="tr-value" id="trPic">-</td>
                             </tr>
+
+                            <tr>
+                                <td class="tr-label">Category</td>
+                                <td class="tr-value" id="trCategory">-</td>
+                                <td class="tr-label">PIC Section</td>
+                                <td class="tr-value" id="trPicSection">-</td>
+                            </tr>
+
                             <tr>
                                 <td class="tr-label">Stage</td>
                                 <td class="tr-value" id="trStage">-</td>
@@ -1710,7 +1831,6 @@
                         <div class="tr-content-box tr-box-approval" id="trApprovalContent"></div>
                     </div>
 
-                    <!-- Signature Area (Table-based) -->
                     <table style="width:100%;margin-top:32px;font-size:12px;border-collapse:collapse;page-break-inside:avoid">
                         <tr>
                             <td style="width:33.33%;vertical-align:top;text-align:center;padding:0 6px">
@@ -1734,7 +1854,7 @@
                                     <div class="sig-label">Disetujui oleh,</div>
                                     <div class="signature-qrcode" data-type="leader" data-signature=""></div>
                                     <div class="sig-name" id="trSignLeader">-</div>
-                                    <div class="sig-role">Leader/Admin</div>
+                                    <div class="sig-role">Group Leader/Manager</div>
                                 </div>
                             </td>
                         </tr>
@@ -1752,6 +1872,65 @@
                 </button>
                 <button class="btn btn-danger" onclick="exportTaskPDF()">
                     <i class="ti ti-file-type-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Role Info Modal -->
+    <div class="modal" id="roleInfoModal">
+        <div class="modal-content" style="max-width: 1100px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-shield-lock"></i> Informasi Role & Hak Akses
+                </h3>
+                <button class="modal-close" onclick="closeModal('roleInfoModal')">×</button>
+            </div>
+            <div class="modal-body">
+
+                <div class="notice-bar" style="margin-bottom:16px">
+                    <i class="ti ti-info-circle"></i>
+                    <span>Berikut daftar lengkap <strong>5 role</strong> di sistem PDCA Kanban beserta hak akses masing-masing.</span>
+                </div>
+
+                <!-- Legend Role Cards -->
+                <div id="roleLegend" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px"></div>
+
+                <!-- Matrix Table -->
+                <div style="font-size:14px;font-weight:600;color:#1f2937;margin-bottom:8px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;display:flex;align-items:center;gap:6px">
+                    <i class="ti ti-table"></i> Matrix Hak Akses
+                </div>
+                <div style="overflow-x:auto">
+                    <table id="roleMatrixTable" class="report-table" style="font-size:12px"></table>
+                </div>
+
+                <!-- Detail per Role -->
+                <div style="font-size:14px;font-weight:600;color:#1f2937;margin-top:24px;margin-bottom:12px;border-bottom:1px solid #e5e7eb;padding-bottom:6px;display:flex;align-items:center;gap:6px">
+                    <i class="ti ti-list-details"></i> Detail Kemampuan per Role
+                </div>
+                <div id="roleDetailList" style="display:flex;flex-direction:column;gap:12px"></div>
+
+                <!-- Catatan Penting -->
+                <div style="margin-top:24px;padding:16px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px;color:#78350f">
+                    <div style="font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+                        <i class="ti ti-alert-triangle"></i> Catatan Penting
+                    </div>
+                    <ul style="padding-left:20px;margin:0;line-height:1.7">
+                        <li><strong>Approve task</strong> hanya bisa dilakukan oleh Group Leader, Manager & Admin — dan <strong>wajib upload 3 dokumen</strong> (4M, Logbook, Nursecall) terlebih dahulu.</li>
+                        <li><strong>Task yang sudah di-approve (done) atau cancelled</strong> tidak bisa diubah lagi oleh role apapun.</li>
+                        <li><strong>Operator</strong> hanya bisa tambah task dengan 4 field dasar; field tindakan hanya bisa diisi oleh Leader.</li>
+                        <li>Transisi stage terbatas: <code>PLAN → DO → CHECK → ACT</code>. Tidak bisa lompat stage.</li>
+                        <li>Perpindahan <strong>DO → CHECK</strong> memerlukan Tindakan Temporary / Permanent yang sudah diisi.</li>
+                    </ul>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('roleInfoModal')">Tutup</button>
+                <button class="btn btn-success" onclick="exportRoleInfoExcel()">
+                    <i class="ti ti-file-spreadsheet"></i> Export Excel
+                </button>
+                <button class="btn" onclick="printRoleInfo()">
+                    <i class="ti ti-printer"></i> Print
                 </button>
             </div>
         </div>
@@ -1790,6 +1969,7 @@
     };
     let employeeList    = [];
     let employeeLoaded  = false;
+    let employeeLoading = false;
     let sectionsList    = [];
     let sectionsLoaded  = false;
     let select2Inited   = false;
@@ -1872,6 +2052,26 @@
             }
         } catch { state.currentUser = null; }
     }
+    function normalizeRole(r) {
+        r = String(r || '').toLowerCase();
+        if (r === 'leader') return 'group_leader';
+        if (r === 'admin')  return 'manager';
+        return r;
+    }
+
+    function currentRole() {
+        return state.currentUser ? normalizeRole(state.currentUser.role) : null;
+    }
+
+    function canEdit() {
+        return ['team_leader', 'group_leader', 'manager'].includes(currentRole());
+    }
+
+    function canApprove() {
+        return ['group_leader', 'manager'].includes(currentRole());
+    }
+
+    function canDragDrop() { return canEdit(); }
 
     // ============================================================
     // NORMALIZE TASK
@@ -1883,6 +2083,8 @@
             operatorName: t.operator_name || '',
             date: t.task_date || '',
             section: t.section || '',
+            category: (t.category || '').toLowerCase(),
+            picSection: (t.pic_section || '').toLowerCase(),
             problem: t.problem || '',
             tempAction: t.temporary_action || '',
             permAction: t.permanent_action || '',
@@ -1902,7 +2104,7 @@
     }
 
     // ============================================================
-    // SELECT2
+    // SELECT2 — untuk Operator & PIC
     // ============================================================
     function initSelect2() {
         if (typeof $.fn.select2 === 'undefined') {
@@ -1911,37 +2113,100 @@
         }
         if (select2Inited) return;
 
-        $('#operatorName').select2({
-            placeholder: '-- Pilih Operator --',
+        const commonOpts = {
+            placeholder: '-- Pilih --',
             allowClear: true,
             width: '100%',
             dropdownParent: $('#taskModal'),
+            minimumResultsForSearch: 0,   // paksa search box selalu muncul
             language: {
-                noResults:     function () { return 'Operator tidak ditemukan'; },
+                noResults:     function () { return 'Data tidak ditemukan'; },
                 searching:     function () { return 'Mencari...'; },
                 inputTooShort: function () { return 'Ketik minimal 1 karakter'; },
-            },
-            matcher: function (params, data) {
-                if ($.trim(params.term) === '') return data;
-
-                const term = params.term.toLowerCase();
-                const text = (data.text || '').toLowerCase();
-
-                if (text.indexOf(term) > -1) return data;
-
-                if (data.element) {
-                    const nik = String($(data.element).data('nik') || '').toLowerCase();
-                    if (nik.indexOf(term) > -1) return data;
-                }
-                if (data.element) {
-                    const dept = String($(data.element).data('dept') || '').toLowerCase();
-                    if (dept.indexOf(term) > -1) return data;
-                }
-                return null;
             }
-        });
+        };
+
+        $('#operatorName').select2($.extend({}, commonOpts, {
+            placeholder: '-- Pilih Operator --',
+        }));
+
+        $('#pic').select2($.extend({}, commonOpts, {
+            placeholder: '-- Pilih PIC --',
+        }));
 
         select2Inited = true;
+    }
+
+    // Helper set value ke Select2 (dipakai saat edit task)
+    function setSelect2Value($sel, value, text) {
+        if (!value) {
+            $sel.val(null).trigger('change');
+            return;
+        }
+        if (!$sel.find("option[value='" + String(value).replace(/'/g, "\\'") + "']").length) {
+            const newOpt = new Option(text || value, value, true, true);
+            $sel.append(newOpt);
+        }
+        $sel.val(value).trigger('change');
+    }
+
+    // ============================================================
+    // LOAD EMPLOYEES — FIX PAGINATION (2000+ karyawan)
+    // ============================================================
+    async function loadEmployees() {
+        if (employeeLoaded) return;
+
+        const $opSel  = $('#operatorName');
+        const $picSel = $('#pic');
+
+        $opSel.html('<option value="">-- Memuat data... --</option>');
+        $picSel.html('<option value="">-- Memuat data... --</option>');
+        if ($opSel.data('select2'))  $opSel.trigger('change.select2');
+        if ($picSel.data('select2')) $picSel.trigger('change.select2');
+
+        try {
+            const res  = await api('/endpoint/employee');
+            const list = res?.data?.data || res?.data || (Array.isArray(res) ? res : []);
+            employeeList = Array.isArray(list) ? list : [];
+
+            // Sort by nama
+            employeeList.sort((a, b) =>
+                String(a.nama || '').localeCompare(String(b.nama || ''))
+            );
+
+            // Build flat list — tanpa optgroup
+            let html = '<option value="">-- Pilih --</option>';
+            employeeList.forEach(emp => {
+                const nama    = String(emp.nama || '').trim();
+                const nik     = String(emp.nik  || '').trim();
+                const section = String(emp.kode_section || '').trim();
+                if (!nama) return;
+
+                const label = nik ? `${nama} — ${nik}` : nama;
+
+                html += `<option value="${escapeHtml(nama)}"
+                                data-nik="${escapeHtml(nik)}"
+                                data-section="${escapeHtml(section)}">
+                            ${escapeHtml(label)}
+                        </option>`;
+            });
+
+            $opSel.html(html);
+            $picSel.html(html);
+
+            employeeLoaded = true;
+
+            if ($opSel.data('select2'))  $opSel.trigger('change.select2');
+            if ($picSel.data('select2')) $picSel.trigger('change.select2');
+
+        } catch (err) {
+            console.error('[employee] gagal load:', err);
+            $opSel.html('<option value="">-- Gagal memuat, coba refresh --</option>');
+            $picSel.html('<option value="">-- Gagal memuat, coba refresh --</option>');
+            if ($opSel.data('select2'))  $opSel.trigger('change.select2');
+            if ($picSel.data('select2')) $picSel.trigger('change.select2');
+            showToast('Gagal memuat data employee: ' + err.message, 'warning');
+        }
     }
 
     // ============================================================
@@ -1974,12 +2239,17 @@
             if (e.target === this) closeModal(this.id);
         });
 
-        $(document).on('change', '#operatorName', function () {
-            const $opt = $(this).find('option:selected');
-            const section = String($opt.data('section') || '').trim();
+        // Auto-fill section saat operator dipilih
+        $('#operatorName').on('select2:select', function (e) {
+            // Ambil dari option yang terpilih, BUKAN dari e.params.data
+            const $selected = $(this).find(':selected');
+            const section = String($selected.data('section') || '').trim();
+
             if (!section) return;
 
             const $secSelect = $('#section');
+
+            // Coba match dulu dengan option yang sudah ada
             let matched = false;
             $secSelect.find('option').each(function () {
                 if (String($(this).val()).toLowerCase() === section.toLowerCase()) {
@@ -1989,6 +2259,7 @@
                 }
             });
 
+            // Kalau tidak ada, append option baru
             if (!matched) {
                 $secSelect.append(`<option value="${escapeHtml(section)}">${escapeHtml(section)}</option>`);
                 $secSelect.val(section);
@@ -1996,69 +2267,10 @@
 
             if ($secSelect.data('select2')) $secSelect.trigger('change.select2');
 
+            // Efek visual hijau sebentar
             $secSelect.css('background', '#f0fdf4');
-            setTimeout(() => $secSelect.css('background', ''), 600);
+            setTimeout(() => $secSelect.css('background', ''), 800);
         });
-    }
-
-    // ============================================================
-    // EMPLOYEE LOADER
-    // ============================================================
-    async function loadEmployees() {
-        if (employeeLoaded) return;
-
-        const $sel = $('#operatorName');
-        $sel.html('<option value="">-- Memuat data... --</option>');
-        $sel.trigger('change.select2');
-
-        try {
-            const res = await api('/endpoint/employee');
-            const list = res?.data?.data || res?.data || [];
-            employeeList = Array.isArray(list) ? list : [];
-
-            employeeList.sort((a, b) => String(a.nama || '').localeCompare(String(b.nama || '')));
-
-            $sel.empty().append('<option value="">-- Pilih Operator --</option>');
-
-            const grouped = {};
-            employeeList.forEach(emp => {
-                const dept = String(emp.dept || 'Lainnya').trim() || 'Lainnya';
-                if (!grouped[dept]) grouped[dept] = [];
-                grouped[dept].push(emp);
-            });
-
-            const sortedDepts = Object.keys(grouped).sort();
-            sortedDepts.forEach(dept => {
-                $sel.append(`<optgroup label="${escapeHtml(dept)}">`);
-                grouped[dept].forEach(emp => {
-                    const nama = String(emp.nama || '').trim();
-                    const nik = String(emp.nik || '').trim();
-                    const section = String(emp.kode_section || '').trim();
-                    if (!nama) return;
-
-                    const label = nik ? `${nama} — ${nik}` : nama;
-
-                    $sel.append(
-                        `<option value="${escapeHtml(nama)}"
-                                data-nik="${escapeHtml(nik)}"
-                                data-section="${escapeHtml(section)}"
-                                data-dept="${escapeHtml(dept)}">
-                            ${escapeHtml(label)}
-                        </option>`
-                    );
-                });
-                $sel.append('</optgroup>');
-            });
-
-            employeeLoaded = true;
-            if ($sel.data('select2')) $sel.trigger('change.select2');
-
-        } catch (err) {
-            console.error('[employee] gagal load:', err);
-            $sel.html('<option value="">-- Gagal memuat, coba refresh --</option>');
-            if ($sel.data('select2')) $sel.trigger('change.select2');
-            showToast('Gagal memuat data employee: ' + err.message, 'warning');
-        }
     }
 
     // ============================================================
@@ -2150,7 +2362,13 @@
     // ============================================================
     // REGISTER
     // ============================================================
-    function toggleRegister() { openModal('registerModal'); }
+    function toggleRegister() {
+        if (String(state.currentUser?.role || '').toLowerCase() !== 'admin') {
+            showAlert('warning', 'Akses Ditolak', 'Hanya Admin yang bisa menambah user baru.');
+            return;
+        }
+        openModal('registerModal');
+    }
 
     async function registerUser() {
         const name = $('#registerName').val().trim();
@@ -2158,6 +2376,11 @@
         const password = $('#registerPassword').val();
         const passwordConfirm = $('#registerPasswordConfirm').val();
         const role = $('#registerRole').val();
+
+        if (String(state.currentUser?.role || '').toLowerCase() !== 'admin') {
+            showAlert('warning', 'Akses Ditolak', 'Hanya Admin yang bisa mendaftarkan user baru.');
+            return;
+        }
 
         if (!name || !username || !password || !passwordConfirm) {
             showAlert('warning', 'Form Tidak Lengkap', 'Semua field wajib diisi!');
@@ -2247,7 +2470,6 @@
         const newPw    = $('#profileNewPassword').val();
         const confirmPw= $('#profileConfirmPassword').val();
 
-        // ── Validasi info profil ──
         if (!name || name.length < 2) {
             showAlert('warning', 'Nama Tidak Valid', 'Nama minimal 2 karakter.');
             return;
@@ -2257,7 +2479,6 @@
             return;
         }
 
-        // ── Validasi ganti password (hanya jika ada isinya) ──
         const wantsChangePw = !!(oldPw || newPw || confirmPw);
 
         if (wantsChangePw) {
@@ -2279,7 +2500,6 @@
             }
         }
 
-        // ── Bangun payload ──
         const payload = { name, username };
         if (wantsChangePw) {
             payload.old_password = oldPw;
@@ -2296,7 +2516,6 @@
         try {
             const res = await api('/auth/profile', { method: 'PUT', body: payload });
 
-            // Update localStorage dengan data terbaru
             const updated = res?.user || res?.data || { ...state.currentUser, name, username };
             saveUser({
                 id:       updated.id       || state.currentUser.id,
@@ -2310,7 +2529,6 @@
             updateUserInterface();
             showToast('Profile berhasil diupdate', 'success');
 
-            // Kalau ganti password, sarankan login ulang
             if (wantsChangePw) {
                 setTimeout(async () => {
                     const again = await showConfirm(
@@ -2353,14 +2571,22 @@
             const user = res?.user || res?.data || res;
             if (!user || !user.role) throw new Error('Response login tidak valid');
 
-            const role = String(user.role).toLowerCase();
-            if (!['admin', 'leader'].includes(role)) throw new Error('Akun ini tidak memiliki akses sebagai Leader/Admin');
+            const role = normalizeRole(user.role);
+            const allowed = ['operator', 'team_leader', 'group_leader', 'manager'];
+            if (!allowed.includes(role)) {
+                throw new Error('Role akun tidak dikenal: ' + role);
+            }
 
-            saveUser({ id: user.id, name: user.name, username: user.username, role });
+            saveUser({
+                id:       user.id,
+                name:     user.name,
+                username: user.username,
+                role:     user.role,
+            });
             closeModal('loginModal');
             $('#loginForm')[0].reset();
             updateUserInterface();
-            showToast('Login berhasil sebagai ' + role, 'success');
+            showToast('Login berhasil sebagai ' + role.replace('_', ' '), 'success');
             setTimeout(() => window.location.reload(), 800);
         } catch (err) {
             showAlert('error', 'Login Gagal', err.message);
@@ -2387,30 +2613,48 @@
         const $reportBtnHeader = $('#reportBtnHeader');
 
         if (state.currentUser) {
+            const rawRole = String(state.currentUser.role || '').toLowerCase();
+            const role    = normalizeRole(rawRole);
+
             $userName.text(state.currentUser.name);
             $userInfo.find('.user-avatar').text((state.currentUser.name || 'U').charAt(0).toUpperCase());
             $userInfo.css('background', '#dcfce7');
             $loginBtn.html('<i class="ti ti-logout"></i> Logout');
-            $('#profileBtn').show(); 
+            $('#profileBtn').show();
 
-            const role = state.currentUser.role;
             let label = '', color = '';
 
-            if (role === 'admin') {
-                label = 'Admin'; color = '#7c3aed';
+            if (rawRole === 'admin') {
+                label = 'Admin';        color = '#7c3aed';
                 $registerBtnHeader.show();
-            } else if (role === 'leader') {
-                label = 'Leader'; color = '#16a34a';
+            } else if (role === 'manager') {
+                label = 'Manager';      color = '#7c3aed';
+                $registerBtnHeader.hide();
+            } else if (role === 'group_leader') {
+                label = 'Group Leader'; color = '#16a34a';
+                $registerBtnHeader.hide();
+            } else if (role === 'team_leader') {
+                label = 'Team Leader';  color = '#0891b2';
+                $registerBtnHeader.hide();
             } else {
-                label = role.charAt(0).toUpperCase() + role.slice(1);
-                color = '#2563eb';
+                label = 'Operator';     color = '#2563eb';
+                $registerBtnHeader.hide();
             }
 
             $reportBtnHeader.show();
+
+            let hint = '';
+            if (canApprove()) {
+                hint = 'Bisa mengisi tindakan, deadline, PIC, drag & drop, dan approve task.';
+            } else if (canEdit()) {
+                hint = 'Bisa mengisi tindakan, deadline, PIC, dan drag & drop. Approve hanya Group Leader / Manager.';
+            } else {
+                hint = 'Hanya bisa menambah task baru dengan data dasar.';
+            }
+
             $noticeBar.html(
                 '<i class="ti ti-circle-check"></i>' +
-                '<span>Anda login sebagai <strong style="color:' + color + '">' + label + '</strong>. ' +
-                'Bisa mengisi tindakan, deadline, PIC, dan melakukan drag & drop.</span>'
+                '<span>Login sebagai <strong style="color:' + color + '">' + label + '</strong>. ' + hint + '</span>'
             );
             $noticeBar.attr('class', 'notice-bar');
         } else {
@@ -2460,13 +2704,28 @@
         return state.tasks.filter(task => {
             if (task.status === 'cancelled') return false;
 
+            // ── Search (cek semua field) ──
             if (state.searchQuery) {
-                const s = [task.operatorName, task.section, task.problem, task.tempAction, task.permAction, task.pic, task.taskCode]
-                    .join(' ').toLowerCase();
+                const s = [
+                    task.operatorName,
+                    task.section,
+                    task.problem,
+                    task.tempAction,
+                    task.permAction,
+                    task.pic,
+                    task.taskCode,
+                    CATEGORY_LABEL[task.category] || '',
+                    PIC_SECTION_LABEL[task.picSection] || '',
+                    task.stage,
+                    task.status,
+                ].join(' ').toLowerCase();
                 if (!s.includes(state.searchQuery)) return false;
             }
+
+            // ── Filter seksi ──
             if (state.sectionFilter !== 'all' && task.section !== state.sectionFilter) return false;
 
+            // ── Filter tanggal (selalu aktif) ──
             if (state.dateFrom) {
                 if (new Date(task.date) < new Date(state.dateFrom)) return false;
             }
@@ -2475,6 +2734,7 @@
                 to.setHours(23, 59, 59);
                 if (new Date(task.date) > to) return false;
             }
+
             return true;
         });
     }
@@ -2482,10 +2742,6 @@
     // ============================================================
     // DRAG & DROP
     // ============================================================
-    function canDragDrop() {
-        return state.currentUser && ['leader', 'admin'].includes(state.currentUser.role);
-    }
-
     function handleDragStart(e, taskId) {
         if (!canDragDrop()) {
             e.preventDefault();
@@ -2547,10 +2803,12 @@
     // TASK CRUD
     // ============================================================
     function openTaskModal() {
-        const isLeader = canDragDrop();
+        const isLeader = canEdit();
 
         $('#modalTitle').text(isLeader ? 'Tambah Task Baru (Leader)' : 'Tambah Task Baru (Operator)');
         $('#taskForm')[0].reset();
+        $('input[name="category"]').prop('checked', false);
+        $('input[name="pic_section"]').prop('checked', false);
         $('#taskId').val('');
         $('#taskDate').val(new Date().toISOString().split('T')[0]);
 
@@ -2565,15 +2823,18 @@
         $('#leaderSection').css('display', isLeader ? 'block' : 'none');
         $('#documentsSection').css('display', isLeader ? 'block' : 'none');
 
+        $('#classificationSection').css('display', isLeader ? 'block' : 'none');
+        $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeader);
+
         $('#historyTaskBtn').hide();
         $('#reportTaskBtn').hide();
         $('#approveTaskBtn').hide();
         $('#cancelTaskBtn').hide();
 
-        if ($('#operatorName').data('select2')) {
-            $('#operatorName').val('').trigger('change.select2');
-        }
+        setSelect2Value($('#operatorName'), '', '');
+        setSelect2Value($('#pic'), '', '');
 
+        // PENTING: load employee (fix pagination)
         loadEmployees();
         loadSections();
         openModal('taskModal');
@@ -2581,25 +2842,40 @@
 
     async function saveTask() {
         const id = $('#taskId').val();
-        const isLeader = canDragDrop();
+        const isLeader = canEdit();
+
+        const category   = $('input[name="category"]:checked').val() || '';
+        const picSection = $('input[name="pic_section"]:checked').val() || '';
 
         const basePayload = {
             operator_name: $('#operatorName').val() ? $('#operatorName').val().trim() : '',
-            task_date: $('#taskDate').val(),
-            section: $('#section').val(),
-            problem: $('#problem').val() ? $('#problem').val().trim() : ''
+            task_date:     $('#taskDate').val(),
+            section:       $('#section').val(),
+            problem:       $('#problem').val() ? $('#problem').val().trim() : '',
         };
 
+        if (isLeader) {
+            basePayload.category    = category;
+            basePayload.pic_section = picSection;
+        }
+
+        // Validasi field wajib
         if (!basePayload.operator_name || !basePayload.task_date || !basePayload.section || !basePayload.problem) {
             showAlert('warning', 'Form Tidak Lengkap', 'Mohon isi semua field yang wajib!');
+            return;
+        }
+
+        // Validasi klasifikasi (khusus leader)
+        if (isLeader && (!category || !picSection)) {
+            showAlert('warning', 'Klasifikasi Belum Lengkap', 'Pilih Category dan PIC Section terlebih dahulu.');
             return;
         }
 
         const leaderPayload = {
             temporary_action: $('#tempAction').val().trim(),
             permanent_action: $('#permAction').val().trim(),
-            deadline: $('#deadline').val() || null,
-            pic: $('#pic').val().trim()
+            deadline:         $('#deadline').val() || null,
+            pic:              $('#pic').val() ? $('#pic').val().trim() : '',
         };
 
         Swal.fire({
@@ -2611,22 +2887,29 @@
 
         try {
             if (id) {
-                await api(`/tasks/${id}`, {
-                    method: 'PUT',
-                    body: {
-                        operator_name: basePayload.operator_name,
-                        task_date: basePayload.task_date,
-                        section: basePayload.section,
-                        problem: basePayload.problem,
-                        ...(isLeader ? leaderPayload : {})
-                    }
-                });
+                const updateBody = {
+                    operator_name: basePayload.operator_name,
+                    task_date:     basePayload.task_date,
+                    section:       basePayload.section,
+                    problem:       basePayload.problem,
+                    ...(isLeader ? {
+                        category:         category,
+                        pic_section:      picSection,
+                        temporary_action: leaderPayload.temporary_action,
+                        permanent_action: leaderPayload.permanent_action,
+                        deadline:         leaderPayload.deadline,
+                        pic:              leaderPayload.pic,
+                    } : {})
+                };
+                await api(`/tasks/${id}`, { method: 'PUT', body: updateBody });
                 showToast('Task berhasil diupdate', 'success');
             } else {
                 const created = await api('/tasks', { method: 'POST', body: basePayload });
                 const newId = created?.id ?? created?.data?.id;
 
-                if (isLeader && newId && (leaderPayload.temporary_action || leaderPayload.permanent_action || leaderPayload.deadline || leaderPayload.pic)) {
+                if (isLeader && newId &&
+                    (leaderPayload.temporary_action || leaderPayload.permanent_action ||
+                     leaderPayload.deadline || leaderPayload.pic)) {
                     await api(`/tasks/${newId}`, { method: 'PUT', body: leaderPayload });
                 }
                 showToast('Task berhasil ditambahkan', 'success');
@@ -2641,9 +2924,9 @@
         }
     }
 
-    function editTask(id) {
-        if (!canDragDrop()) {
-            showConfirm('Akses Ditolak', 'Silakan login sebagai leader untuk mengedit task ini.', 'Login Sekarang', 'Batal')
+    async function editTask(id) {
+        if (!canEdit()) {
+            showConfirm('Akses Ditolak', 'Silakan login sebagai Leader untuk mengedit task ini.', 'Login Sekarang', 'Batal')
                 .then(confirmed => { if (confirmed) openModal('loginModal'); });
             return;
         }
@@ -2651,10 +2934,7 @@
         const task = state.tasks.find(t => t.id === id);
         if (!task) return;
 
-        loadEmployees();
-        loadSections();
-
-        $('#modalTitle').text('Edit Task (Leader)');
+        $('#modalTitle').text('Edit Task');
         $('#taskId').val(task.id);
 
         taskAttachments = {};
@@ -2664,34 +2944,45 @@
 
         loadAttachments(task.id);
 
-        setTimeout(() => {
-            const $sel = $('#operatorName');
-            const name = task.operatorName || '';
-            const found = $sel.find('option').filter(function () { return this.value === name; }).length;
-            if (!found && name) {
-                $sel.append(`<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`);
-            }
-            $sel.val(name);
-            if ($sel.data('select2')) $sel.trigger('change.select2');
-        }, 300);
+        await Promise.all([
+            loadEmployees(),
+            loadSections(),
+        ]);
 
-        setTimeout(() => {
-            const $sec = $('#section');
-            const sec = task.section || '';
-            const found = $sec.find('option').filter(function () { return this.value === sec; }).length;
-            if (!found && sec) {
-                $sec.append(`<option value="${escapeHtml(sec)}">${escapeHtml(sec)}</option>`);
-            }
-            $sec.val(sec);
-            if ($sec.data('select2')) $sec.trigger('change.select2');
-        }, 350);
+        // Set operator & PIC via helper
+        setSelect2Value($('#operatorName'), task.operatorName, task.operatorName);
+        setSelect2Value($('#pic'), task.pic, task.pic);
 
+        // Set seksi
+        const $sec = $('#section');
+        const sec = task.section || '';
+        const foundSec = $sec.find('option').filter(function () { return this.value === sec; }).length;
+        if (!foundSec && sec) {
+            $sec.append(`<option value="${escapeHtml(sec)}">${escapeHtml(sec)}</option>`);
+        }
+        $sec.val(sec);
+        if ($sec.data('select2')) $sec.trigger('change.select2');
+
+        // Field lain
         $('#taskDate').val(task.date);
         $('#problem').val(task.problem);
+
+        // Radio card
+        $('input[name="category"]').prop('checked', false);
+        if (task.category) {
+            $(`input[name="category"][value="${task.category}"]`).prop('checked', true);
+        }
+        $('input[name="pic_section"]').prop('checked', false);
+        if (task.picSection) {
+            $(`input[name="pic_section"][value="${task.picSection}"]`).prop('checked', true);
+        }
+        const isLeaderEdit = canEdit();
+        $('#classificationSection').css('display', isLeaderEdit ? 'block' : 'none');
+        $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeaderEdit);
+
         $('#tempAction').val(task.tempAction);
         $('#permAction').val(task.permAction);
         $('#deadline').val(task.deadline);
-        $('#pic').val(task.pic);
 
         $('#tempAction, #permAction, #deadline, #pic').prop('disabled', false);
         $('#leaderSection').css('display', 'block');
@@ -2700,7 +2991,7 @@
         const isCancelled = task.status === 'cancelled';
         const isAct = task.stage === 'act';
 
-        if (isAct && !isDone && !isCancelled) {
+        if (isAct && !isDone && !isCancelled && canApprove()) {
             $('#approveTaskBtn').show().prop('disabled', true);
         } else {
             $('#approveTaskBtn').hide();
@@ -2719,6 +3010,7 @@
             $('#saveBtn').prop('disabled', false);
         }
 
+        applyDocLockState();
         openModal('taskModal');
     }
 
@@ -2750,6 +3042,10 @@
     }
 
     async function approveTask() {
+        if (!canApprove()) {
+            showAlert('warning', 'Akses Ditolak', 'Hanya Group Leader & Manager yang bisa approve task.');
+            return;
+        }
         const id = $('#taskId').val();
         if (!id) return;
 
@@ -2860,13 +3156,13 @@
         Swal.close();
 
         const iconMap = {
-            'create': { icon: 'ti-plus', color: '#2563eb', bg: '#eff6ff', label: 'Dibuat' },
-            'update': { icon: 'ti-pencil', color: '#7c3aed', bg: '#f5f3ff', label: 'Diupdate' },
-            'move_stage': { icon: 'ti-arrow-right', color: '#0891b2', bg: '#ecfeff', label: 'Pindah Stage' },
-            'approve': { icon: 'ti-circle-check', color: '#16a34a', bg: '#f0fdf4', label: 'Approved' },
-            'cancel': { icon: 'ti-circle-x', color: '#dc2626', bg: '#fef2f2', label: 'Cancelled' },
-            'delete': { icon: 'ti-trash', color: '#dc2626', bg: '#fef2f2', label: 'Dihapus' },
-            'restore': { icon: 'ti-restore', color: '#16a34a', bg: '#f0fdf4', label: 'Direstore' },
+            'create':    { icon: 'ti-plus',         color: '#2563eb', bg: '#eff6ff', label: 'Dibuat' },
+            'update':    { icon: 'ti-pencil',       color: '#7c3aed', bg: '#f5f3ff', label: 'Diupdate' },
+            'move_stage':{ icon: 'ti-arrow-right',  color: '#0891b2', bg: '#ecfeff', label: 'Pindah Stage' },
+            'approve':   { icon: 'ti-circle-check', color: '#16a34a', bg: '#f0fdf4', label: 'Approved' },
+            'cancel':    { icon: 'ti-circle-x',     color: '#dc2626', bg: '#fef2f2', label: 'Cancelled' },
+            'delete':    { icon: 'ti-trash',        color: '#dc2626', bg: '#fef2f2', label: 'Dihapus' },
+            'restore':   { icon: 'ti-restore',      color: '#16a34a', bg: '#f0fdf4', label: 'Direstore' },
         };
 
         if (histories.length === 0) {
@@ -2882,6 +3178,8 @@
             return;
         }
 
+        window._historyData = histories; // simpan untuk expand
+
         const timelineHtml = histories.map((h, idx) => {
             const meta = iconMap[h.action] || { icon: 'ti-activity', color: '#6b7280', bg: '#f3f4f6', label: h.action };
             const isLast = idx === histories.length - 1;
@@ -2889,18 +3187,32 @@
             let changeHtml = '';
             if (h.oldStage && h.newStage && h.oldStage !== h.newStage) {
                 changeHtml += `<div style="font-size:12px;margin-top:4px;color:#374151">
-                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStage||'').toUpperCase()}</span>
+                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStage || '').toUpperCase()}</span>
                     <i class="ti ti-arrow-right" style="margin:0 6px;color:#9ca3af"></i>
-                    <span style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;font-weight:600">${(h.newStage||'').toUpperCase()}</span>
+                    <span style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;font-weight:600">${(h.newStage || '').toUpperCase()}</span>
                 </div>`;
             }
             if (h.oldStatus && h.newStatus && h.oldStatus !== h.newStatus) {
                 changeHtml += `<div style="font-size:12px;margin-top:4px;color:#374151">
-                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStatus||'').toUpperCase()}</span>
+                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStatus || '').toUpperCase()}</span>
                     <i class="ti ti-arrow-right" style="margin:0 6px;color:#9ca3af"></i>
-                    <span style="background:#dcfce7;padding:2px 6px;border-radius:4px;color:#166534;font-weight:600">${(h.newStatus||'').toUpperCase()}</span>
+                    <span style="background:#dcfce7;padding:2px 6px;border-radius:4px;color:#166534;font-weight:600">${(h.newStatus || '').toUpperCase()}</span>
                 </div>`;
             }
+
+            // Cek apakah ada diff yang bisa ditampilkan
+            const oldV = h.oldValues || h.old_values;
+            const newV = h.newValues || h.new_values;
+            const hasDiff = !!(oldV || newV);
+
+            const toggleBtn = hasDiff
+                ? `<button type="button" onclick="toggleHistoryDetail(${idx})"
+                        id="histToggleBtn${idx}"
+                        style="margin-top:8px;background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px">
+                        <i class="ti ti-chevron-down" id="histToggleIcon${idx}"></i> Lihat Perubahan
+                </button>
+                <div id="histDetail${idx}" style="display:none;margin-top:8px"></div>`
+                : '';
 
             return `<div style="display:flex;gap:12px;position:relative;padding-bottom:${isLast ? '0' : '20px'}">
                 <div style="flex-shrink:0;position:relative">
@@ -2920,13 +3232,14 @@
                     </div>
                     ${changeHtml}
                     ${h.notes ? `<div style="font-size:12px;color:#6b7280;margin-top:6px;font-style:italic">${escapeHtml(h.notes)}</div>` : ''}
+                    ${toggleBtn}
                 </div>
             </div>`;
         }).join('');
 
         Swal.fire({
             title: 'History Task',
-            html: `<div style="text-align:left;max-height:60vh;overflow-y:auto;padding:4px 8px">
+            html: `<div style="text-align:left;max-height:65vh;overflow-y:auto;padding:4px 8px">
                 <div style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px">
                     <div style="color:#6b7280;margin-bottom:4px">Task:</div>
                     <div style="font-weight:600;color:#111827">${title}</div>
@@ -2936,10 +3249,108 @@
                 </div>
                 <div>${timelineHtml}</div>
             </div>`,
-            width: 650,
+            width: 700,
             confirmButtonText: 'Tutup',
             confirmButtonColor: '#2563eb'
         });
+    }
+
+    // Toggle expand detail
+    function toggleHistoryDetail(idx) {
+        const $detail = document.getElementById('histDetail' + idx);
+        const $icon = document.getElementById('histToggleIcon' + idx);
+        const $btn = document.getElementById('histToggleBtn' + idx);
+        if (!$detail) return;
+
+        const isOpen = $detail.style.display !== 'none';
+
+        if (isOpen) {
+            $detail.style.display = 'none';
+            if ($icon) $icon.className = 'ti ti-chevron-down';
+            if ($btn) $btn.innerHTML = '<i class="ti ti-chevron-down" id="histToggleIcon' + idx + '"></i> Lihat Perubahan';
+        } else {
+            if ($detail.innerHTML.trim() === '') {
+                const h = window._historyData[idx];
+                $detail.innerHTML = buildHistoryDetailHtml(h);
+            }
+            $detail.style.display = 'block';
+            if ($btn) $btn.innerHTML = '<i class="ti ti-chevron-up" id="histToggleIcon' + idx + '"></i> Sembunyikan';
+        }
+    }
+
+    function buildHistoryDetailHtml(h) {
+        const fieldLabels = {
+            operator_name:     'Nama Operator',
+            task_date:         'Tanggal',
+            section:           'Seksi',
+            problem:           'Masalah',
+            category:          'Category',
+            pic_section:       'PIC Section',
+            temporary_action:  'Tindakan Temporary',
+            permanent_action:  'Tindakan Permanent',
+            deadline:          'Deadline',
+            pic:               'PIC',
+            stage:             'Stage',
+            status:            'Status',
+        };
+
+        let oldVals = h.oldValues || h.old_values || null;
+        let newVals = h.newValues || h.new_values || null;
+
+        const tryParse = v => {
+            if (typeof v !== 'string') return v;
+            try { return JSON.parse(v); } catch { return v; }
+        };
+        oldVals = tryParse(oldVals);
+        newVals = tryParse(newVals);
+
+        if (!oldVals && !newVals) {
+            return `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:10px;font-size:12px;color:#92400e">
+                <i class="ti ti-alert-triangle"></i> Detail perubahan tidak tersedia.
+                Backend belum menyimpan <code>old_values</code> / <code>new_values</code>.
+            </div>`;
+        }
+
+        const keys = new Set([
+            ...Object.keys(oldVals || {}),
+            ...Object.keys(newVals || {})
+        ]);
+
+        const rows = [];
+        keys.forEach(k => {
+            const ov = (oldVals || {})[k];
+            const nv = (newVals || {})[k];
+            if (JSON.stringify(ov) === JSON.stringify(nv)) return;
+            rows.push({ key: k, ov, nv });
+        });
+
+        if (rows.length === 0) {
+            return `<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:10px;font-size:12px;color:#166534">
+                <i class="ti ti-check"></i> Tidak ada perubahan nilai (kemungkinan save tanpa ubah).
+            </div>`;
+        }
+
+        const tableRows = rows.map(r => {
+            const label = fieldLabels[r.key] || r.key;
+            const ovStr = r.ov == null || r.ov === '' ? '-' : String(r.ov);
+            const nvStr = r.nv == null || r.nv === '' ? '-' : String(r.nv);
+            return `<tr>
+                <td style="padding:6px 8px;border:1px solid #e5e7eb;background:#f9fafb;font-weight:600;color:#374151;font-size:11px;width:28%;vertical-align:top">${escapeHtml(label)}</td>
+                <td style="padding:6px 8px;border:1px solid #e5e7eb;color:#991b1b;background:#fef2f2;font-size:11px;word-break:break-word;vertical-align:top">${escapeHtml(ovStr)}</td>
+                <td style="padding:6px 8px;border:1px solid #e5e7eb;color:#166534;background:#f0fdf4;font-size:11px;word-break:break-word;vertical-align:top">${escapeHtml(nvStr)}</td>
+            </tr>`;
+        }).join('');
+
+        return `<table style="width:100%;border-collapse:collapse">
+            <thead>
+                <tr>
+                    <th style="padding:6px 8px;border:1px solid #e5e7eb;background:#f3f4f6;text-align:left;font-size:10px;text-transform:uppercase;color:#6b7280">Field</th>
+                    <th style="padding:6px 8px;border:1px solid #e5e7eb;background:#fee2e2;text-align:left;font-size:10px;text-transform:uppercase;color:#991b1b">Sebelum</th>
+                    <th style="padding:6px 8px;border:1px solid #e5e7eb;background:#dcfce7;text-align:left;font-size:10px;text-transform:uppercase;color:#166534">Sesudah</th>
+                </tr>
+            </thead>
+            <tbody>${tableRows}</tbody>
+        </table>`;
     }
 
     // ============================================================
@@ -2949,7 +3360,7 @@
 
     function openReport() {
         if (!canDragDrop()) {
-            showAlert('warning', 'Akses Ditolak', 'Silakan login sebagai leader/admin untuk melihat report.');
+            showAlert('warning', 'Akses Ditolak', 'Silakan login sebagai Group leader/manager untuk melihat report.');
             return;
         }
 
@@ -3044,6 +3455,8 @@
                     <th style="width:130px">Kode</th>
                     <th style="width:90px">Tanggal</th>
                     <th style="width:100px">Seksi</th>
+                    <th style="width:80px">Category</th>
+                    <th style="width:70px">PIC Sec</th>
                     <th>Masalah</th>
                     <th style="width:70px">Stage</th>
                     <th style="width:90px">Status</th>
@@ -3055,6 +3468,8 @@
                         <td><strong>${escapeHtml(t.taskCode)}</strong></td>
                         <td>${formatDate(t.date)}</td>
                         <td>${escapeHtml(t.section)}</td>
+                        <td style="text-align:center"><span class="card-tag cat-${t.category || ''}">${escapeHtml(CATEGORY_LABEL[t.category] || '-')}</span></td>
+                        <td style="text-align:center"><span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[t.picSection] || '-')}</span></td>
                         <td>${escapeHtml(t.problem)}</td>
                         <td style="text-align:center"><span class="stage-pill">${t.stage}</span></td>
                         <td style="text-align:center"><span class="status-pill status-${t.status}">${t.status}</span></td>
@@ -3092,7 +3507,7 @@
     }
 
     // ============================================================
-    // EXPORT PDF (Report Umum) — FIXED
+    // EXPORT PDF (Report Umum)
     // ============================================================
     async function exportPDF() {
         const original = document.getElementById('reportContent');
@@ -3176,28 +3591,27 @@
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-            const pdfWidth = 210;
-            const margin = 8;
-            const contentWidth = pdfWidth - (margin * 2);
-            const contentHeight = 297 - (margin * 2);
+            const pdfWidth  = 210;
+            const pdfHeight = 297;
+            const margin    = 8;
+            const contentWidth  = pdfWidth  - (margin * 2);
+            const contentHeight = pdfHeight - (margin * 2);
 
-            const imgWidth = contentWidth;
-            const imgHeight = (canvas.height * contentWidth) / canvas.width;
+            const scaleW = contentWidth  / canvas.width;
+            const scaleH = contentHeight / canvas.height;
+            const scale  = Math.min(scaleW, scaleH);
+
+            const imgWidth  = canvas.width  * scale;
+            const imgHeight = canvas.height * scale;
+
+            const posX = margin + (contentWidth - imgWidth) / 2;
+            const posY = margin;
+
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-            let heightLeft = imgHeight;
-            let position = margin;
-
-            pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-            heightLeft -= contentHeight;
-
-            while (heightLeft > 0) {
-                position = margin - (imgHeight - heightLeft);
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-                heightLeft -= contentHeight;
+            pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
+            if (pdf.getNumberOfPages() > 1) {
+                pdf.deletePage(pdf.getNumberOfPages());
             }
-
             pdf.save(filename);
             Swal.close();
             showToast('PDF berhasil diunduh', 'success');
@@ -3248,6 +3662,16 @@
         $('#trTaskDate').text(task.date ? formatDateLong(task.date) : '-');
         $('#trSection').text(task.section || '-');
         $('#trPic').text(task.pic || '-');
+        $('#trCategory').html(
+            task.category
+                ? `<span class="card-tag cat-${task.category}">${escapeHtml(CATEGORY_LABEL[task.category] || task.category)}</span>`
+                : '-'
+        );
+        $('#trPicSection').html(
+            task.picSection
+                ? `<span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[task.picSection] || task.picSection)}</span>`
+                : '-'
+        );
         $('#trStage').text((task.stage || '-').toUpperCase());
         $('#trStatus').text((task.status || '-').toUpperCase());
         $('#trDeadline').text(task.deadline ? formatDateLong(task.deadline) : '-');
@@ -3261,7 +3685,7 @@
         if (atts.length > 0) {
             $('#trAttachmentSection').show();
             $('#trAttachmentList').html(atts.map(a => {
-                const url = API_BASE.replace(/\/$/, '') + '/storage/public/' + a.file_path;
+                const url = API_BASE.replace(/\/$/, '') + '/storage/' + a.file_path;
                 const isImg = (a.mime_type || '').startsWith('image/');
                 return `<div style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center;background:#fff">
                     <a href="${url}" target="_blank" style="text-decoration:none;color:#2563eb;font-size:12px;font-weight:600">
@@ -3274,7 +3698,6 @@
         } else {
             $('#trAttachmentSection').hide();
         }
-
 
         if (isDone) badges.push(`<span class="badge-status badge-approved"><i class="ti ti-circle-check"></i> APPROVED</span>`);
         else if (isCancelled) badges.push(`<span class="badge-status badge-cancelled"><i class="ti ti-circle-x"></i> CANCELLED</span>`);
@@ -3327,7 +3750,7 @@
     }
 
     // ============================================================
-    // EXPORT TASK PDF — FIXED
+    // EXPORT TASK PDF
     // ============================================================
     async function exportTaskPDF() {
         const original = document.getElementById('taskReportContent');
@@ -3413,12 +3836,6 @@
             const fullHeight = clone.scrollHeight;
             wrapper.style.height = fullHeight + 'px';
 
-            console.log('[export] clone size:', {
-                width: clone.offsetWidth,
-                height: clone.offsetHeight,
-                scrollHeight: fullHeight
-            });
-
             const canvas = await html2canvas(clone, {
                 scale: 2,
                 useCORS: true,
@@ -3439,30 +3856,27 @@
                 format: 'a4'
             });
 
-            const pdfWidth = 210;
+            const pdfWidth  = 210;
             const pdfHeight = 297;
-            const margin = 8;
-            const contentWidth = pdfWidth - (margin * 2);
+            const margin    = 8;
+            const contentWidth  = pdfWidth  - (margin * 2);
             const contentHeight = pdfHeight - (margin * 2);
 
-            const imgWidth = contentWidth;
-            const imgHeight = (canvas.height * contentWidth) / canvas.width;
+            const scaleW = contentWidth  / canvas.width;
+            const scaleH = contentHeight / canvas.height;
+            const scale  = Math.min(scaleW, scaleH);
+
+            const imgWidth  = canvas.width  * scale;
+            const imgHeight = canvas.height * scale;
+
+            const posX = margin + (contentWidth - imgWidth) / 2;
+            const posY = margin;
 
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-
-            let heightLeft = imgHeight;
-            let position = margin;
-
-            pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-            heightLeft -= contentHeight;
-
-            while (heightLeft > 0) {
-                position = margin - (imgHeight - heightLeft);
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', margin, position, imgWidth, imgHeight);
-                heightLeft -= contentHeight;
+            pdf.addImage(imgData, 'JPEG', posX, posY, imgWidth, imgHeight);
+            if (pdf.getNumberOfPages() > 1) {
+                pdf.deletePage(pdf.getNumberOfPages());
             }
-
             pdf.save(filename);
 
             Swal.close();
@@ -3704,6 +4118,8 @@
                     ${task.tempAction ? `<div class="card-desc">Temp: ${escapeHtml(task.tempAction)}</div>` : ''}
                     ${task.permAction ? `<div class="card-desc">Perm: ${escapeHtml(task.permAction)}</div>` : ''}
                     <div class="card-meta">
+                        ${task.category ? `<span class="card-tag cat-${task.category}">${escapeHtml(CATEGORY_LABEL[task.category] || task.category)}</span>` : ''}
+                        ${task.picSection ? `<span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[task.picSection] || task.picSection)}</span>` : ''}
                         <span class="card-tag">${escapeHtml(task.section)}</span>
                         ${task.pic ? `<span class="card-tag">PIC: ${escapeHtml(task.pic)}</span>` : ''}
                     </div>
@@ -3727,6 +4143,16 @@
     // ============================================================
     // ATTACHMENT UPLOAD
     // ============================================================
+    const CATEGORY_LABEL = {
+        man:      'Man',
+        machine:  'Machine',
+        material: 'Material',
+        methode:  'Methode',
+    };
+    const PIC_SECTION_LABEL = {
+        mdf: 'MDF', pe: 'PE', pc: 'PC', inj: 'INJ',
+        st:  'ST',  qc: 'QC', whp: 'WHP', prc: 'PRC', log: 'LOG',
+    };
     const DOC_LABEL = { '4m': '4M', 'logbook': 'Logbook', 'nursecall': 'Nursecall' };
     const DOC_MAX_SIZE = 4 * 1024 * 1024;
     const DOC_MIMES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
@@ -4075,6 +4501,397 @@
         if (!from && !to) { setActiveQuickDate('all'); return; }
 
         setActiveQuickDate(null);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // ROLE INFORMATION
+    // ══════════════════════════════════════════════════════════════
+
+    const ROLE_INFO = {
+        roles: [
+            {
+                key: 'operator',
+                name: 'Operator',
+                icon: 'ti-user',
+                color: '#2563eb',
+                bg: '#eff6ff',
+                desc: 'Hanya bisa melaporkan masalah dengan data dasar.',
+            },
+            {
+                key: 'team_leader',
+                name: 'Team Leader',
+                icon: 'ti-users',
+                color: '#0891b2',
+                bg: '#ecfeff',
+                desc: 'Bisa isi tindakan & gerakkan task antar stage.',
+            },
+            {
+                key: 'group_leader',
+                name: 'Group Leader',
+                icon: 'ti-user-star',
+                color: '#16a34a',
+                bg: '#f0fdf4',
+                desc: 'Bisa approve task setelah dokumen lengkap.',
+            },
+            {
+                key: 'manager',
+                name: 'Manager',
+                icon: 'ti-briefcase',
+                color: '#7c3aed',
+                bg: '#f5f3ff',
+                desc: 'Akses penuh untuk monitoring & approval.',
+            },
+            {
+                key: 'admin',
+                name: 'Admin',
+                icon: 'ti-shield-check',
+                color: '#7c3aed',
+                bg: '#ede9fe',
+                desc: 'Akses penuh + bisa tambah user baru.',
+            },
+        ],
+
+        matrix: [
+            { feature: 'Buat task baru',                 operator: true,  team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Isi data dasar (operator, tanggal, seksi, masalah)',
+                                                        operator: true,  team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Isi klasifikasi (Category, PIC Section)',
+                                                        operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Isi tindakan (Temp, Perm, Deadline, PIC)',
+                                                        operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Drag & drop stage',              operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Edit task',                      operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Hapus task',                     operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Approve task',                   operator: false, team_leader: false, group_leader: true,  manager: true,  admin: true },
+            { feature: 'Cancel task',                    operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Lihat Report',                   operator: false, team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Lihat History',                  operator: true,  team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Tambah User Baru',               operator: false, team_leader: false, group_leader: false, manager: false, admin: true },
+            { feature: 'Login / Logout',                 operator: true,  team_leader: true,  group_leader: true,  manager: true,  admin: true },
+            { feature: 'Edit Profile sendiri',           operator: true,  team_leader: true,  group_leader: true,  manager: true,  admin: true },
+        ],
+
+        details: [
+            {
+                name: 'Operator',
+                color: '#2563eb',
+                bg: '#eff6ff',
+                icon: 'ti-user',
+                can: [
+                    'Tambah task baru dengan 4 field dasar (Operator, Tanggal, Seksi, Masalah)',
+                    'Lihat semua task di Kanban board',
+                    'Klik task untuk lihat detail (read-only)',
+                    'Lihat history task',
+                    'Login & edit profile sendiri',
+                ],
+                cannot: [
+                    'Isi Category / PIC Section',
+                    'Isi Tindakan / Deadline / PIC',
+                    'Drag & drop task',
+                    'Edit / Hapus / Approve task',
+                    'Buka Report',
+                ],
+            },
+            {
+                name: 'Team Leader',
+                color: '#0891b2',
+                bg: '#ecfeff',
+                icon: 'ti-users',
+                can: [
+                    'Semua akses Operator, PLUS:',
+                    'Isi klasifikasi: Category + PIC Section',
+                    'Isi Tindakan Temporary & Permanent',
+                    'Set Deadline & PIC',
+                    'Drag & drop task antar stage',
+                    'Edit & Hapus task',
+                    'Lihat Report',
+                ],
+                cannot: [
+                    'Approve task (butuh Group Leader ke atas)',
+                    'Tambah user baru',
+                ],
+            },
+            {
+                name: 'Group Leader',
+                color: '#16a34a',
+                bg: '#f0fdf4',
+                icon: 'ti-user-star',
+                can: [
+                    'Semua akses Team Leader, PLUS:',
+                    'Approve task (setelah 3 dokumen diupload)',
+                    'Cancel task',
+                ],
+                cannot: [
+                    'Tambah user baru',
+                ],
+            },
+            {
+                name: 'Manager',
+                color: '#7c3aed',
+                bg: '#f5f3ff',
+                icon: 'ti-briefcase',
+                can: [
+                    'Semua akses Group Leader',
+                    'Approve & Cancel task',
+                    'Lihat Report lengkap',
+                ],
+                cannot: [
+                    'Tambah user baru (khusus Admin)',
+                ],
+            },
+            {
+                name: 'Admin',
+                color: '#7c3aed',
+                bg: '#ede9fe',
+                icon: 'ti-shield-check',
+                can: [
+                    'Semua akses Manager, PLUS:',
+                    'Tambah User Baru (tombol muncul di header)',
+                    'Daftarkan user dengan role apapun',
+                    'Akses tanpa batasan',
+                ],
+                cannot: [],
+            },
+        ],
+    };
+
+    function openRoleInfo() {
+        renderRoleLegend();
+        renderRoleMatrix();
+        renderRoleDetails();
+        openModal('roleInfoModal');
+    }
+
+    function renderRoleLegend() {
+        const html = ROLE_INFO.roles.map(r => `
+            <div style="background:${r.bg};border:1px solid ${r.color}30;border-radius:10px;padding:12px;display:flex;align-items:flex-start;gap:10px">
+                <div style="width:36px;height:36px;background:${r.color};color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <i class="ti ${r.icon}" style="font-size:18px"></i>
+                </div>
+                <div style="min-width:0">
+                    <div style="font-weight:700;color:${r.color};font-size:13px">${r.name}</div>
+                    <div style="font-size:11px;color:#6b7280;line-height:1.4;margin-top:2px">${r.desc}</div>
+                </div>
+            </div>
+        `).join('');
+        $('#roleLegend').html(html);
+    }
+
+    function renderRoleMatrix() {
+        const cols = ROLE_INFO.roles;
+        const rows = ROLE_INFO.matrix;
+
+        let html = `
+            <thead>
+                <tr>
+                    <th style="text-align:left;min-width:240px">Fitur / Aksi</th>
+                    ${cols.map(r => `
+                        <th style="text-align:center;min-width:90px;background:${r.bg};color:${r.color}">
+                            <i class="ti ${r.icon}"></i> ${r.name}
+                        </th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        rows.forEach((row, i) => {
+            const bg = i % 2 === 0 ? '#ffffff' : '#fafafa';
+            html += `<tr>`;
+            html += `<td style="background:${bg};font-weight:500;color:#374151">${escapeHtml(row.feature)}</td>`;
+            cols.forEach(r => {
+                const v = row[r.key];
+                if (v) {
+                    html += `<td style="text-align:center;background:${bg}">
+                        <i class="ti ti-check" style="color:#16a34a;font-size:16px"></i>
+                    </td>`;
+                } else {
+                    html += `<td style="text-align:center;background:${bg}">
+                        <i class="ti ti-x" style="color:#dc2626;font-size:16px;opacity:0.5"></i>
+                    </td>`;
+                }
+            });
+            html += `</tr>`;
+        });
+
+        html += `</tbody>`;
+        $('#roleMatrixTable').html(html);
+    }
+
+    function renderRoleDetails() {
+        const html = ROLE_INFO.details.map(d => `
+            <div style="border:1px solid ${d.color}30;border-radius:10px;overflow:hidden">
+                <div style="background:${d.bg};padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid ${d.color}30">
+                    <i class="ti ${d.icon}" style="color:${d.color};font-size:18px"></i>
+                    <span style="font-weight:700;color:${d.color};font-size:14px">${d.name}</span>
+                </div>
+                <div style="padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:12px">
+                    <div>
+                        <div style="font-weight:700;color:#16a34a;margin-bottom:6px;display:flex;align-items:center;gap:4px">
+                            <i class="ti ti-circle-check"></i> Bisa
+                        </div>
+                        <ul style="padding-left:18px;margin:0;line-height:1.7;color:#374151">
+                            ${d.can.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <div style="font-weight:700;color:#dc2626;margin-bottom:6px;display:flex;align-items:center;gap:4px">
+                            <i class="ti ti-circle-x"></i> Tidak Bisa
+                        </div>
+                        ${d.cannot.length > 0
+                            ? `<ul style="padding-left:18px;margin:0;line-height:1.7;color:#374151">
+                                ${d.cannot.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+                            </ul>`
+                            : `<div style="color:#9ca3af;font-style:italic">Tidak ada batasan</div>`
+                        }
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        $('#roleDetailList').html(html);
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // EXPORT EXCEL
+    // ══════════════════════════════════════════════════════════════
+    function exportRoleInfoExcel() {
+        if (typeof XLSX === 'undefined') {
+            showAlert('error', 'Gagal Export', 'Library SheetJS (XLSX) belum dimuat. Cek koneksi internet Anda.');
+            return;
+        }
+
+        try {
+            const wb = XLSX.utils.book_new();
+
+            // ── Sheet 1: Matrix ──────────────────────────────────────
+            const headers = ['Fitur / Aksi', ...ROLE_INFO.roles.map(r => r.name)];
+
+            const matrixRows = ROLE_INFO.matrix.map(row => [
+                row.feature,
+                ...ROLE_INFO.roles.map(r => row[r.key] ? '✓' : '✗'),
+            ]);
+
+            const sheet1Data = [
+                ['PDCA KANBAN BOARD - Matrix Hak Akses Role'],
+                ['Dicetak:', new Date().toLocaleString('id-ID')],
+                [],
+                headers,
+                ...matrixRows,
+            ];
+
+            const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
+
+            // Column widths
+            ws1['!cols'] = [
+                { wch: 50 },  // Fitur
+                { wch: 14 },  // Operator
+                { wch: 14 },  // Team Leader
+                { wch: 14 },  // Group Leader
+                { wch: 14 },  // Manager
+                { wch: 14 },  // Admin
+            ];
+
+            // Merge title
+            ws1['!merges'] = [
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },  // Title
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } },  // Date
+            ];
+
+            XLSX.utils.book_append_sheet(wb, ws1, 'Matrix Akses');
+
+            // ── Sheet 2: Detail per Role ─────────────────────────────
+            const detailRows = [['Role', 'Kategori', 'Keterangan']];
+
+            ROLE_INFO.details.forEach(d => {
+                detailRows.push([d.name, '✓ BISA', '']);
+                d.can.forEach(c => {
+                    detailRows.push(['', '', c]);
+                });
+                if (d.cannot.length > 0) {
+                    detailRows.push([d.name, '✗ TIDAK BISA', '']);
+                    d.cannot.forEach(c => {
+                        detailRows.push(['', '', c]);
+                    });
+                }
+                detailRows.push(['', '', '']); // empty separator
+            });
+
+            const ws2 = XLSX.utils.aoa_to_sheet(detailRows);
+            ws2['!cols'] = [
+                { wch: 16 },
+                { wch: 16 },
+                { wch: 80 },
+            ];
+            XLSX.utils.book_append_sheet(wb, ws2, 'Detail per Role');
+
+            // ── Sheet 3: Catatan Penting ─────────────────────────────
+            const notes = [
+                ['CATATAN PENTING'],
+                [],
+                ['1.', 'Approve task hanya bisa dilakukan oleh Group Leader, Manager & Admin.'],
+                ['',   'Wajib upload 3 dokumen (4M, Logbook, Nursecall) sebelum approve.'],
+                ['2.', 'Task yang sudah di-approve (done) atau cancelled tidak bisa diubah lagi.'],
+                ['3.', 'Operator hanya bisa tambah task dengan 4 field dasar.'],
+                ['4.', 'Transisi stage: PLAN → DO → CHECK → ACT (tidak bisa lompat).'],
+                ['5.', 'Perpindahan DO → CHECK memerlukan Tindakan Temporary / Permanent.'],
+            ];
+            const ws3 = XLSX.utils.aoa_to_sheet(notes);
+            ws3['!cols'] = [{ wch: 5 }, { wch: 100 }];
+            XLSX.utils.book_append_sheet(wb, ws3, 'Catatan Penting');
+
+            // ── Save ─────────────────────────────────────────────────
+            const dateStr = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `Info-Role-PDCA-${dateStr}.xlsx`);
+
+            showToast('Excel berhasil diunduh', 'success');
+
+        } catch (err) {
+            console.error('[exportRoleInfoExcel] error:', err);
+            showAlert('error', 'Gagal Export Excel', err.message || 'Error tidak dikenal');
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // PRINT ROLE INFO
+    // ══════════════════════════════════════════════════════════════
+    function printRoleInfo() {
+        const content = document.getElementById('roleInfoModal');
+        if (!content) return;
+
+        const printWin = window.open('', '_blank', 'width=900,height=700');
+        const modalBody = content.querySelector('.modal-body').innerHTML;
+
+        printWin.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Info Role - PDCA Kanban</title>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+                <style>
+                    body { font-family: -apple-system, sans-serif; padding: 20px; color: #111827; font-size: 12px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #e5e7eb; padding: 6px 8px; text-align: left; }
+                    th { background: #f3f4f6; font-size: 11px; text-transform: uppercase; }
+                    .ti { vertical-align: -0.125em; stroke-width: 2; }
+                    h1, h2, h3 { page-break-after: avoid; }
+                    .modal-footer, .modal-header, .notice-bar { display: none; }
+                    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                </style>
+            </head>
+            <body>
+                <h2 style="margin-bottom:4px">PDCA Kanban Board - Informasi Role & Hak Akses</h2>
+                <div style="color:#6b7280;font-size:11px;margin-bottom:16px">Dicetak: ${new Date().toLocaleString('id-ID')}</div>
+                ${modalBody}
+            </body>
+            </html>
+        `);
+
+        printWin.document.close();
+
+        setTimeout(() => {
+            printWin.print();
+            setTimeout(() => printWin.close(), 500);
+        }, 400);
     }
     </script>
 </body>

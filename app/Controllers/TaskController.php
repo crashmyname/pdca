@@ -39,7 +39,9 @@ class TaskController extends BaseController
                 ->orWhere('temporary_action', 'LIKE', "%{$search}%")
                 ->orWhere('permanent_action', 'LIKE', "%{$search}%")
                 ->orWhere('pic', 'LIKE', "%{$search}%")
-                ->orWhere('task_code', 'LIKE', "%{$search}%");
+                ->orWhere('task_code', 'LIKE', "%{$search}%")
+                ->orWhere('category', 'LIKE', "%{$search}%")
+                ->orWhere('pic_section', 'LIKE', "%{$search}%");
             });
         }
 
@@ -61,8 +63,13 @@ class TaskController extends BaseController
     public function store(Request $request)
     {
         try {
-
             $taskCode = $this->generateTaskCode();
+
+            $user     = auth()->user();
+            $userRole = strtolower($user->role ?? 'operator');
+            $userName = $user->name ?? $request->operator_name ?? 'Operator';
+
+            $canEdit = $this->canEditTask($user);
 
             $task = Task::create([
                 'task_code'       => $taskCode,
@@ -70,11 +77,18 @@ class TaskController extends BaseController
                 'task_date'       => $request->task_date,
                 'section'         => $request->section,
                 'problem'         => $request->problem,
+                'category'        => $canEdit ? ($request->category    ?: null) : null,
+                'pic_section'     => $canEdit ? ($request->pic_section ?: null) : null,
+                'temporary_action' => $canEdit ? ($request->temporary_action ?: null) : null,
+                'permanent_action' => $canEdit ? ($request->permanent_action ?: null) : null,
+                'deadline'         => $canEdit ? ($request->deadline ?: null) : null,
+                'pic'              => $canEdit ? ($request->pic ?: null) : null,
+
                 'stage'           => 'plan',
                 'status'          => 'open',
-                'created_by_name' => $request->operator_name,
-                'created_by_role' => 'operator',
-                'created_by'      => $request->operator_name,
+                'created_by_name' => $userName,
+                'created_by_role' => $userRole,
+                'created_by'      => $userName,
             ]);
 
             TaskHistory::create([
@@ -82,9 +96,9 @@ class TaskController extends BaseController
                 'action'          => 'create',
                 'new_stage'       => 'plan',
                 'new_status'      => 'open',
-                'changed_by_name' => $request->operator_name,
-                'changed_by_role' => 'operator',
-                'notes'           => 'Task created by ' . $request->operator_name,
+                'changed_by_name' => $userName,
+                'changed_by_role' => $userRole,
+                'notes'           => 'Task created by ' . $userName . ' (' . $userRole . ')',
             ]);
 
             return $this->json($task, 201);
@@ -117,32 +131,92 @@ class TaskController extends BaseController
     public function update(Request $request, $id)
     {
         $task = Task::findOrFail($id);
+        $user = auth()->user();
 
-        // Hanya leader yang bisa update leader fields
-        if (!$this->isLeader(auth()->user())) {
-            return $this->json([
-                'message' => 'Only leader can update this task'
-            ], 403);
+        if (!$this->canEditTask($user)) {
+            return $this->json(['message' => 'Only leader can update this task'], 403);
         }
-        
-        $task->update([
+
+        if (in_array(strtolower($task->status), ['done', 'cancelled'], true)) {
+            return $this->json([
+                'message' => 'Task yang sudah done/cancelled tidak bisa diubah'
+            ], 422);
+        }
+
+        // ══════════════════════════════════════════════════════
+        // 1. SNAPSHOT SEBELUM UPDATE
+        // ══════════════════════════════════════════════════════
+        $trackedFields = [
+            'operator_name', 'task_date', 'section', 'problem',
+            'category', 'pic_section',
+            'temporary_action', 'permanent_action', 'deadline', 'pic',
+        ];
+
+        $oldValues = [];
+        foreach ($trackedFields as $f) {
+            $oldValues[$f] = $task->$f ?? null;
+        }
+
+        // ══════════════════════════════════════════════════════
+        // 2. BUILD PAYLOAD (logika asli Anda — tetap dipertahankan)
+        // ══════════════════════════════════════════════════════
+        $payload = [
+            'category'         => $request->category    ?: $task->category,
+            'pic_section'      => $request->pic_section ?: $task->pic_section,
             'temporary_action' => $request->temporary_action,
             'permanent_action' => $request->permanent_action,
-            'deadline' => $request->deadline,
-            'pic' => $request->pic,
-            'updated_by' => auth()->user()->id ?? null,
-        ]);
+            'deadline'         => $request->deadline ?: null,
+            'pic'              => $request->pic,
+            'updated_by'       => $user->id ?? null,
+        ];
 
-        // Log history
-        TaskHistory::create([
-            'task_id' => $task->id,
-            'action' => 'update',
-            'changed_by_name' => auth()->user()->name,
-            'changed_by_role' => 'leader',
-            'notes' => 'Leader fields updated',
-        ]);
+        if ($request->operator_name) $payload['operator_name'] = $request->operator_name;
+        if ($request->task_date)     $payload['task_date']     = $request->task_date;
+        if ($request->section)       $payload['section']       = $request->section;
+        if ($request->problem)       $payload['problem']       = $request->problem;
 
-        return $this->json($task,200);
+        // ══════════════════════════════════════════════════════
+        // 3. SIMPAN
+        // ══════════════════════════════════════════════════════
+        $task->update($payload);
+        $task->refresh(); // ambil nilai terbaru dari DB
+
+        // ══════════════════════════════════════════════════════
+        // 4. HITUNG FIELD YANG BENAR-BENAR BERUBAH
+        // ══════════════════════════════════════════════════════
+        $changedOld = [];
+        $changedNew = [];
+
+        foreach ($trackedFields as $f) {
+            $ov = $oldValues[$f];
+            $nv = $task->$f ?? null;
+
+            // Normalisasi: null vs '' vs '0' dianggap sama
+            $ovNorm = ($ov === '' || $ov === null) ? null : (string) $ov;
+            $nvNorm = ($nv === '' || $nv === null) ? null : (string) $nv;
+
+            if ($ovNorm !== $nvNorm) {
+                $changedOld[$f] = $ovNorm;
+                $changedNew[$f] = $nvNorm;
+            }
+        }
+
+        // ══════════════════════════════════════════════════════
+        // 5. SIMPAN HISTORY (hanya kalau ada perubahan)
+        // ══════════════════════════════════════════════════════
+        if (!empty($changedOld) || !empty($changedNew)) {
+            TaskHistory::create([
+                'task_id'         => $task->id,
+                'action'          => 'update',
+                'old_values'      => json_encode($changedOld, JSON_UNESCAPED_UNICODE),
+                'new_values'      => json_encode($changedNew, JSON_UNESCAPED_UNICODE),
+                'changed_by_name' => $user->name,
+                'changed_by_role' => strtolower($user->role),
+                'notes'           => 'Task updated by ' . $user->name,
+            ]);
+        }
+
+        return $this->json($task, 200);
     }
 
     // PATCH /api/tasks/{id}/stage - Update stage (Leader only)
@@ -377,11 +451,26 @@ class TaskController extends BaseController
 
             $histories = TaskHistory::query()
                 ->where('task_id', '=', $id)
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')   // ← ubah ke ASC: dari lama ke baru
                 ->get(\PDO::FETCH_ASSOC);
 
             // Normalisasi untuk frontend
             $data = array_map(function ($h) {
+                // Parse JSON snapshot kalau ada
+                $oldValues = null;
+                $newValues = null;
+
+                if (!empty($h['old_values'])) {
+                    $oldValues = is_array($h['old_values'])
+                        ? $h['old_values']
+                        : json_decode($h['old_values'], true);
+                }
+                if (!empty($h['new_values'])) {
+                    $newValues = is_array($h['new_values'])
+                        ? $h['new_values']
+                        : json_decode($h['new_values'], true);
+                }
+
                 return [
                     'id'            => (int) $h['id'],
                     'action'        => $h['action'] ?? '',
@@ -389,6 +478,8 @@ class TaskController extends BaseController
                     'newStage'      => $h['new_stage']       ?? null,
                     'oldStatus'     => $h['old_status']      ?? null,
                     'newStatus'     => $h['new_status']      ?? null,
+                    'oldValues'     => $oldValues,   // ← TAMBAH
+                    'newValues'     => $newValues,   // ← TAMBAH
                     'changedByName' => $h['changed_by_name'] ?? null,
                     'changedByRole' => isset($h['changed_by_role']) ? strtolower($h['changed_by_role']) : null,
                     'notes'         => $h['notes']           ?? null,
@@ -459,6 +550,8 @@ class TaskController extends BaseController
                     'operatorName'    => $t['operator_name']   ?? '',
                     'date'            => $t['task_date']       ?? '',
                     'section'         => $t['section']         ?? '',
+                    'category'        => $t['category']        ?? '',
+                    'picSection'      => $t['pic_section']     ?? '',
                     'problem'         => $t['problem']         ?? '',
                     'tempAction'      => $t['temporary_action']?? '',
                     'permAction'      => $t['permanent_action']?? '',
@@ -542,6 +635,14 @@ class TaskController extends BaseController
     private function isLeader($user)
     {
         if (!$user || !isset($user->role)) return false;
-        return in_array(strtolower($user->role), ['leader', 'admin'], true);
+        return in_array(strtolower($user->role), ['team_leader','group_leader', 'manager', 'admin'], true);
+    }
+
+    private function canEditTask($user)
+    {
+        if (!$user || !isset($user->role)) return false;
+        return in_array(strtolower($user->role), [
+            'team_leader', 'group_leader', 'manager', 'admin'
+        ], true);
     }
 }
