@@ -1096,6 +1096,14 @@
             background: #fee2e2 !important;
             color: #991b1b !important;
         }
+        /* Spinner animation untuk tombol refresh */
+        .ti-spin {
+            animation: ti-spin 0.9s linear infinite;
+        }
+        @keyframes ti-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1201,6 +1209,9 @@
                 <button class="btn btn-sm" onclick="clearFilters()">
                     <i class="ti ti-refresh"></i> Reset
                 </button>
+                <button class="btn btn-sm" onclick="refreshData()" id="refreshBtn" title="Muat ulang data dari server">
+                    <i class="ti ti-reload"></i> Refresh
+                </button>
             </div>
             <div class="filter-row" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-200)">
                 <span style="font-size:11px;color:var(--gray-500);font-weight:700;text-transform:uppercase;letter-spacing:0.5px">Quick Filter:</span>
@@ -1216,6 +1227,9 @@
                     </button>
                     <button class="btn btn-sm btn-quick-date" data-range="all" onclick="setQuickDate('all')">
                         <i class="ti ti-calendar"></i> Semua
+                    </button>
+                    <button class="btn btn-sm" onclick="openCancelledModal()" id="cancelledBtn" title="Lihat semua task cancelled" style="margin-left:auto">
+                        <i class="ti ti-circle-x"></i> Cancelled Task (<span id="cancelledCount">0</span>)
                     </button>
                 </div>
             </div>
@@ -2017,6 +2031,44 @@
             </div>
         </div>
     </div>
+    <!-- Cancelled Tasks Modal -->
+    <div class="modal" id="cancelledTasksModal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-circle-x" style="color:#dc2626"></i> Task Cancelled
+                </h3>
+                <button class="modal-close" onclick="closeModal('cancelledTasksModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="notice-bar warning" style="margin-bottom:16px">
+                    <i class="ti ti-info-circle"></i>
+                    <span>Berikut daftar task yang sudah dibatalkan. Task cancelled tidak muncul di Kanban board.</span>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="report-table" id="cancelledTable">
+                        <thead>
+                            <tr>
+                                <th style="width:32px;text-align:center">No</th>
+                                <th style="width:140px">Kode</th>
+                                <th style="width:90px">Tanggal</th>
+                                <th style="width:130px">Operator</th>
+                                <th style="width:110px">Seksi</th>
+                                <th>Masalah</th>
+                                <th style="width:70px;text-align:center">Stage</th>
+                                <th style="width:120px">PIC</th>
+                                <th style="width:60px;text-align:center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cancelledTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('cancelledTasksModal')">Tutup</button>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -2420,6 +2472,34 @@
                 $sel.val(currentVal);
             }
         });
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // REFRESH DATA
+    // ══════════════════════════════════════════════════════════════
+    async function refreshData() {
+        const $btn  = $('#refreshBtn');
+        const $icon = $btn.find('i');
+
+        // Disable + spin icon
+        $btn.prop('disabled', true);
+        $icon.addClass('ti-spin');
+
+        // Force reload sections (task selalu fresh dari loadTasks)
+        sectionsLoaded = false;
+
+        try {
+            await Promise.all([
+                loadSections(),
+                loadTasks(),
+            ]);
+            showToast('Data berhasil di-refresh', 'success');
+        } catch (err) {
+            showToast('Gagal refresh: ' + err.message, 'error');
+        } finally {
+            $btn.prop('disabled', false);
+            $icon.removeClass('ti-spin');
+        }
     }
 
     // ============================================================
@@ -2861,6 +2941,42 @@
         if (!task || task.stage === newStage) return;
 
         const oldStage = task.stage;
+
+        // ══════════════════════════════════════════════════════
+        // VALIDASI KHUSUS: CHECK → ACT
+        // Semua field wajib sudah terisi
+        // ══════════════════════════════════════════════════════
+        if (oldStage === 'check' && newStage === 'act') {
+            const required = [
+                { key: 'category',     label: 'Category' },
+                { key: 'picSection',   label: 'PIC Section' },
+                { key: 'tempAction',   label: 'Tindakan Temporary' },
+                { key: 'permAction',   label: 'Tindakan Permanent' },
+                { key: 'deadline',     label: 'Deadline' },
+                { key: 'pic',          label: 'PIC' },
+            ];
+
+            const missing = required
+                .filter(r => !task[r.key] || String(task[r.key]).trim() === '')
+                .map(r => r.label);
+
+            if (missing.length > 0) {
+                showAlert(
+                    'warning',
+                    'Form Belum Lengkap',
+                    'Untuk memindahkan task ke <strong>ACT</strong>, semua field berikut harus diisi terlebih dahulu:<br><br>' +
+                    '<ul style="text-align:left;padding-left:20px;margin:8px 0">' +
+                    missing.map(m => `<li><strong>${m}</strong></li>`).join('') +
+                    '</ul>' +
+                    '<small style="color:#6b7280">Buka task → klik Edit → isi field yang kurang → Simpan → coba pindahkan lagi.</small>'
+                );
+                return;   // ← batalkan drop
+            }
+        }
+
+        // ══════════════════════════════════════════════════════
+        // LANJUT PROSES PINDAH STAGE
+        // ══════════════════════════════════════════════════════
         task.stage = newStage;
         render();
 
@@ -2879,6 +2995,56 @@
     function cleanupDragUI() {
         document.querySelectorAll('.kanban-column').forEach(c => c.classList.remove('drag-over'));
         document.querySelectorAll('.kanban-card').forEach(c => c.classList.remove('dragging'));
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // CANCELLED TASKS VIEWER
+    // ══════════════════════════════════════════════════════════════
+    function openCancelledModal() {
+        const cancelled = state.tasks
+            .filter(t => t.status === 'cancelled')
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        const $body = $('#cancelledTableBody');
+
+        if (cancelled.length === 0) {
+            $body.html(`
+                <tr>
+                    <td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">
+                        <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
+                        <div style="font-size:14px">Tidak ada task yang dibatalkan</div>
+                    </td>
+                </tr>
+            `);
+        } else {
+            $body.html(cancelled.map((t, i) => `
+                <tr>
+                    <td style="text-align:center">${i + 1}</td>
+                    <td><strong>${escapeHtml(t.taskCode || '-')}</strong></td>
+                    <td>${t.date ? formatDate(t.date) : '-'}</td>
+                    <td>${escapeHtml(t.operatorName || '-')}</td>
+                    <td>${escapeHtml(t.section || '-')}</td>
+                    <td style="max-width:320px;word-break:break-word">${escapeHtml(t.problem || '-')}</td>
+                    <td style="text-align:center">
+                        <span class="stage-pill">${(t.stage || '-').toUpperCase()}</span>
+                    </td>
+                    <td>${escapeHtml(t.pic || '-')}</td>
+                    <td style="text-align:center">
+                        <button class="btn btn-sm" onclick="closeModal('cancelledTasksModal'); openTaskReport(${t.id})" title="Lihat Report">
+                            <i class="ti ti-file-description"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join(''));
+        }
+
+        openModal('cancelledTasksModal');
+    }
+
+    // Update counter cancelled di tombol
+    function updateCancelledCount() {
+        const n = state.tasks.filter(t => t.status === 'cancelled').length;
+        $('#cancelledCount').text(n);
     }
 
     // ============================================================
@@ -4130,6 +4296,7 @@
         renderStats(filtered);
         renderKanban(filtered, isLeader);
         updateBoardInfo(filtered, isLeader);
+        updateCancelledCount();
     }
 
     function renderStats(list) {
