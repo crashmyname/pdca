@@ -1104,6 +1104,101 @@
             from { transform: rotate(0deg); }
             to   { transform: rotate(360deg); }
         }
+        /* Phase Badge */
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #fff;
+            margin-right: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+        .phase-1 { background: linear-gradient(135deg, #2563eb, #1e40af); }
+        .phase-2 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .phase-3 { background: linear-gradient(135deg, #0891b2, #0e7490); }
+        .phase-4 { background: linear-gradient(135deg, #16a34a, #15803d); }
+
+        /* Dokumen status radio (Sudah/Belum) */
+        .doc-status-radio {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .doc-status-radio .radio-card-content {
+            min-height: 48px;
+            padding: 6px 4px;
+            gap: 2px;
+        }
+        .doc-status-radio .radio-card-content .ti { font-size: 16px; }
+        .doc-status-radio .radio-card-content .radio-label { font-size: 10px; }
+
+        .doc-status-radio .radio-card input[value="sudah"]:checked + .radio-card-content {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+        .doc-status-radio .radio-card input[value="sudah"]:checked + .radio-card-content .ti,
+        .doc-status-radio .radio-card input[value="sudah"]:checked + .radio-card-content .radio-label {
+            color: #16a34a;
+        }
+        .doc-status-radio .radio-card input[value="belum"]:checked + .radio-card-content {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+        .doc-status-radio .radio-card input[value="belum"]:checked + .radio-card-content .ti,
+        .doc-status-radio .radio-card input[value="belum"]:checked + .radio-card-content .radio-label {
+            color: #dc2626;
+        }
+        /* Kolom header dengan phase badge + subtitle */
+        .kanban-column .column-title {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+        .kanban-column .column-title .column-icon {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .kanban-column .column-title > span:last-child {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+            line-height: 1.3;
+        }
+        .kanban-column .column-title .phase-badge {
+            font-size: 9px;
+            padding: 2px 8px;
+            margin: 0;
+            align-self: flex-start;
+        }
+        .kanban-column .column-title > span:last-child > span:not(.phase-badge) {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray-800);
+            word-break: break-word;
+        }
+        /* Klasifikasi lebih fleksibel untuk label panjang */
+        #categoryGroup {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        }
+        #categoryGroup .radio-card-content {
+            min-height: 72px;
+        }
+        #categoryGroup .radio-card-content .radio-label {
+            font-size: 10px;
+            line-height: 1.25;
+            white-space: normal;
+            text-align: center;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1251,7 +1346,11 @@
                     <div class="column-header">
                         <span class="column-title">
                             <span class="column-icon"><i class="ti ti-clipboard-list"></i></span>
-                            Plan
+                            <span>
+                                <span class="phase-badge phase-1">Phase 1</span>
+                                <span>Informasi Masalah</span>
+                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Operator</div>
+                            </span>
                         </span>
                         <span class="column-count" id="planBadge">0</span>
                     </div>
@@ -1261,7 +1360,11 @@
                     <div class="column-header">
                         <span class="column-title">
                             <span class="column-icon"><i class="ti ti-bolt"></i></span>
-                            Do
+                            <span>
+                                <span class="phase-badge phase-2">Phase 2</span>
+                                <span>Penanggung Jawab Masalah</span>
+                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Team Leader</div>
+                            </span>
                         </span>
                         <span class="column-count" id="doBadge">0</span>
                     </div>
@@ -1271,7 +1374,11 @@
                     <div class="column-header">
                         <span class="column-title">
                             <span class="column-icon"><i class="ti ti-circle-check"></i></span>
-                            Check
+                            <span>
+                                <span class="phase-badge phase-3">Phase 3</span>
+                                <span>Isi Tindakan</span>
+                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Seksi Terkait</div>
+                            </span>
                         </span>
                         <span class="column-count" id="checkBadge">0</span>
                     </div>
@@ -1281,7 +1388,11 @@
                     <div class="column-header">
                         <span class="column-title">
                             <span class="column-icon"><i class="ti ti-tool"></i></span>
-                            Act
+                            <span>
+                                <span class="phase-badge phase-4">Phase 4</span>
+                                <span>Approval / Evaluasi Tindakan</span>
+                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Group Leader</div>
+                            </span>
                         </span>
                         <span class="column-count" id="actBadge">0</span>
                     </div>
@@ -1301,8 +1412,12 @@
             <div class="modal-body">
                 <form id="taskForm">
                     <?= csrf()?>
-                    <div class="form-section">
-                        <div class="form-section-title"><i class="ti ti-notes"></i> Data Operator</div>
+                    <div class="form-section" id="phase1Section">
+                        <div class="form-section-title">
+                            <span class="phase-badge phase-1">Phase 1</span>
+                            <i class="ti ti-notes"></i> 
+                            Data Operator
+                        </div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label required">Nama Operator</label>
@@ -1331,6 +1446,7 @@
                     </div>
                     <div class="form-section" id="classificationSection">
                         <div class="form-section-title">
+                            <span class="phase-badge phase-2">Phase 2</span>
                             <i class="ti ti-category"></i> Klasifikasi Masalah
                         </div>
 
@@ -1344,11 +1460,11 @@
                                         <span class="radio-label">Man</span>
                                     </div>
                                 </label>
-                                <label class="radio-card">
+                               <label class="radio-card">
                                     <input type="radio" name="category" value="machine">
                                     <div class="radio-card-content">
                                         <i class="ti ti-engine"></i>
-                                        <span class="radio-label">Machine</span>
+                                        <span class="radio-label">Machine / Jig / Mold</span>
                                     </div>
                                 </label>
                                 <label class="radio-card">
@@ -1386,118 +1502,90 @@
                     <div class="form-section" id="documentsSection">
                         <div class="form-section-title">
                             <i class="ti ti-paperclip"></i> Dokumen Pendukung
-                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Wajib 3 file untuk approve</span>
+                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Semua wajib "Sudah" untuk approve</span>
                         </div>
 
                         <div class="doc-upload-grid">
+
+                            <!-- 4M -->
                             <div class="doc-upload-card" data-type="4m">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-file-text"></i>
                                     <span class="doc-title">4M</span>
-                                    <span class="doc-status" id="docStatus4m">Belum ada</span>
                                 </div>
-                                <div class="doc-dropzone" id="docDrop4m" onclick="pickFile('4m')"
-                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
-                                    ondrop="handleDocDrop(event, '4m')">
-                                    <i class="ti ti-cloud-upload doc-icon"></i>
-                                    <div class="doc-hint">Klik atau seret file ke sini</div>
-                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
-                                </div>
-                                <div class="doc-preview" id="docPreview4m" style="display:none">
-                                    <div class="doc-info">
-                                        <i class="ti ti-file doc-info-icon"></i>
-                                        <div class="doc-info-text">
-                                            <a href="#" target="_blank" id="docLink4m" class="doc-info-name">-</a>
-                                            <div class="doc-info-meta" id="docMeta4m">-</div>
+                                <div class="doc-status-radio">
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_4m" value="sudah">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-check"></i>
+                                            <span class="radio-label">Sudah</span>
                                         </div>
-                                    </div>
-                                    <div class="doc-actions">
-                                        <button type="button" class="btn btn-sm" onclick="pickFile('4m')" title="Ganti">
-                                            <i class="ti ti-refresh"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('4m')" title="Hapus">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_4m" value="belum">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-x"></i>
+                                            <span class="radio-label">Belum</span>
+                                        </div>
+                                    </label>
                                 </div>
-                                <input type="file" id="docInput4m" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, '4m')">
                             </div>
 
+                            <!-- Logbook -->
                             <div class="doc-upload-card" data-type="logbook">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-notebook"></i>
                                     <span class="doc-title">Logbook</span>
-                                    <span class="doc-status" id="docStatusLogbook">Belum ada</span>
                                 </div>
-                                <div class="doc-dropzone" id="docDropLogbook" onclick="pickFile('logbook')"
-                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
-                                    ondrop="handleDocDrop(event, 'logbook')">
-                                    <i class="ti ti-cloud-upload doc-icon"></i>
-                                    <div class="doc-hint">Klik atau seret file ke sini</div>
-                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
-                                </div>
-                                <div class="doc-preview" id="docPreviewLogbook" style="display:none">
-                                    <div class="doc-info">
-                                        <i class="ti ti-file doc-info-icon"></i>
-                                        <div class="doc-info-text">
-                                            <a href="#" target="_blank" id="docLinkLogbook" class="doc-info-name">-</a>
-                                            <div class="doc-info-meta" id="docMetaLogbook">-</div>
+                                <div class="doc-status-radio">
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_logbook" value="sudah">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-check"></i>
+                                            <span class="radio-label">Sudah</span>
                                         </div>
-                                    </div>
-                                    <div class="doc-actions">
-                                        <button type="button" class="btn btn-sm" onclick="pickFile('logbook')" title="Ganti">
-                                            <i class="ti ti-refresh"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('logbook')" title="Hapus">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_logbook" value="belum">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-x"></i>
+                                            <span class="radio-label">Belum</span>
+                                        </div>
+                                    </label>
                                 </div>
-                                <input type="file" id="docInputLogbook" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, 'logbook')">
                             </div>
 
+                            <!-- Nursecall -->
                             <div class="doc-upload-card" data-type="nursecall">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-bell"></i>
                                     <span class="doc-title">Nursecall</span>
-                                    <span class="doc-status" id="docStatusNursecall">Belum ada</span>
                                 </div>
-                                <div class="doc-dropzone" id="docDropNursecall" onclick="pickFile('nursecall')"
-                                    ondragover="handleDocDragOver(event)" ondragleave="handleDocDragLeave(event)"
-                                    ondrop="handleDocDrop(event, 'nursecall')">
-                                    <i class="ti ti-cloud-upload doc-icon"></i>
-                                    <div class="doc-hint">Klik atau seret file ke sini</div>
-                                    <div class="doc-sub">PDF / JPG / PNG · max 4 MB</div>
-                                </div>
-                                <div class="doc-preview" id="docPreviewNursecall" style="display:none">
-                                    <div class="doc-info">
-                                        <i class="ti ti-file doc-info-icon"></i>
-                                        <div class="doc-info-text">
-                                            <a href="#" target="_blank" id="docLinkNursecall" class="doc-info-name">-</a>
-                                            <div class="doc-info-meta" id="docMetaNursecall">-</div>
+                                <div class="doc-status-radio">
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_nursecall" value="sudah">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-check"></i>
+                                            <span class="radio-label">Sudah</span>
                                         </div>
-                                    </div>
-                                    <div class="doc-actions">
-                                        <button type="button" class="btn btn-sm" onclick="pickFile('nursecall')" title="Ganti">
-                                            <i class="ti ti-refresh"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDoc('nursecall')" title="Hapus">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="doc_status_nursecall" value="belum">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-x"></i>
+                                            <span class="radio-label">Belum</span>
+                                        </div>
+                                    </label>
                                 </div>
-                                <input type="file" id="docInputNursecall" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleFileSelect(event, 'nursecall')">
                             </div>
-                        </div>
 
-                        <div class="doc-progress-bar" id="docProgressBar" style="display:none">
-                            <div class="doc-progress-fill" id="docProgressFill"></div>
                         </div>
                     </div>
                     <div class="form-section" id="leaderSection">
                         <div class="form-section-title">
-                            <i class="ti ti-tool"></i> Tindakan & Approval 
-                            <span class="lock-icon"><i class="ti ti-lock"></i> (Khusus Leader)</span>
+                            <span class="phase-badge phase-3">Phase 3</span>
+                            <i class="ti ti-tool"></i> Tindakan 
+                            <span class="lock-icon"><i class="ti ti-lock"></i></span>
                         </div>
                         <div class="form-grid">
                             <div class="form-group full-width">
@@ -1520,6 +1608,55 @@
                                 <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
                                     <i class="ti ti-info-circle"></i> Ketik nama untuk mencari
                                 </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-section" id="approvalSection">
+                        <div class="form-section-title">
+                            <span class="phase-badge phase-4">Phase 4</span>
+                            <i class="ti ti-circle-check"></i> Approval
+                            <span class="lock-icon"><i class="ti ti-lock"></i> (Group Leader / Manager)</span>
+                        </div>
+
+                        <!-- Info status approval -->
+                        <div id="approvalInfoBox" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px">
+                            <!-- Empty state -->
+                            <div id="approvalEmptyState" style="text-align:center;color:#9ca3af">
+                                <i class="ti ti-clock-hour-4" style="font-size:32px;opacity:0.4;display:block;margin-bottom:8px"></i>
+                                <div style="font-size:13px">Belum ada approval</div>
+                                <div style="font-size:11px;margin-top:4px">Task dapat di-approve setelah semua Phase 1-3 terisi dan berada di stage ACT</div>
+                            </div>
+
+                            <!-- Filled state -->
+                            <div id="approvalFilledState" style="display:none">
+                                <div class="tr-approval-grid">
+                                    <div>
+                                        <div class="tr-label-inline">Disetujui oleh</div>
+                                        <div style="font-weight:600;margin-top:2px;color:#111827" id="approvalByName">-</div>
+                                    </div>
+                                    <div>
+                                        <div class="tr-label-inline">Waktu Approval</div>
+                                        <div style="font-weight:600;margin-top:2px;color:#111827" id="approvalAt">-</div>
+                                    </div>
+                                    <div>
+                                        <div class="tr-label-inline">Tanda Tangan</div>
+                                        <div style="font-weight:600;margin-top:2px;color:#111827" id="approvalSignature">-</div>
+                                    </div>
+                                    <div>
+                                        <div class="tr-label-inline">Status Akhir</div>
+                                        <div style="margin-top:2px" id="approvalStatusBadge">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checklist approval -->
+                        <div id="approvalChecklist" style="margin-top:12px;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:12px">
+                            <div style="font-weight:600;color:#92400e;margin-bottom:8px">
+                                <i class="ti ti-list-check"></i> Checklist Approval
+                            </div>
+                            <div id="approvalChecklistItems" style="color:#78350f;line-height:1.8">
+                                <!-- diisi via JS -->
                             </div>
                         </div>
                     </div>
@@ -2014,8 +2151,8 @@
                         <li><strong>Approve task</strong> hanya bisa dilakukan oleh Group Leader, Manager & Admin — dan <strong>wajib upload 3 dokumen</strong> (4M, Logbook, Nursecall) terlebih dahulu.</li>
                         <li><strong>Task yang sudah di-approve (done) atau cancelled</strong> tidak bisa diubah lagi oleh role apapun.</li>
                         <li><strong>Operator</strong> hanya bisa tambah task dengan 4 field dasar; field tindakan hanya bisa diisi oleh Leader.</li>
-                        <li>Transisi stage terbatas: <code>PLAN → DO → CHECK → ACT</code>. Tidak bisa lompat stage.</li>
-                        <li>Perpindahan <strong>DO → CHECK</strong> memerlukan Tindakan Temporary / Permanent yang sudah diisi.</li>
+                        <li>Transisi phase terbatas: <code>Phase 1 → 2 → 3 → 4</code>. Tidak bisa lompat phase.</li>
+                        <li>Perpindahan <strong>Phase 2 → Phase 3</strong> memerlukan Tindakan Temporary / Permanent yang sudah diisi.</li>
                     </ul>
                 </div>
 
@@ -2107,7 +2244,8 @@
     let sectionsList    = [];
     let sectionsLoaded  = false;
     let select2Inited   = false;
-    let taskAttachments = {};
+    // let taskAttachments = {};
+    let taskDocStatus = { '4m': 'belum', 'logbook': 'belum', 'nursecall': 'belum' };
 
     const USER_STORAGE_KEY = 'pdca_user_info';
 
@@ -2234,6 +2372,9 @@
             createdAt: t.created_at || null,
             updatedAt: t.updated_at || null,
             attachments: t.attachments || [],
+            doc4mStatus:        (t.doc_4m_status        || 'belum').toLowerCase(),
+            docLogbookStatus:   (t.doc_logbook_status   || 'belum').toLowerCase(),
+            docNursecallStatus: (t.doc_nursecall_status || 'belum').toLowerCase(),
         };
     }
 
@@ -2404,6 +2545,9 @@
             // Efek visual hijau sebentar
             $secSelect.css('background', '#f0fdf4');
             setTimeout(() => $secSelect.css('background', ''), 800);
+        });
+        $(document).on('change', 'input[name^="doc_status_"]', function () {
+            updateApproveButtonState();
         });
     }
 
@@ -2960,6 +3104,10 @@
                 .filter(r => !task[r.key] || String(task[r.key]).trim() === '')
                 .map(r => r.label);
 
+            if (task.doc4mStatus !== 'sudah')        missing.push('Dokumen 4M');
+            if (task.docLogbookStatus !== 'sudah')   missing.push('Dokumen Logbook');
+            if (task.docNursecallStatus !== 'sudah') missing.push('Dokumen Nursecall');
+
             if (missing.length > 0) {
                 showAlert(
                     'warning',
@@ -2970,7 +3118,7 @@
                     '</ul>' +
                     '<small style="color:#6b7280">Buka task → klik Edit → isi field yang kurang → Simpan → coba pindahkan lagi.</small>'
                 );
-                return;   // ← batalkan drop
+                return;
             }
         }
 
@@ -2982,7 +3130,8 @@
 
         try {
             await api(`/tasks/${taskId}/stage`, { method: 'PATCH', body: { stage: newStage } });
-            showToast(`Task dipindahkan ke ${newStage.toUpperCase()}`, 'success');
+            const label = STAGE_LABEL[newStage];
+            showToast(`Task dipindahkan ke ${label.short}: ${label.title}`, 'success');
             await loadTasks();
         } catch (err) {
             task.stage = oldStage;
@@ -3057,12 +3206,16 @@
         $('#taskForm')[0].reset();
         $('input[name="category"]').prop('checked', false);
         $('input[name="pic_section"]').prop('checked', false);
+
+        // Reset dokumen ke "Belum"
+        $('input[name="doc_status_4m"][value="belum"]').prop('checked', true);
+        $('input[name="doc_status_logbook"][value="belum"]').prop('checked', true);
+        $('input[name="doc_status_nursecall"][value="belum"]').prop('checked', true);
+
+        taskDocStatus = { '4m': 'belum', 'logbook': 'belum', 'nursecall': 'belum' };
+
         $('#taskId').val('');
         $('#taskDate').val(new Date().toISOString().split('T')[0]);
-
-        taskAttachments = {};
-        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
-        $('.doc-upload-card').removeClass('locked');
 
         $('#tempAction').prop('disabled', !isLeader);
         $('#permAction').prop('disabled', !isLeader);
@@ -3070,9 +3223,11 @@
         $('#pic').prop('disabled', !isLeader);
         $('#leaderSection').css('display', isLeader ? 'block' : 'none');
         $('#documentsSection').css('display', isLeader ? 'block' : 'none');
-
         $('#classificationSection').css('display', isLeader ? 'block' : 'none');
         $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeader);
+        $('input[name^="doc_status_"]').prop('disabled', !isLeader);
+
+        renderApprovalSection(null);
 
         $('#historyTaskBtn').hide();
         $('#reportTaskBtn').hide();
@@ -3082,10 +3237,10 @@
         setSelect2Value($('#operatorName'), '', '');
         setSelect2Value($('#pic'), '', '');
 
-        // PENTING: load employee (fix pagination)
         loadEmployees();
         loadSections();
         openModal('taskModal');
+        setTimeout(() => updateApproveButtonState(), 50);
     }
 
     async function saveTask() {
@@ -3107,23 +3262,24 @@
             basePayload.pic_section = picSection;
         }
 
-        // Validasi field wajib
         if (!basePayload.operator_name || !basePayload.task_date || !basePayload.section || !basePayload.problem) {
             showAlert('warning', 'Form Tidak Lengkap', 'Mohon isi semua field yang wajib!');
             return;
         }
 
-        // Validasi klasifikasi (khusus leader)
         if (isLeader && (!category || !picSection)) {
             showAlert('warning', 'Klasifikasi Belum Lengkap', 'Pilih Category dan PIC Section terlebih dahulu.');
             return;
         }
 
         const leaderPayload = {
-            temporary_action: $('#tempAction').val().trim(),
-            permanent_action: $('#permAction').val().trim(),
-            deadline:         $('#deadline').val() || null,
-            pic:              $('#pic').val() ? $('#pic').val().trim() : '',
+            temporary_action:      $('#tempAction').val().trim(),
+            permanent_action:      $('#permAction').val().trim(),
+            deadline:              $('#deadline').val() || null,
+            pic:                   $('#pic').val() ? $('#pic').val().trim() : '',
+            doc_4m_status:         $('input[name="doc_status_4m"]:checked').val()        || 'belum',
+            doc_logbook_status:    $('input[name="doc_status_logbook"]:checked').val()   || 'belum',
+            doc_nursecall_status:  $('input[name="doc_status_nursecall"]:checked').val() || 'belum',
         };
 
         Swal.fire({
@@ -3147,6 +3303,9 @@
                         permanent_action: leaderPayload.permanent_action,
                         deadline:         leaderPayload.deadline,
                         pic:              leaderPayload.pic,
+                        doc_4m_status:        leaderPayload.doc_4m_status,
+                        doc_logbook_status:   leaderPayload.doc_logbook_status,
+                        doc_nursecall_status: leaderPayload.doc_nursecall_status,
                     } : {})
                 };
                 await api(`/tasks/${id}`, { method: 'PUT', body: updateBody });
@@ -3155,9 +3314,13 @@
                 const created = await api('/tasks', { method: 'POST', body: basePayload });
                 const newId = created?.id ?? created?.data?.id;
 
-                if (isLeader && newId &&
-                    (leaderPayload.temporary_action || leaderPayload.permanent_action ||
-                     leaderPayload.deadline || leaderPayload.pic)) {
+                if (isLeader && newId && (
+                    leaderPayload.temporary_action || leaderPayload.permanent_action ||
+                    leaderPayload.deadline || leaderPayload.pic ||
+                    leaderPayload.doc_4m_status === 'sudah' ||
+                    leaderPayload.doc_logbook_status === 'sudah' ||
+                    leaderPayload.doc_nursecall_status === 'sudah'
+                )) {
                     await api(`/tasks/${newId}`, { method: 'PUT', body: leaderPayload });
                 }
                 showToast('Task berhasil ditambahkan', 'success');
@@ -3185,23 +3348,24 @@
         $('#modalTitle').text('Edit Task');
         $('#taskId').val(task.id);
 
-        taskAttachments = {};
-        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
+        // Set status dokumen dari task
+        taskDocStatus = {
+            '4m':        task.doc4mStatus        || 'belum',
+            'logbook':   task.docLogbookStatus   || 'belum',
+            'nursecall': task.docNursecallStatus || 'belum',
+        };
+        ['4m', 'logbook', 'nursecall'].forEach(t => {
+            const status = taskDocStatus[t] || 'belum';
+            $(`input[name="doc_status_${t}"][value="${status}"]`).prop('checked', true);
+        });
 
         $('#approveTaskBtn').prop('disabled', true);
 
-        loadAttachments(task.id);
+        await Promise.all([loadEmployees(), loadSections()]);
 
-        await Promise.all([
-            loadEmployees(),
-            loadSections(),
-        ]);
-
-        // Set operator & PIC via helper
         setSelect2Value($('#operatorName'), task.operatorName, task.operatorName);
         setSelect2Value($('#pic'), task.pic, task.pic);
 
-        // Set seksi
         const $sec = $('#section');
         const sec = task.section || '';
         const foundSec = $sec.find('option').filter(function () { return this.value === sec; }).length;
@@ -3211,11 +3375,9 @@
         $sec.val(sec);
         if ($sec.data('select2')) $sec.trigger('change.select2');
 
-        // Field lain
         $('#taskDate').val(task.date);
         $('#problem').val(task.problem);
 
-        // Radio card
         $('input[name="category"]').prop('checked', false);
         if (task.category) {
             $(`input[name="category"][value="${task.category}"]`).prop('checked', true);
@@ -3227,6 +3389,7 @@
         const isLeaderEdit = canEdit();
         $('#classificationSection').css('display', isLeaderEdit ? 'block' : 'none');
         $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeaderEdit);
+        $('input[name^="doc_status_"]').prop('disabled', !isLeaderEdit);
 
         $('#tempAction').val(task.tempAction);
         $('#permAction').val(task.permAction);
@@ -3234,6 +3397,8 @@
 
         $('#tempAction, #permAction, #deadline, #pic').prop('disabled', false);
         $('#leaderSection').css('display', 'block');
+
+        renderApprovalSection(task);
 
         const isDone = task.status === 'done';
         const isCancelled = task.status === 'cancelled';
@@ -3253,13 +3418,14 @@
 
         if (isDone || isCancelled) {
             $('#operatorName, #taskDate, #section, #problem, #tempAction, #permAction, #deadline, #pic').prop('disabled', true);
+            $('input[name^="doc_status_"]').prop('disabled', true);
             $('#saveBtn').prop('disabled', true);
         } else {
             $('#saveBtn').prop('disabled', false);
         }
 
-        applyDocLockState();
         openModal('taskModal');
+        setTimeout(() => updateApproveButtonState(), 50);
     }
 
     async function deleteTask(id) {
@@ -3297,16 +3463,18 @@
         const id = $('#taskId').val();
         if (!id) return;
 
+        // Cek status dari radio
         const missing = [];
         ['4m', 'logbook', 'nursecall'].forEach(t => {
-            if (!taskAttachments[t]) missing.push(DOC_LABEL[t]);
+            const status = $(`input[name="doc_status_${t}"]:checked`).val() || 'belum';
+            if (status !== 'sudah') missing.push(DOC_LABEL[t] || t.toUpperCase());
         });
 
         if (missing.length > 0) {
             showAlert(
                 'warning',
                 'Dokumen Belum Lengkap',
-                'Upload dokumen berikut sebelum approve:<br><br>' +
+                'Tandai "Sudah" untuk dokumen berikut sebelum approve:<br><br>' +
                 '<ul style="text-align:left;padding-left:20px;margin:8px 0">' +
                 missing.map(m => `<li><strong>${m}</strong></li>`).join('') +
                 '</ul>'
@@ -3929,23 +4097,21 @@
         const isDone = task.status === 'done';
         const isCancelled = task.status === 'cancelled';
         const isInProgress = task.status === 'in_progress';
-        const atts = Object.values(taskAttachments).filter(Boolean);
-        if (atts.length > 0) {
-            $('#trAttachmentSection').show();
-            $('#trAttachmentList').html(atts.map(a => {
-                const url = API_BASE.replace(/\/$/, '') + '/storage/' + a.file_path;
-                const isImg = (a.mime_type || '').startsWith('image/');
-                return `<div style="border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center;background:#fff">
-                    <a href="${url}" target="_blank" style="text-decoration:none;color:#2563eb;font-size:12px;font-weight:600">
-                        <i class="ti ${isImg ? 'ti-photo' : 'ti-file-text'}" style="font-size:20px;display:block;margin-bottom:4px"></i>
-                        ${escapeHtml(DOC_LABEL[a.file_type])}
-                    </a>
-                    <div style="font-size:10px;color:#6b7280;margin-top:2px">${formatFileSize(a.file_size)}</div>
-                </div>`;
-            }).join(''));
-        } else {
-            $('#trAttachmentSection').hide();
-        }
+        const docList = [
+            { type: '4m',        label: '4M',        status: task.doc4mStatus },
+            { type: 'logbook',   label: 'Logbook',   status: task.docLogbookStatus },
+            { type: 'nursecall', label: 'Nursecall', status: task.docNursecallStatus },
+        ];
+        $('#trAttachmentSection').show();
+        $('#trAttachmentList').html(docList.map(d => {
+            const ok = d.status === 'sudah';
+            return `<div style="border:1px solid ${ok ? '#86efac' : '#fecaca'};border-radius:6px;padding:8px;text-align:center;background:${ok ? '#f0fdf4' : '#fef2f2'}">
+                <i class="ti ${ok ? 'ti-circle-check' : 'ti-circle-x'}"
+                style="font-size:20px;display:block;margin-bottom:4px;color:${ok ? '#16a34a' : '#dc2626'}"></i>
+                <div style="font-weight:600;color:${ok ? '#166534' : '#991b1b'};font-size:12px">${d.label}</div>
+                <div style="font-size:10px;margin-top:2px;color:${ok ? '#15803d' : '#b91c1c'}">${ok ? 'Sudah' : 'Belum'}</div>
+            </div>`;
+        }).join(''));
 
         if (isDone) badges.push(`<span class="badge-status badge-approved"><i class="ti ti-circle-check"></i> APPROVED</span>`);
         else if (isCancelled) badges.push(`<span class="badge-status badge-cancelled"><i class="ti ti-circle-x"></i> CANCELLED</span>`);
@@ -4306,6 +4472,16 @@
         $('#actCount').text(list.filter(t => t.stage === 'act').length);
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // STAGE LABEL MAPPING (untuk tooltip/badge)
+    // ══════════════════════════════════════════════════════════════
+    const STAGE_LABEL = {
+        plan:  { title: 'Informasi Masalah',        role: 'Operator',      short: 'Phase 1' },
+        do:    { title: 'Penanggung Jawab Masalah', role: 'Team Leader',   short: 'Phase 2' },
+        check: { title: 'Isi Tindakan',             role: 'Seksi Terkait', short: 'Phase 3' },
+        act:   { title: 'Approval / Evaluasi',      role: 'Group Leader',  short: 'Phase 4' },
+    };
+
     function renderKanban(filtered, isLeader) {
         ['plan', 'do', 'check', 'act'].forEach(stage => {
             const $container = $(`#${stage}Items`);
@@ -4394,7 +4570,7 @@
     // ============================================================
     const CATEGORY_LABEL = {
         man:      'Man',
-        machine:  'Machine',
+        machine:  'Machine / Jig / Mold',
         material: 'Material',
         methode:  'Methode',
     };
@@ -4403,178 +4579,178 @@
         st:  'ST',  qc: 'QC', whp: 'WHP', prc: 'PRC', log: 'LOG',
     };
     const DOC_LABEL = { '4m': '4M', 'logbook': 'Logbook', 'nursecall': 'Nursecall' };
-    const DOC_MAX_SIZE = 4 * 1024 * 1024;
-    const DOC_MIMES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    // const DOC_MAX_SIZE = 4 * 1024 * 1024;
+    // const DOC_MIMES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
-    function getDocEls(type) {
-        const t = String(type || '').toLowerCase();
-        const KEY_MAP = {
-            '4m':       '4m',
-            'logbook':  'Logbook',
-            'nursecall':'Nursecall',
-        };
-        const key = KEY_MAP[t];
-        if (!key) return null;
+    // function getDocEls(type) {
+    //     const t = String(type || '').toLowerCase();
+    //     const KEY_MAP = {
+    //         '4m':       '4m',
+    //         'logbook':  'Logbook',
+    //         'nursecall':'Nursecall',
+    //     };
+    //     const key = KEY_MAP[t];
+    //     if (!key) return null;
 
-        return {
-            card:    $(`.doc-upload-card[data-type="${t}"]`),
-            status:  $(`#docStatus${key}`),
-            drop:    $(`#docDrop${key}`),
-            preview: $(`#docPreview${key}`),
-            input:   $(`#docInput${key}`),
-            link:    $(`#docLink${key}`),
-            meta:    $(`#docMeta${key}`),
-        };
-    }
+    //     return {
+    //         card:    $(`.doc-upload-card[data-type="${t}"]`),
+    //         status:  $(`#docStatus${key}`),
+    //         drop:    $(`#docDrop${key}`),
+    //         preview: $(`#docPreview${key}`),
+    //         input:   $(`#docInput${key}`),
+    //         link:    $(`#docLink${key}`),
+    //         meta:    $(`#docMeta${key}`),
+    //     };
+    // }
 
-    function isTaskLocked() {
-        const id = parseInt($('#taskId').val() || '0', 10);
-        if (!id) return false;
-        const task = state.tasks.find(t => t.id === id);
-        if (!task) return false;
-        return task.status === 'done' || task.status === 'cancelled';
-    }
+    // function isTaskLocked() {
+    //     const id = parseInt($('#taskId').val() || '0', 10);
+    //     if (!id) return false;
+    //     const task = state.tasks.find(t => t.id === id);
+    //     if (!task) return false;
+    //     return task.status === 'done' || task.status === 'cancelled';
+    // }
 
-    function applyDocLockState() {
-        $('.doc-upload-card').toggleClass('locked', isTaskLocked());
-    }
+    // function applyDocLockState() {
+    //     $('.doc-upload-card').toggleClass('locked', isTaskLocked());
+    // }
 
-    function pickFile(type) {
-        if (isTaskLocked()) {
-            showToast('Task sudah di-approve, dokumen tidak bisa diubah', 'warning');
-            return;
-        }
-        const els = getDocEls(type);
-        if (els) els.input.trigger('click');
-    }
+    // function pickFile(type) {
+    //     if (isTaskLocked()) {
+    //         showToast('Task sudah di-approve, dokumen tidak bisa diubah', 'warning');
+    //         return;
+    //     }
+    //     const els = getDocEls(type);
+    //     if (els) els.input.trigger('click');
+    // }
 
-    function handleDocDragOver(e) {
-        e.preventDefault();
-        e.currentTarget.classList.add('drag-over');
-    }
-    function handleDocDragLeave(e) {
-        e.currentTarget.classList.remove('drag-over');
-    }
-    function handleDocDrop(e, type) {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        const file = e.dataTransfer.files?.[0];
-        if (file) uploadDoc(type, file);
-    }
-    function handleFileSelect(e, type) {
-        const file = e.target.files?.[0];
-        if (file) uploadDoc(type, file);
-        e.target.value = '';
-    }
+    // function handleDocDragOver(e) {
+    //     e.preventDefault();
+    //     e.currentTarget.classList.add('drag-over');
+    // }
+    // function handleDocDragLeave(e) {
+    //     e.currentTarget.classList.remove('drag-over');
+    // }
+    // function handleDocDrop(e, type) {
+    //     e.preventDefault();
+    //     e.currentTarget.classList.remove('drag-over');
+    //     const file = e.dataTransfer.files?.[0];
+    //     if (file) uploadDoc(type, file);
+    // }
+    // function handleFileSelect(e, type) {
+    //     const file = e.target.files?.[0];
+    //     if (file) uploadDoc(type, file);
+    //     e.target.value = '';
+    // }
 
-    async function uploadDoc(type, file) {
-        type = String(type || '').toLowerCase();
+    // async function uploadDoc(type, file) {
+    //     type = String(type || '').toLowerCase();
 
-        if (file.size > DOC_MAX_SIZE) {
-            showAlert('warning', 'File Terlalu Besar', 'Maksimum 4 MB. File Anda: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
-            return;
-        }
-        if (!DOC_MIMES.includes(file.type)) {
-            showAlert('warning', 'Format Tidak Didukung', 'Hanya PDF / JPG / PNG.');
-            return;
-        }
+    //     if (file.size > DOC_MAX_SIZE) {
+    //         showAlert('warning', 'File Terlalu Besar', 'Maksimum 4 MB. File Anda: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
+    //         return;
+    //     }
+    //     if (!DOC_MIMES.includes(file.type)) {
+    //         showAlert('warning', 'Format Tidak Didukung', 'Hanya PDF / JPG / PNG.');
+    //         return;
+    //     }
 
-        const taskId = $('#taskId').val();
-        if (!taskId) {
-            showAlert('warning', 'Simpan Task Dulu', 'Simpan task terlebih dahulu sebelum upload dokumen.');
-            return;
-        }
+    //     const taskId = $('#taskId').val();
+    //     if (!taskId) {
+    //         showAlert('warning', 'Simpan Task Dulu', 'Simpan task terlebih dahulu sebelum upload dokumen.');
+    //         return;
+    //     }
 
-        $('#docProgressBar').show();
-        $('#docProgressFill').css('width', '0%');
+    //     $('#docProgressBar').show();
+    //     $('#docProgressFill').css('width', '0%');
 
-        const fd = new FormData();
-        fd.append('file_type', type);
-        fd.append('file', file);
+    //     const fd = new FormData();
+    //     fd.append('file_type', type);
+    //     fd.append('file', file);
 
-        try {
-            const token = window.CSRF_TOKEN || $('meta[name="csrf-token"]').attr('content') || '';
-            await $.ajax({
-                url: API_BASE + `/tasks/${taskId}/attachments`,
-                type: 'POST',
-                data: fd,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                xhr: function () {
-                    const xhr = new window.XMLHttpRequest();
-                    xhr.upload.addEventListener('progress', function (e) {
-                        if (e.lengthComputable) {
-                            const pct = (e.loaded / e.total) * 100;
-                            $('#docProgressFill').css('width', pct + '%');
-                        }
-                    });
-                    return xhr;
-                },
-                headers: { 'X-CSRF-TOKEN': token }
-            });
+    //     try {
+    //         const token = window.CSRF_TOKEN || $('meta[name="csrf-token"]').attr('content') || '';
+    //         await $.ajax({
+    //             url: API_BASE + `/tasks/${taskId}/attachments`,
+    //             type: 'POST',
+    //             data: fd,
+    //             processData: false,
+    //             contentType: false,
+    //             dataType: 'json',
+    //             xhr: function () {
+    //                 const xhr = new window.XMLHttpRequest();
+    //                 xhr.upload.addEventListener('progress', function (e) {
+    //                     if (e.lengthComputable) {
+    //                         const pct = (e.loaded / e.total) * 100;
+    //                         $('#docProgressFill').css('width', pct + '%');
+    //                     }
+    //                 });
+    //                 return xhr;
+    //             },
+    //             headers: { 'X-CSRF-TOKEN': token }
+    //         });
 
-            await loadAttachments(taskId);
+    //         await loadAttachments(taskId);
 
-            showToast(DOC_LABEL[type] + ' berhasil diupload', 'success');
+    //         showToast(DOC_LABEL[type] + ' berhasil diupload', 'success');
 
-        } catch (err) {
-            const msg = err?.responseJSON?.message || err?.responseText || err?.statusText || err?.message || 'Upload gagal';
-            showAlert('error', 'Upload Gagal', msg);
-        } finally {
-            setTimeout(() => {
-                $('#docProgressBar').hide();
-                $('#docProgressFill').css('width', '0%');
-            }, 600);
-        }
-    }
+    //     } catch (err) {
+    //         const msg = err?.responseJSON?.message || err?.responseText || err?.statusText || err?.message || 'Upload gagal';
+    //         showAlert('error', 'Upload Gagal', msg);
+    //     } finally {
+    //         setTimeout(() => {
+    //             $('#docProgressBar').hide();
+    //             $('#docProgressFill').css('width', '0%');
+    //         }, 600);
+    //     }
+    // }
 
-    function renderDocPreview(type, att) {
-        type = String(type || '').toLowerCase();
-        const els = getDocEls(type);
-        if (!els || !els.card.length) return;
+    // function renderDocPreview(type, att) {
+    //     type = String(type || '').toLowerCase();
+    //     const els = getDocEls(type);
+    //     if (!els || !els.card.length) return;
 
-        if (!att) {
-            els.card.removeClass('has-file');
-            els.status.text('Belum ada');
-            els.drop.show();
-            els.preview.hide();
-            return;
-        }
+    //     if (!att) {
+    //         els.card.removeClass('has-file');
+    //         els.status.text('Belum ada');
+    //         els.drop.show();
+    //         els.preview.hide();
+    //         return;
+    //     }
 
-        els.card.addClass('has-file');
-        els.status.text('✓ Tersedia');
-        els.drop.hide();
-        els.preview.show();
+    //     els.card.addClass('has-file');
+    //     els.status.text('✓ Tersedia');
+    //     els.drop.hide();
+    //     els.preview.show();
 
-        const fileUrl = API_BASE.replace(/\/$/, '') + '/storage/' + (att.file_path || '');
-        els.link.attr('href', fileUrl).text(att.original_name || att.stored_name || '-');
-        els.meta.text(formatFileSize(att.file_size) + ' · ' + (att.uploaded_by_name || '-'));
-    }
+    //     const fileUrl = API_BASE.replace(/\/$/, '') + '/storage/' + (att.file_path || '');
+    //     els.link.attr('href', fileUrl).text(att.original_name || att.stored_name || '-');
+    //     els.meta.text(formatFileSize(att.file_size) + ' · ' + (att.uploaded_by_name || '-'));
+    // }
 
-    async function removeDoc(type) {
-        type = String(type || '').toLowerCase();
+    // async function removeDoc(type) {
+    //     type = String(type || '').toLowerCase();
 
-        const taskId = $('#taskId').val();
-        if (!taskId) return;
+    //     const taskId = $('#taskId').val();
+    //     if (!taskId) return;
 
-        const confirmed = await showConfirm(
-            'Hapus Dokumen?',
-            `Hapus file <strong>${DOC_LABEL[type]}</strong>?`,
-            'Ya, Hapus', 'Batal', 'warning'
-        );
-        if (!confirmed) return;
+    //     const confirmed = await showConfirm(
+    //         'Hapus Dokumen?',
+    //         `Hapus file <strong>${DOC_LABEL[type]}</strong>?`,
+    //         'Ya, Hapus', 'Batal', 'warning'
+    //     );
+    //     if (!confirmed) return;
 
-        try {
-            await api(`/tasks/${taskId}/attachments/${type}`, { method: 'DELETE' });
-            delete taskAttachments[type];
-            renderDocPreview(type, null);
-            showToast(DOC_LABEL[type] + ' dihapus', 'info');
-            updateApproveButtonState();
-        } catch (err) {
-            showAlert('error', 'Gagal Hapus', err.message);
-        }
-    }
+    //     try {
+    //         await api(`/tasks/${taskId}/attachments/${type}`, { method: 'DELETE' });
+    //         delete taskAttachments[type];
+    //         renderDocPreview(type, null);
+    //         showToast(DOC_LABEL[type] + ' dihapus', 'info');
+    //         updateApproveButtonState();
+    //     } catch (err) {
+    //         showAlert('error', 'Gagal Hapus', err.message);
+    //     }
+    // }
 
     function formatFileSize(bytes) {
         if (!bytes) return '0 B';
@@ -4583,33 +4759,33 @@
         return (bytes / 1024 / 1024).toFixed(2) + ' MB';
     }
 
-    async function loadAttachments(taskId) {
-        taskAttachments = {};
-        ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
+    // async function loadAttachments(taskId) {
+    //     taskAttachments = {};
+    //     ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
 
-        if (!taskId) {
-            updateApproveButtonState();
-            return;
-        }
+    //     if (!taskId) {
+    //         updateApproveButtonState();
+    //         return;
+    //     }
 
-        try {
-            const res = await api(`/tasks/${taskId}/attachments`);
-            const list = Array.isArray(res) ? res : (res?.data || []);
+    //     try {
+    //         const res = await api(`/tasks/${taskId}/attachments`);
+    //         const list = Array.isArray(res) ? res : (res?.data || []);
 
-            list.forEach(att => {
-                const type = String(att.file_type || '').toLowerCase();
-                if (!DOC_LABEL[type]) return;
+    //         list.forEach(att => {
+    //             const type = String(att.file_type || '').toLowerCase();
+    //             if (!DOC_LABEL[type]) return;
 
-                att.file_type = type;
-                taskAttachments[type] = att;
-                renderDocPreview(type, att);
-            });
-        } catch (err) {
-            console.warn('[attachments] gagal load:', err);
-        } finally {
-            updateApproveButtonState();
-        }
-    }
+    //             att.file_type = type;
+    //             taskAttachments[type] = att;
+    //             renderDocPreview(type, att);
+    //         });
+    //     } catch (err) {
+    //         console.warn('[attachments] gagal load:', err);
+    //     } finally {
+    //         updateApproveButtonState();
+    //     }
+    // }
 
     // ============================================================
     // UTIL
@@ -4631,12 +4807,12 @@
     function closeModal(id) { $('#' + id).removeClass('active'); }
     function updateApproveButtonState() {
         const $btn = $('#approveTaskBtn');
-        if (!$btn.length || !$btn.is(':visible')) return;
+        if (!$btn.length) return;
 
         const missing = [];
         ['4m', 'logbook', 'nursecall'].forEach(t => {
-            const att = taskAttachments[t];
-            if (!att || !att.file_path) missing.push(DOC_LABEL[t]);
+            const status = $(`input[name="doc_status_${t}"]:checked`).val() || 'belum';
+            if (status !== 'sudah') missing.push(DOC_LABEL[t] || t.toUpperCase());
         });
 
         if (missing.length === 0) {
@@ -4645,9 +4821,73 @@
                 .html('<i class="ti ti-check"></i> Approve');
         } else {
             $btn.prop('disabled', true)
-                .attr('title', 'Upload dulu: ' + missing.join(', '))
+                .attr('title', 'Tandai "Sudah" dulu: ' + missing.join(', '))
                 .html('<i class="ti ti-lock"></i> Approve');
         }
+    }
+
+    function renderApprovalSection(task) {
+        const $empty = $('#approvalEmptyState');
+        const $filled = $('#approvalFilledState');
+        const $checklist = $('#approvalChecklistItems');
+
+        $empty.hide();
+        $filled.hide();
+
+        const isApproved = task && (
+            task.status === 'done' || !!task.approvedAt || !!task.leaderSignature
+        );
+
+        if (isApproved) {
+            $filled.show();
+            $('#approvalByName').text(task.leaderSignature || task.approvedByName || '-');
+            $('#approvalAt').text(task.approvedAt ? formatDateTime(task.approvedAt) : '-');
+            $('#approvalSignature').html(
+                task.leaderSignature
+                    ? `<span style="display:inline-flex;align-items:center;gap:4px;color:#16a34a">
+                        <i class="ti ti-circle-check"></i> ${escapeHtml(task.leaderSignature)}
+                    </span>`
+                    : '<span style="color:#9ca3af">-</span>'
+            );
+            $('#approvalStatusBadge').html(`<span class="status-pill status-done">APPROVED</span>`);
+            $checklist.html('<div style="color:#16a34a"><i class="ti ti-circle-check"></i> Task sudah di-approve</div>');
+            return;
+        }
+
+        if (!task) {
+            $empty.show();
+            $checklist.html(`
+                <div><i class="ti ti-minus"></i> Simpan task terlebih dahulu</div>
+                <div><i class="ti ti-minus"></i> Isi Phase 1-3</div>
+                <div><i class="ti ti-minus"></i> Pindahkan ke stage ACT</div>
+                <div><i class="ti ti-minus"></i> Tandai semua dokumen "Sudah"</div>
+            `);
+            return;
+        }
+
+        $empty.show();
+
+        const docOk = task.doc4mStatus === 'sudah'
+                && task.docLogbookStatus === 'sudah'
+                && task.docNursecallStatus === 'sudah';
+
+        const checks = [
+            { label: 'Phase 1: Data Operator + Klasifikasi lengkap',
+            done: !!(task.operatorName && task.date && task.section && task.problem && task.category && task.picSection) },
+            { label: 'Phase 2: Semua dokumen ditandai "Sudah"',  done: docOk },
+            { label: 'Phase 3: Tindakan & PIC terisi',
+            done: !!(task.tempAction || task.permAction) && !!task.pic },
+            { label: 'Task berada di stage ACT',                 done: task.stage === 'act' },
+            { label: 'Status task = in_progress',                done: task.status === 'in_progress' },
+        ];
+
+        $checklist.html(checks.map(c => `
+            <div style="display:flex;align-items:center;gap:6px">
+                <i class="ti ${c.done ? 'ti-circle-check' : 'ti-circle-x'}"
+                style="color:${c.done ? '#16a34a' : '#dc2626'}"></i>
+                <span>${escapeHtml(c.label)}</span>
+            </div>
+        `).join(''));
     }
 
     // ============================================================

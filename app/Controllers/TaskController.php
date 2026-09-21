@@ -147,6 +147,7 @@ class TaskController extends BaseController
             'operator_name', 'task_date', 'section', 'problem',
             'category', 'pic_section',
             'temporary_action', 'permanent_action', 'deadline', 'pic',
+            'doc_4m_status', 'doc_logbook_status', 'doc_nursecall_status',
         ];
 
         $oldValues = [];
@@ -162,6 +163,9 @@ class TaskController extends BaseController
             'deadline'         => $request->deadline ?: null,
             'pic'              => $request->pic,
             'updated_by'       => $user->id ?? null,
+            'doc_4m_status'        => $request->doc_4m_status        ?: 'belum',
+            'doc_logbook_status'   => $request->doc_logbook_status   ?: 'belum',
+            'doc_nursecall_status' => $request->doc_nursecall_status ?: 'belum',
         ];
 
         if ($request->operator_name) $payload['operator_name'] = $request->operator_name;
@@ -233,34 +237,41 @@ class TaskController extends BaseController
 
             // Validasi DO → CHECK butuh tindakan
             if ($oldStage === 'DO' && $newStage === 'CHECK') {
-                if (empty($task->temporary_action) && empty($task->permanent_action)) {
+                if (empty($task->category) && empty($task->pic_section)) {
                     return $this->json([
                         'success' => false,
-                        'message' => 'Isi tindakan dulu sebelum pindah ke CHECK'
+                        'message' => 'Isi category dan pic section sebelum pindah ke phase 3'
                     ], 422);
                 }
             }
 
-            if($oldStage === 'CHECK' && $newStage === 'ACT'){
-                $required = [
-                    'category' => $task->cateogry,
-                    'pic_section' => $task->pic_section,
-                    'temporary_action' => $task->temporary_action,
-                    'permanent_action' => $task->permanent_action,
-                    'deadline' => $task->deadline,
-                    'pic' => $task->pic
-                ];
+            if ($oldStage === 'CHECK' && $newStage === 'ACT') {
 
                 $missing = [];
-                foreach($required as $req => $label){
-                    if(empty($task->field)) $missing[] = $label;
+
+                if (($task->doc_4m_status        ?? 'belum') !== 'sudah') $missing[] = 'Dokumen 4M';
+                if (($task->doc_logbook_status   ?? 'belum') !== 'sudah') $missing[] = 'Dokumen Logbook';
+                if (($task->doc_nursecall_status ?? 'belum') !== 'sudah') $missing[] = 'Dokumen Nursecall';
+
+                $required = [
+                    'category'         => 'Category',
+                    'pic_section'      => 'PIC Section',
+                    'temporary_action' => 'Tindakan Temporary',
+                    'permanent_action' => 'Tindakan Permanent',
+                    'deadline'         => 'Deadline',
+                    'pic'              => 'PIC',
+                ];
+
+                foreach ($required as $field => $label) {
+                    if (empty($task->$field)) {
+                        $missing[] = $label;
+                    }
                 }
 
-                if(!empty($mising)){
+                if (!empty($missing)) {
                     return $this->json([
                         'success' => false,
-                        'message' => 'Form belum lengkap: ' . implode(', ', $missing),
-                        'missing' => $missing,
+                        'message' => 'Form belum lengkap, isi dulu: ' . implode(', ', $missing),
                     ], 422);
                 }
             }

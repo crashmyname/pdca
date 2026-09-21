@@ -23,6 +23,9 @@ class CreateTasksTable
         $table->text('permanent_action')->nullable();
         $table->date('deadline')->nullable();
         $table->string('pic')->nullable();
+        $table->string('doc_4m_status',10)->notNullable()->default('belum');
+        $table->string('doc_logbook_status',10)->notNullable()->default('belum');
+        $table->string('doc_nursecall_status',10)->notNullable()->default('belum');
         $table->enum('stage',['plan','do','check','act'])->default('plan');
         $table->timestamp('stage_updated_at')->nullable();
         $table->bigInteger('stage_updated_by')->nullable();
