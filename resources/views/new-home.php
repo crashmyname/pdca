@@ -1262,28 +1262,28 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-label">Plan</span>
+                    <span class="stat-label">Phase 1</span>
                     <span class="stat-icon stat-plan"><i class="ti ti-clipboard-list"></i></span>
                 </div>
                 <div class="stat-value" id="planCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-label">Do</span>
+                    <span class="stat-label">Phase 2</span>
                     <span class="stat-icon stat-do"><i class="ti ti-bolt"></i></span>
                 </div>
                 <div class="stat-value" id="doCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-label">Check</span>
+                    <span class="stat-label">Phase 3</span>
                     <span class="stat-icon stat-check"><i class="ti ti-circle-check"></i></span>
                 </div>
                 <div class="stat-value" id="checkCount">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-label">Act</span>
+                    <span class="stat-label">Phase 4</span>
                     <span class="stat-icon stat-act"><i class="ti ti-tool"></i></span>
                 </div>
                 <div class="stat-value" id="actCount">0</div>
@@ -1391,7 +1391,7 @@
                             <span>
                                 <span class="phase-badge phase-4">Phase 4</span>
                                 <span>Approval / Evaluasi Tindakan</span>
-                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Group Leader</div>
+                                <div style="font-size:10px;color:#6b7280;font-weight:500;margin-top:2px">Group Leader UP</div>
                             </span>
                         </span>
                         <span class="column-count" id="actBadge">0</span>
@@ -1868,10 +1868,10 @@
                             <label class="form-label">Stage</label>
                             <select class="form-select" id="reportStage">
                                 <option value="all">Semua Stage</option>
-                                <option value="plan">Plan</option>
-                                <option value="do">Do</option>
-                                <option value="check">Check</option>
-                                <option value="act">Act</option>
+                                <option value="plan">Phase 1</option>
+                                <option value="do">Phase 2</option>
+                                <option value="check">Phase 3</option>
+                                <option value="act">Phase 4</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
@@ -3196,6 +3196,32 @@
         $('#cancelledCount').text(n);
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // PHASE VISIBILITY — Tampilkan section sesuai stage task
+    // ══════════════════════════════════════════════════════════════
+    function applyPhaseVisibility(stage, options = {}) {
+        const { isLeader = false } = options;
+
+        const stageOrder = ['plan', 'do', 'check', 'act'];
+        const idx = Math.max(0, stageOrder.indexOf(String(stage || 'plan').toLowerCase()));
+
+        // Phase 1: Data Operator — selalu tampil (context)
+        $('#phase1Section').show();
+
+        // Phase 2: Klasifikasi + Dokumen — tampil saat stage >= do (Phase 2)
+        const showPhase2 = isLeader && idx >= 1;
+        $('#classificationSection').toggle(showPhase2);
+        $('#documentsSection').toggle(showPhase2);
+
+        // Phase 3: Tindakan — tampil saat stage >= check (Phase 3)
+        const showPhase3 = isLeader && idx >= 2;
+        $('#leaderSection').toggle(showPhase3);
+
+        // Phase 4: Approval — tampil saat stage >= act (Phase 4)
+        const showPhase4 = isLeader && idx >= 3;
+        $('#approvalSection').toggle(showPhase4);
+    }
+
     // ============================================================
     // TASK CRUD
     // ============================================================
@@ -3221,11 +3247,11 @@
         $('#permAction').prop('disabled', !isLeader);
         $('#deadline').prop('disabled', !isLeader);
         $('#pic').prop('disabled', !isLeader);
-        $('#leaderSection').css('display', isLeader ? 'block' : 'none');
-        $('#documentsSection').css('display', isLeader ? 'block' : 'none');
-        $('#classificationSection').css('display', isLeader ? 'block' : 'none');
         $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeader);
         $('input[name^="doc_status_"]').prop('disabled', !isLeader);
+
+        // Panggil helper visibility SETELAH semua set value/disabled
+        applyPhaseVisibility('plan', { isLeader });
 
         renderApprovalSection(null);
 
@@ -3387,18 +3413,20 @@
             $(`input[name="pic_section"][value="${task.picSection}"]`).prop('checked', true);
         }
         const isLeaderEdit = canEdit();
-        $('#classificationSection').css('display', isLeaderEdit ? 'block' : 'none');
         $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeaderEdit);
         $('input[name^="doc_status_"]').prop('disabled', !isLeaderEdit);
 
+        // Terapkan visibility sesuai stage task
+        
         $('#tempAction').val(task.tempAction);
         $('#permAction').val(task.permAction);
         $('#deadline').val(task.deadline);
-
+        
         $('#tempAction, #permAction, #deadline, #pic').prop('disabled', false);
-        $('#leaderSection').css('display', 'block');
-
+        // $('#leaderSection').css('display', 'block');
+        
         renderApprovalSection(task);
+        applyPhaseVisibility(task.stage, { isLeader: isLeaderEdit });
 
         const isDone = task.status === 'done';
         const isCancelled = task.status === 'cancelled';
@@ -3834,10 +3862,10 @@
 
         const byStage = summary.by_stage || {};
         $('#reportSummary').html(`
-            <div class="report-stat-card plan"><div class="report-stat-label">Plan</div><div class="report-stat-value">${byStage.plan || 0}</div></div>
-            <div class="report-stat-card do"><div class="report-stat-label">Do</div><div class="report-stat-value">${byStage.do || 0}</div></div>
-            <div class="report-stat-card check"><div class="report-stat-label">Check</div><div class="report-stat-value">${byStage.check || 0}</div></div>
-            <div class="report-stat-card act"><div class="report-stat-label">Act</div><div class="report-stat-value">${byStage.act || 0}</div></div>
+            <div class="report-stat-card plan"><div class="report-stat-label">Phase 1</div><div class="report-stat-value">${byStage.plan || 0}</div></div>
+            <div class="report-stat-card do"><div class="report-stat-label">Phase 2</div><div class="report-stat-value">${byStage.do || 0}</div></div>
+            <div class="report-stat-card check"><div class="report-stat-label">Phase 3</div><div class="report-stat-value">${byStage.check || 0}</div></div>
+            <div class="report-stat-card act"><div class="report-stat-label">Phase 4</div><div class="report-stat-value">${byStage.act || 0}</div></div>
         `);
 
         const bySection = summary.by_section || {};
