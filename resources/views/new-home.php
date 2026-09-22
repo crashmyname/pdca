@@ -3150,9 +3150,27 @@
     // CANCELLED TASKS VIEWER
     // ══════════════════════════════════════════════════════════════
     function openCancelledModal() {
-        const cancelled = state.tasks
+        let cancelled = state.tasks
             .filter(t => t.status === 'cancelled')
             .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (state.dateFrom) {
+            const from = new Date(state.dateFrom);
+            from.setHours(0, 0, 0, 0);
+            cancelled = cancelled.filter(t => {
+                const d = new Date(t.date);
+                d.setHours(0, 0, 0, 0);
+                return d >= from;
+            });
+        }
+        if (state.dateTo) {
+            const to = new Date(state.dateTo);
+            to.setHours(23, 59, 59, 999);
+            cancelled = cancelled.filter(t => {
+                const d = new Date(t.date);
+                return d <= to;
+            });
+        }
 
         const $body = $('#cancelledTableBody');
 
@@ -3161,7 +3179,10 @@
                 <tr>
                     <td colspan="9" style="text-align:center;padding:40px;color:#9ca3af">
                         <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
-                        <div style="font-size:14px">Tidak ada task yang dibatalkan</div>
+                        <div style="font-size:14px">Tidak ada task cancelled pada periode ini</div>
+                        <div style="font-size:12px;margin-top:6px;color:#d1d5db">
+                            Coba ubah filter tanggal di halaman utama
+                        </div>
                     </td>
                 </tr>
             `);
@@ -3192,7 +3213,19 @@
 
     // Update counter cancelled di tombol
     function updateCancelledCount() {
-        const n = state.tasks.filter(t => t.status === 'cancelled').length;
+        let n = state.tasks.filter(t => t.status === 'cancelled').length;
+
+        if (state.dateFrom) {
+            const from = new Date(state.dateFrom);
+            from.setHours(0, 0, 0, 0);
+            n = state.tasks.filter(t => {
+                if (t.status !== 'cancelled') return false;
+                const d = new Date(t.date);
+                d.setHours(0, 0, 0, 0);
+                return d >= from;
+            }).length;
+        }
+
         $('#cancelledCount').text(n);
     }
 
