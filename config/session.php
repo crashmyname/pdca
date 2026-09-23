@@ -13,4 +13,11 @@ return [
     'same_site' => 'Lax',
 
     'storage_path' => BPJS_BASE_PATH . '/storage/session/'.env('APP_NAME'),
+    'redis' => [
+        'host'     => env('REDIS_HOST', '127.0.0.1'),
+        'port'     => (int) env('REDIS_PORT', 6379),
+        'password' => env('REDIS_PASSWORD') ?: null,
+        'database' => (int) env('REDIS_DATABASE', 0),
+        'prefix'   => env('REDIS_PREFIX', 'session:'),
+    ],
 ];
