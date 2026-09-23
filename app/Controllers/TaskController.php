@@ -15,10 +15,8 @@ class TaskController extends BaseController
     // GET /api/tasks - List tasks with filters
     public function index(Request $request)
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-        
+        $this->closeSessionEarly();
+
         $query = Task::query();
 
         // Filters
@@ -528,6 +526,7 @@ class TaskController extends BaseController
     // GET /tasks/report - Aggregated report data
     public function report(Request $request)
     {
+        $this->closeSessionEarly();
         try {
             $query = Task::query();
 
@@ -667,5 +666,13 @@ class TaskController extends BaseController
         return in_array(strtolower($user->role), [
             'team_leader', 'group_leader', 'manager', 'admin'
         ], true);
+    }
+
+    protected function closeSessionEarly()
+    {
+        if(session_status() === PHP_SESSION_ACTIVE)
+        {
+            session_write_close();
+        }
     }
 }
