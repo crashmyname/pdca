@@ -3205,7 +3205,7 @@
                     <td>${escapeHtml(t.section || '-')}</td>
                     <td style="max-width:320px;word-break:break-word">${escapeHtml(t.problem || '-')}</td>
                     <td style="text-align:center">
-                        <span class="stage-pill">${(t.stage || '-').toUpperCase()}</span>
+                        <span class="stage-pill">${stageDisplay(t.stage)}</span>
                     </td>
                     <td>${escapeHtml(t.pic || '-')}</td>
                     <td style="text-align:center">
@@ -3673,9 +3673,9 @@
             let changeHtml = '';
             if (h.oldStage && h.newStage && h.oldStage !== h.newStage) {
                 changeHtml += `<div style="font-size:12px;margin-top:4px;color:#374151">
-                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${(h.oldStage || '').toUpperCase()}</span>
+                    <span style="background:#f3f4f6;padding:2px 6px;border-radius:4px">${stageDisplay(h.oldStage)}</span>
                     <i class="ti ti-arrow-right" style="margin:0 6px;color:#9ca3af"></i>
-                    <span style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;font-weight:600">${(h.newStage || '').toUpperCase()}</span>
+                    <span style="background:#dbeafe;padding:2px 6px;border-radius:4px;color:#1e40af;font-weight:600">${stageDisplay(h.newStage)}</span>
                 </div>`;
             }
             if (h.oldStatus && h.newStatus && h.oldStatus !== h.newStatus) {
@@ -3776,7 +3776,7 @@
             permanent_action:  'Tindakan Permanent',
             deadline:          'Deadline',
             pic:               'PIC',
-            stage:             'Stage',
+            stage:             'Stage / Phase',
             status:            'Status',
         };
 
@@ -3957,7 +3957,7 @@
                         <td style="text-align:center"><span class="card-tag cat-${t.category || ''}">${escapeHtml(CATEGORY_LABEL[t.category] || '-')}</span></td>
                         <td style="text-align:center"><span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[t.picSection] || '-')}</span></td>
                         <td>${escapeHtml(t.problem)}</td>
-                        <td style="text-align:center"><span class="stage-pill">${t.stage}</span></td>
+                        <td style="text-align:center"><span class="stage-pill">${stageDisplay(t.stage)}</span></td>
                         <td style="text-align:center"><span class="status-pill status-${t.status}">${t.status}</span></td>
                         <td>${escapeHtml(t.pic || '-')}</td>
                     </tr>`).join('')}
@@ -4158,7 +4158,7 @@
                 ? `<span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[task.picSection] || task.picSection)}</span>`
                 : '-'
         );
-        $('#trStage').text((task.stage || '-').toUpperCase());
+        $('#trStage').text(stageDisplay(task.stage));
         $('#trStatus').text((task.status || '-').toUpperCase());
         $('#trDeadline').text(task.deadline ? formatDateLong(task.deadline) : '-');
         $('#trCreatedAt').text(task.createdAt ? formatDateTime(task.createdAt) : '-');
@@ -4188,7 +4188,7 @@
         else if (task.stage === 'act' && isInProgress) badges.push(`<span class="badge-status badge-pending-approval"><i class="ti ti-clock-hour-4"></i> MENUNGGU APPROVAL</span>`);
         else if (isInProgress) badges.push(`<span class="badge-status badge-in-progress"><i class="ti ti-bolt"></i> IN PROGRESS</span>`);
         else badges.push(`<span class="badge-status" style="background:#dbeafe;color:#1e40af;border:1px solid #93c5fd"><i class="ti ti-flag"></i> OPEN</span>`);
-        badges.push(`<span class="stage-pill">STAGE: ${(task.stage || '').toUpperCase()}</span>`);
+        badges.push(`<span class="stage-pill">${stageDisplay(task.stage)}</span>`);
         $('#trStatusBadges').html(badges.join(''));
 
         $('#trProblem').html(task.problem ? escapeHtml(task.problem) : '<span class="tr-empty">Tidak ada deskripsi masalah</span>');
@@ -4425,7 +4425,7 @@
                 <tr><td style="padding:4px 0;color:#6b7280">Operator</td><td>${escapeHtml(task.operatorName)}</td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Tanggal</td><td>${escapeHtml(task.date)}</td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Seksi</td><td><span style="background:#f3f4f6;padding:2px 8px;border-radius:6px">${escapeHtml(task.section)}</span></td></tr>
-                <tr><td style="padding:4px 0;color:#6b7280">Stage</td><td><strong>${task.stage.toUpperCase()}</strong></td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280">Stage</td><td><strong>${stageDisplay(task.stage)}</strong></td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Status</td><td><strong>${task.status.toUpperCase()}</strong></td></tr>
             </table>
             <hr style="margin:12px 0;border:none;border-top:1px solid #e5e7eb">
@@ -4551,6 +4551,10 @@
         check: { title: 'Isi Tindakan',             role: 'Seksi Terkait', short: 'Phase 3' },
         act:   { title: 'Approval / Evaluasi',      role: 'Group Leader',  short: 'Phase 4' },
     };
+
+    function stageDisplay(stage) {
+        return STAGE_LABEL[String(stage || '').toLowerCase()]?.short || '-';
+    }
 
     function renderKanban(filtered, isLeader) {
         ['plan', 'do', 'check', 'act'].forEach(stage => {
