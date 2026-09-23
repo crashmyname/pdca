@@ -15,6 +15,10 @@ class TaskController extends BaseController
     // GET /api/tasks - List tasks with filters
     public function index(Request $request)
     {
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+        
         $query = Task::query();
 
         // Filters
