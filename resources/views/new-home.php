@@ -2625,11 +2625,9 @@
         const $btn  = $('#refreshBtn');
         const $icon = $btn.find('i');
 
-        // Disable + spin icon
         $btn.prop('disabled', true);
         $icon.addClass('ti-spin');
 
-        // Force reload sections (task selalu fresh dari loadTasks)
         sectionsLoaded = false;
 
         try {
@@ -2651,7 +2649,15 @@
     // ============================================================
     async function loadTasks() {
         try {
-            const res = await api('/tasks', { query: { per_page: 500 } });
+            const query = {
+                per_page: 500,
+                date_from: state.dateFrom || '',
+                date_to:   state.dateTo   || '',
+                section:   state.sectionFilter !== 'all' ? state.sectionFilter : '',
+                search:    state.searchQuery || '',
+            };
+
+            const res = await api('/tasks', { query });
             const list = Array.isArray(res) ? res : (res?.data || []);
             state.tasks = list.map(normalizeTask);
             render();
@@ -2984,15 +2990,18 @@
     // ============================================================
     function handleSearch(q) {
         state.searchQuery = (q || '').toLowerCase();
-        render();
+        clearTimeout(window._searchTimer);
+        window._searchTimer = setTimeout(() => loadTasks(), 400);
     }
+
     function handleFilter() {
         state.sectionFilter = $('#sectionFilter').val();
         state.dateFrom = $('#dateFrom').val() || null;
         state.dateTo = $('#dateTo').val() || null;
         detectActiveQuickDate();
-        render();
+        loadTasks();
     }
+
     function clearFilters() {
         state.searchQuery = '';
         state.sectionFilter = 'all';
@@ -5029,7 +5038,7 @@
         state.dateTo   = to   || null;
 
         setActiveQuickDate(range);
-        render();
+        loadTasks();
     }
 
     function detectActiveQuickDate() {
