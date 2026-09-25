@@ -103,6 +103,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task created by ' . $userName . ' (' . $userRole . ')',
             ]);
 
+            $this->broadcastPdcaStats();
             return $this->json($task, 201);
 
         } catch (\Throwable $e) {
@@ -206,6 +207,7 @@ class TaskController extends BaseController
             ]);
         }
 
+        $this->broadcastPdcaStats();
         return $this->json($task, 200);
     }
 
@@ -312,6 +314,7 @@ class TaskController extends BaseController
                 'notes'           => "Stage: {$oldStage} → {$newStage}, Status: {$oldStatus} → {$newStatus}",
             ]);
 
+            $this->broadcastPdcaStats();
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
@@ -376,6 +379,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task approved by ' . ($user->name ?? 'Leader'),
             ]);
 
+            $this->broadcastPdcaStats();
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
@@ -405,6 +409,7 @@ class TaskController extends BaseController
 
         $task->delete();
 
+        $this->broadcastPdcaStats();
         return $this->json([
             'message' => 'Task deleted successfully'
         ],200);
@@ -629,6 +634,39 @@ class TaskController extends BaseController
         ];
 
         return $this->json($stats,200);
+    }
+
+    public function broadcastPdcaStats(): void
+    {
+        $stats = [
+            'total' => Task::query()->count(),
+            'by_stage' => [
+                'plan'  => Task::query()->where('stage', '=', 'plan')->count(),
+                'do'    => Task::query()->where('stage', '=', 'do')->count(),
+                'check' => Task::query()->where('stage', '=', 'check')->count(),
+                'act'   => Task::query()->where('stage', '=', 'act')->count(),
+            ],
+            'by_status' => [
+                'open'        => Task::query()->where('status', '=', 'open')->count(),
+                'in_progress' => Task::query()->where('status', '=', 'in_progress')->count(),
+                'done'        => Task::query()->where('status', '=', 'done')->count(),
+                'cancelled'   => Task::query()->where('status', '=', 'cancelled')->count(),
+            ],
+        ];
+
+        $ch = curl_init('http://10.203.68.47:3002/broadcast');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($stats),
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'X-Broadcast-Secret: abogobogahesoyam',
+            ],
+            CURLOPT_TIMEOUT        => 2,
+            CURLOPT_RETURNTRANSFER => true,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
     }
 
     // Helper: Generate task code
