@@ -451,6 +451,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task cancelled by ' . ($user->name ?? 'Leader'),
             ]);
 
+            $this->broadcastPdcaStats();
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
