@@ -624,16 +624,16 @@ class TaskController extends BaseController
         $stats = [
             'total' => $base->count(),
             'by_stage' => [
-                'plan'  => $base->where('stage', '=', 'plan')->count(),
-                'do'    => $base->where('stage', '=', 'do')->count(),
-                'check' => $base->where('stage', '=', 'check')->count(),
-                'act'   => $base->where('stage', '=', 'act')->count(),
+                'plan'  => $base->where('stage', '=', 'PLAN')->count(),
+                'do'    => $base->where('stage', '=', 'DO')->count(),
+                'check' => $base->where('stage', '=', 'CHECK')->count(),
+                'act'   => $base->where('stage', '=', 'ACT')->count(),
             ],
             'by_status' => [
-                'open'        => $base->where('status', '=', 'open')->count(),
-                'in_progress' => $base->where('status', '=', 'in_progress')->count(),
-                'done'        => $base->where('status', '=', 'done')->count(),
-                'cancelled'   => $base->where('status', '=', 'cancelled')->count(),
+                'open'        => $base->where('status', '=', 'OPEN')->count(),
+                'in_progress' => $base->where('status', '=', 'IN_PROGRESS')->count(),
+                'done'        => $base->where('status', '=', 'DONE')->count(),
+                'cancelled'   => $base->where('status', '=', 'CANCELLED')->count(),
             ],
             'period' => [
                 'type'  => 'monthly',
