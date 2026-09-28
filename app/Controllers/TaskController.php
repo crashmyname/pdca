@@ -617,8 +617,8 @@ class TaskController extends BaseController
 
     public function buildMonthlyStats()
     {
-        $startOfMonth = date('Y-m-01 00:00:00');
-        $endOfMonth   = date('Y-m-t 23:59:59');
+        $startOfMonth = date('Y-m-01');
+        $endOfMonth   = date('Y-m-t');
 
         $base = Task::query()->whereBetween('task_date',$startOfMonth,$endOfMonth);
         $stats = [
@@ -642,6 +642,7 @@ class TaskController extends BaseController
                 'to'    => $endOfMonth,
             ],
         ];
+        return $stats;
     }
 
     // GET /api/tasks/stats - Get statistics
