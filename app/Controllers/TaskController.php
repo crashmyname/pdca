@@ -618,22 +618,23 @@ class TaskController extends BaseController
     public function buildMonthlyStats()
     {
         $startOfMonth = Date::parse(Date::Now())->format('Y-m-01');
-        $endOfMonth = Date::parse(Date::Now())->format('Y-m-t');
+        $endOfMonth   = Date::parse(Date::Now())->format('Y-m-t');
 
-        $base = Task::query()->whereBetween('task_date',$startOfMonth,$endOfMonth);
+        $base = Task::query()->whereBetween('task_date', $startOfMonth, $endOfMonth);
+
         $stats = [
-            'total' => $base->count(),
+            'total' => (clone $base)->count(),
             'by_stage' => [
-                'plan'  => $base->where('stage', '=', 'PLAN')->count(),
-                'do'    => $base->where('stage', '=', 'DO')->count(),
-                'check' => $base->where('stage', '=', 'CHECK')->count(),
-                'act'   => $base->where('stage', '=', 'ACT')->count(),
+                'plan'  => (clone $base)->where('stage', '=', 'PLAN')->count(),
+                'do'    => (clone $base)->where('stage', '=', 'DO')->count(),  
+                'check' => (clone $base)->where('stage', '=', 'CHECK')->count(),
+                'act'   => (clone $base)->where('stage', '=', 'ACT')->count(), 
             ],
             'by_status' => [
-                'open'        => $base->where('status', '=', 'OPEN')->count(),
-                'in_progress' => $base->where('status', '=', 'IN_PROGRESS')->count(),
-                'done'        => $base->where('status', '=', 'DONE')->count(),
-                'cancelled'   => $base->where('status', '=', 'CANCELLED')->count(),
+                'open'        => (clone $base)->where('status', '=', 'OPEN')->count(),
+                'in_progress' => (clone $base)->where('status', '=', 'IN_PROGRESS')->count(),
+                'done'        => (clone $base)->where('status', '=', 'DONE')->count(),
+                'cancelled'   => (clone $base)->where('status', '=', 'CANCELLED')->count(),
             ],
             'period' => [
                 'type'  => 'monthly',
@@ -642,6 +643,7 @@ class TaskController extends BaseController
                 'to'    => $endOfMonth,
             ],
         ];
+
         return $stats;
     }
 
