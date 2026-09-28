@@ -615,50 +615,47 @@ class TaskController extends BaseController
         }
     }
 
+    public function buildMonthlyStats()
+    {
+        $startOfMonth = Date::parse(Date::Now())->format('Y-m-01');
+        $endOfMonth = Date::parse(Date::Now())->format('Y-m-t');
+
+        $base = Task::query()->whereBetween('task_date',$startOfMonth,$endOfMonth);
+        $stats = [
+            'total' => $base->count(),
+            'by_stage' => [
+                'plan'  => $base->where('stage', '=', 'plan')->count(),
+                'do'    => $base->where('stage', '=', 'do')->count(),
+                'check' => $base->where('stage', '=', 'check')->count(),
+                'act'   => $base->where('stage', '=', 'act')->count(),
+            ],
+            'by_status' => [
+                'open'        => $base->where('status', '=', 'open')->count(),
+                'in_progress' => $base->where('status', '=', 'in_progress')->count(),
+                'done'        => $base->where('status', '=', 'done')->count(),
+                'cancelled'   => $base->where('status', '=', 'cancelled')->count(),
+            ],
+            'period' => [
+                'type'  => 'monthly',
+                'label' => Date::parse(Date::Now())->format('F Y'),
+                'from'  => $startOfMonth,
+                'to'    => $endOfMonth,
+            ],
+        ];
+    }
+
     // GET /api/tasks/stats - Get statistics
     public function stats()
     {
-        $stats = [
-            'total' => Task::query()->count(),
-            'by_stage' => [
-                'plan' => Task::query()->where('stage', '=','plan')->count(),
-                'do' => Task::query()->where('stage', '=', 'do')->count(),
-                'check' => Task::query()->where('stage', '=', 'check')->count(),
-                'act' => Task::query()->where('stage', '=', 'act')->count(),
-            ],
-            'by_status' => [
-                'open' => Task::query()->where('status', '=', 'open')->count(),
-                'in_progress' => Task::query()->where('status', '=', 'in_progress')->count(),
-                'done' => Task::query()->where('status', '=', 'done')->count(),
-                'cancelled' => Task::query()->where('status', '=', 'cancelled')->count(),
-            ],
-        ];
-
-        return $this->json($stats,200);
+        return $this->json($this->buildMonthlyStats(),200);
     }
 
     public function broadcastPdcaStats(): void
     {
-        $stats = [
-            'total' => Task::query()->count(),
-            'by_stage' => [
-                'plan'  => Task::query()->where('stage', '=', 'plan')->count(),
-                'do'    => Task::query()->where('stage', '=', 'do')->count(),
-                'check' => Task::query()->where('stage', '=', 'check')->count(),
-                'act'   => Task::query()->where('stage', '=', 'act')->count(),
-            ],
-            'by_status' => [
-                'open'        => Task::query()->where('status', '=', 'open')->count(),
-                'in_progress' => Task::query()->where('status', '=', 'in_progress')->count(),
-                'done'        => Task::query()->where('status', '=', 'done')->count(),
-                'cancelled'   => Task::query()->where('status', '=', 'cancelled')->count(),
-            ],
-        ];
-
         $ch = curl_init('http://10.203.68.47:3002/broadcast');
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => json_encode($stats),
+            CURLOPT_POSTFIELDS     => json_encode($this->buildMonthlyStats()),
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'X-Broadcast-Secret: abogobogahesoyam',

@@ -1199,6 +1199,81 @@
             white-space: normal;
             text-align: center;
         }
+        /* ═══════════════════════════════════════════════════ */
+        /* LOADING OVERLAY*/
+        /* ═══════════════════════════════════════════════════ */
+        .board-container,
+        .stats-grid {
+            position: relative;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            border-radius: var(--radius);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .loading-spinner {
+            width: 42px;
+            height: 42px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: loadingSpin 0.8s linear infinite;
+        }
+        @keyframes loadingSpin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--gray-600);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .loading-text .ti {
+            font-size: 16px;
+            color: var(--primary);
+        }
+
+        /* Skeleton shimmer untuk stats */
+        .stat-value.loading {
+            background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+            color: transparent !important;
+            border-radius: 6px;
+            min-width: 40px;
+            display: inline-block;
+        }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Date input & quick buttons saat loading */
+        .date-input:disabled,
+        .btn-quick-date:disabled,
+        .filter-select:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2236,7 +2311,7 @@
         searchQuery: '',
         sectionFilter: 'all',
         dateFrom: null,
-        dateTo: null
+        dateTo: null,
     };
     let employeeList    = [];
     let employeeLoaded  = false;
@@ -2648,6 +2723,10 @@
     // LOAD TASKS
     // ============================================================
     async function loadTasks() {
+        const loadingMsg = state.dateFrom && state.dateTo
+            ? `Mengambil data ${formatDate(state.dateFrom)} — ${formatDate(state.dateTo)}...`
+            : 'Mengumpulkan data...';
+        showBoardLoading(loadingMsg);
         try {
             const query = {
                 per_page: 500,
@@ -2668,6 +2747,8 @@
             } else {
                 showToast('Gagal memuat task: ' + err.message, 'error');
             }
+        } finally{
+            hideBoardLoading()
         }
     }
 
@@ -4994,6 +5075,42 @@
             reverseButtons: true
         }).then(result => result.isConfirmed);
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // LOADING STATE
+    // ══════════════════════════════════════════════════════════════
+    function showBoardLoading(text = 'Mengumpulkan data...') {
+        let $overlay = $('#boardLoadingOverlay');
+        if (!$overlay.length) {
+            $overlay = $(`
+                <div class="loading-overlay" id="boardLoadingOverlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">
+                        <i class="ti ti-database-search"></i>
+                        <span class="loading-msg"></span>
+                    </div>
+                </div>
+            `);
+            $('.board-container').append($overlay);
+        }
+        $overlay.find('.loading-msg').text(text);
+        $overlay.addClass('active');
+
+        // Skeleton pada angka statistik
+        $('#planCount, #doCount, #checkCount, #actCount').addClass('loading');
+
+        // Disable filter controls biar tidak spam klik
+        $('#dateFrom, #dateTo, #sectionFilter, #searchInput').prop('disabled', true);
+        $('.btn-quick-date').prop('disabled', true);
+    }
+
+    function hideBoardLoading() {
+        $('#boardLoadingOverlay').removeClass('active');
+        $('#planCount, #doCount, #checkCount, #actCount').removeClass('loading');
+        $('#dateFrom, #dateTo, #sectionFilter, #searchInput').prop('disabled', false);
+        $('.btn-quick-date').prop('disabled', false);
+    }
+
     // ============================================================
     // DATE HELPERS
     // ============================================================
