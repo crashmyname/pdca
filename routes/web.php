@@ -2,6 +2,7 @@
 
 use App\Controllers\AuthController;
 use App\Controllers\SsoController;
+use App\Controllers\SupportController;
 use App\Controllers\TaskAttachmentController;
 use App\Controllers\TaskController;
 use App\Controllers\UtilsController;
@@ -20,6 +21,46 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/tasks',        [TaskController::class, 'index']);
 Route::get('/tasks/stats',  [TaskController::class, 'stats']);
 Route::get('/tasks/{id}',   [TaskController::class, 'show']);
+Route::get('/tasks/onprogress',[TaskController::class,'getTaskOnProgress']);
+
+// Nursecall
+Route::post('/support/nursecall',[SupportController::class,'storeNurseCall']);
+Route::get('/support/nursecall/find', [SupportController::class, 'findNursecall']);
+Route::get('/support/nursecall', [SupportController::class,'listNursecall']);
+Route::get('/support/nursecall/by-lane',  [SupportController::class, 'byLaneNursecall']);
+Route::get('/support/nursecall/{id}', [SupportController::class,'showNursecall']);
+Route::get('/support/nursecall/latest', [SupportController::class, 'latestNursecall']);
+
+// 4M
+Route::post('/support/4m', [SupportController::class,'store4m']);
+Route::get('/support/4m', [SupportController::class,'listRecord4m']);
+Route::get('/support/4m/{id}', [SupportController::class,'showRecord4m']);
+Route::get('/support/4m/by-lane',         [SupportController::class, 'byLaneRecord4m']);
+Route::get('/support/4m/find',        [SupportController::class, 'findRecord4m']);
+Route::get('/support/4m/latest',        [SupportController::class, 'latestRecord4m']);
+
+Route::get('/debug/test-nursecall', function () {
+    try {
+        $record = \App\Models\NursecallRecord::create([
+            'no_lane'      => 'TEST-DEBUG',
+            'type'         => 'Test',
+            'month_year'   => '2026-10',
+            'date_created' => '2026-10-05',
+        ]);
+
+        return json_encode([
+            'success' => true,
+            'record_id' => $record->id ?? 'NO_ID',   // ← tes akses ->id
+            'all' => method_exists($record, 'toArray') ? $record->toArray() : 'no_toArray',
+        ]);
+    } catch (\Throwable $e) {
+        return json_encode([
+            'error' => $e->getMessage(),
+            'file'  => $e->getFile(),
+            'line'  => $e->getLine(),
+        ]);
+    }
+});
 
 Route::post('/tasks', [TaskController::class, 'store']);
 Route::get('/endpoint/employee',[UtilsController::class, 'getEmployee']);
@@ -40,6 +81,7 @@ Route::get('/csrf-token', function () {
     ]);
     exit;
 });
+
 // ============================================================
 // PROTECTED ROUTES AUTH
 // ============================================================

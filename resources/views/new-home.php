@@ -1274,6 +1274,178 @@
             opacity: 0.55;
             cursor: not-allowed;
         }
+        /* Support Modal */
+        .support-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--gray-100);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+        }
+        .support-tab {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .support-tab:hover { background: rgba(255,255,255,0.6); }
+        .support-tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+        .support-form { display: none; }
+        .support-form.active { display: block; }
+
+        /* Dynamic Table (untuk Content rows) */
+        .dynamic-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .dynamic-table th {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 600;
+            padding: 8px 6px;
+            text-align: left;
+            border: 1px solid var(--gray-200);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .dynamic-table td {
+            padding: 4px;
+            border: 1px solid var(--gray-200);
+            vertical-align: middle;
+        }
+        .dynamic-table td input,
+        .dynamic-table td select,
+        .dynamic-table td textarea {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--gray-200);
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            background: white;
+            color: var(--gray-800);
+        }
+        .dynamic-table td input:focus,
+        .dynamic-table td select:focus,
+        .dynamic-table td textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+        }
+        .dynamic-table td textarea {
+            resize: vertical;
+            min-height: 38px;
+            line-height: 1.35;
+        }
+        .dynamic-table .row-num {
+            text-align: center;
+            font-weight: 600;
+            color: var(--gray-500);
+            background: var(--gray-50);
+            font-size: 12px;
+        }
+        .dynamic-table .btn-remove-row {
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            padding: 0;
+            transition: all 0.15s;
+        }
+        .dynamic-table .btn-remove-row:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        .dynamic-table .btn-remove-row .ti { font-size: 13px; }
+        /* Reference Section */
+        .reference-section {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px !important;
+            margin-bottom: 16px;
+        }
+        .reference-section .form-section-title {
+            margin-bottom: 8px !important;
+            padding-bottom: 6px !important;
+            font-size: 12px !important;
+        }
+        .reference-section select {
+            background: white;
+        }
+        .record-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .record-mode-badge.mode-new {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+        .record-mode-badge.mode-edit {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
+        .task-source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 8px;
+            background: #e0e7ff;
+            color: #3730a3;
+            margin-bottom: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .task-source-badge .ti { font-size: 11px; }
+        .record-mode-badge.mode-empty {
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+        .record-mode-badge.mode-new-month {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fcd34d;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1306,6 +1478,9 @@
                     <div class="user-avatar">O</div>
                     <span id="userName">Operator</span>
                 </div>
+                <button class="btn" onclick="openSupportModal()" id="supportBtn" title="Support: Nursecall & Record 4M">
+                    <i class="ti ti-headset"></i> Support
+                </button>
                 <button class="btn" onclick="openRoleInfo()" id="roleInfoBtn" title="Informasi Role & Akses">
                     <i class="ti ti-shield-lock"></i> Info Role
                 </button>
@@ -2282,6 +2457,245 @@
         </div>
     </div>
 
+    <!-- Support Modal -->
+    <div class="modal" id="supportModal">
+        <div class="modal-content" style="max-width: 1200px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="ti ti-headset"></i> Support</h3>
+                <button class="modal-close" onclick="closeModal('supportModal')">×</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Tabs -->
+                <div class="support-tabs">
+                    <button type="button" class="support-tab active" data-tab="nursecall" onclick="switchSupportTab('nursecall')">
+                        <i class="ti ti-bell"></i> Nursecall
+                    </button>
+                    <button type="button" class="support-tab" data-tab="4m" onclick="switchSupportTab('4m')">
+                        <i class="ti ti-file-text"></i> Record 4M
+                    </button>
+                </div>
+
+                <!-- ═══════════════ FORM NURSECALL ═══════════════ -->
+                <form id="nursecallForm" class="support-form active" data-tab="nursecall">
+                    <?= csrf() ?>
+                    <!-- HEADER -->
+                    <div class="form-section">
+                        <div class="form-section-title"><i class="ti ti-file-info"></i> Header</div>
+                        <div id="ncModeIndicator" style="margin-bottom:10px"></div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">No Lane</label>
+                                <input type="text" 
+                                    class="form-input" 
+                                    id="ncNoLane" 
+                                    required 
+                                    list="ncLaneList"
+                                    placeholder="Ketik / pilih lane..."
+                                    autocomplete="off">
+                                <datalist id="ncLaneList"></datalist>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Pilih lane existing atau ketik lane baru
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Type</label>
+                                <input type="text" class="form-input" id="ncType" required placeholder="Contoh: Inspeksi">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Bulan / Tahun</label>
+                                <input type="month" class="form-input" id="ncMonthYear" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Tanggal Dibuat</label>
+                                <input type="date" class="form-input" id="ncDateCreated" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Dibuat — Nama</label>
+                                <input type="text" class="form-input" id="ncCreatedName" placeholder="Nama pembuat">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Disetujui — Nama</label>
+                                <input type="text" class="form-input" id="ncApprovedName" placeholder="Nama penyetuju">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- REFERENCE DATA -->
+                    <div class="form-section reference-section">
+                        <div class="form-section-title" style="color:#1e40af;border-bottom-color:#bfdbfe">
+                            <i class="ti ti-database-import"></i> Reference Data PDCA
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <select class="form-select" id="ncReferenceTask" onchange="applyNursecallReference(this.value)" style="flex:1">
+                                <option value="">-- Memuat... --</option>
+                            </select>
+                        </div>
+                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
+                            <i class="ti ti-info-circle"></i> Pilih POST IT → otomatis jadi 1 baris di Content. Pilih ulang task yang sama untuk update datanya.
+                        </small>
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div class="form-section">
+                        <div class="form-section-title" style="justify-content:space-between">
+                            <span><i class="ti ti-list"></i> Content</span>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addNursecallRow()">
+                                <i class="ti ti-plus"></i> Tambah Baris
+                            </button>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="dynamic-table" id="ncContentTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width:36px">#</th>
+                                        <th style="width:125px">Tanggal</th>
+                                        <th style="width:95px">Jam</th>
+                                        <th style="min-width:170px">Masalah</th>
+                                        <th style="width:130px">Sumber Masalah</th>
+                                        <th style="min-width:170px">Tindakan</th>
+                                        <th style="width:130px">Nurse Leader</th>
+                                        <th style="width:70px">Status</th>
+                                        <th style="width:85px">Judgement</th>
+                                        <th style="width:130px">Group Leader</th>
+                                        <th style="width:40px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ncContentBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="form-section">
+                        <div class="form-section-title"><i class="ti ti-signature"></i> Footer</div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Komentar</label>
+                                <textarea class="form-textarea" id="ncComment" rows="2" placeholder="Komentar..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tanggal</label>
+                                <input type="date" class="form-input" id="ncFooterDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Dibuat — Nama</label>
+                                <input type="text" class="form-input" id="ncFooterCreatedName">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Disetujui — Nama</label>
+                                <input type="text" class="form-input" id="ncFooterApprovedName">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding:16px 0 0;border-top:1px solid var(--gray-200);margin-top:16px">
+                        <button type="button" class="btn" onclick="closeModal('supportModal')">Batal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy"></i> Simpan Nursecall
+                        </button>
+                    </div>
+                </form>
+
+                <!-- ═══════════════ FORM RECORD 4M ═══════════════ -->
+                <form id="record4mForm" class="support-form" data-tab="4m">
+                    <?= csrf() ?>
+
+                    <!-- REFERENCE DATA -->
+                    <div class="form-section reference-section">
+                        <div class="form-section-title" style="color:#1e40af;border-bottom-color:#bfdbfe">
+                            <i class="ti ti-database-import"></i> Reference Data PDCA
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <select class="form-select" id="ncReferenceTask" onchange="applyNursecallReference(this.value)" style="flex:1">
+                                <option value="">-- Memuat... --</option>
+                            </select>
+                        </div>
+                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
+                            <i class="ti ti-info-circle"></i> Pilih POST IT → otomatis jadi 1 baris di Content. Pilih ulang task yang sama untuk update datanya.
+                        </small>
+                    </div>
+                    <!-- HEADER -->
+                    <div class="form-section">
+                        <div class="form-section-title"><i class="ti ti-file-info"></i> Header</div>
+                        <div id="m4ModeIndicator" style="margin-bottom:10px"></div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">No Lane</label>
+                                <input type="text" 
+                                    class="form-input" 
+                                    id="m4NoLane" 
+                                    required 
+                                    list="m4LaneList"
+                                    placeholder="Ketik / pilih lane..."
+                                    autocomplete="off">
+                                <datalist id="m4LaneList"></datalist>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Pilih lane existing atau ketik lane baru
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Type</label>
+                                <input type="text" class="form-input" id="m4Type" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Bulan / Tahun</label>
+                                <input type="month" class="form-input" id="m4MonthYear" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Tanggal</label>
+                                <input type="date" class="form-input" id="m4Date" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Dibuat — Nama</label>
+                                <input type="text" class="form-input" id="m4CreatedName">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">TTD Disetujui — Nama</label>
+                                <input type="text" class="form-input" id="m4ApprovedName">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div class="form-section">
+                        <div class="form-section-title" style="justify-content:space-between">
+                            <span><i class="ti ti-list"></i> Content</span>
+                            <button type="button" class="btn btn-sm btn-primary" onclick="addRecord4mRow()">
+                                <i class="ti ti-plus"></i> Tambah Baris
+                            </button>
+                        </div>
+                        <div style="overflow-x:auto">
+                            <table class="dynamic-table" id="m4ContentTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width:36px">#</th>
+                                        <th style="width:130px">Tanggal</th>
+                                        <th style="width:80px">Shift</th>
+                                        <th style="min-width:220px">Masalah</th>
+                                        <th style="width:130px">Category</th>
+                                        <th style="width:160px">Team Leader</th>
+                                        <th style="width:160px">Group Leader</th>
+                                        <th style="width:40px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="m4ContentBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding:16px 0 0;border-top:1px solid var(--gray-200);margin-top:16px">
+                        <button type="button" class="btn" onclick="closeModal('supportModal')">Batal</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy"></i> Simpan Record 4M
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
@@ -2588,6 +3002,35 @@
         $('.modal').on('click', function (e) {
             if (e.target === this) closeModal(this.id);
         });
+
+        // Nursecall — saat No Lane atau Bulan berubah
+        $(document).on('change blur', '#ncNoLane, #ncMonthYear', function () {
+            const noLane = $('#ncNoLane').val().trim();
+            if (!noLane) {
+                updateModeBadge('nc', 'empty');
+                return;
+            }
+            clearTimeout(window._ncLaneTimer);
+            window._ncLaneTimer = setTimeout(() => {
+                checkByLane('nc', noLane);
+            }, 400);
+        });
+
+        // 4M
+        $(document).on('change blur', '#m4NoLane, #m4MonthYear', function () {
+            const noLane = $('#m4NoLane').val().trim();
+            if (!noLane) {
+                updateModeBadge('m4', 'empty');
+                return;
+            }
+            clearTimeout(window._m4LaneTimer);
+            window._m4LaneTimer = setTimeout(() => {
+                checkByLane('m4', noLane);
+            }, 400);
+        });
+
+        $('#nursecallForm').on('submit', function (e) { e.preventDefault(); saveNursecall(); });
+        $('#record4mForm').on('submit', function (e) { e.preventDefault(); saveRecord4m(); });
 
         // Auto-fill section saat operator dipilih
         $('#operatorName').on('select2:select', function (e) {
@@ -5572,6 +6015,896 @@
             printWin.print();
             setTimeout(() => printWin.close(), 500);
         }, 400);
+    }
+    // ============================================================
+    // SUPPORT — VERSI FINAL
+    // ============================================================
+    let ncExistingRecordId = null;
+    let m4ExistingRecordId = null;
+    let referenceTasksCache = null;
+
+    // ─────────────────────────────────────────────
+    // OPEN MODAL
+    // ─────────────────────────────────────────────
+    function openSupportModal() {
+        // Reset form
+        $('#nursecallForm')[0].reset();
+        $('#record4mForm')[0].reset();
+
+        const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.slice(0, 7);
+
+        // Reset content
+        document.getElementById('ncContentBody').innerHTML = '';
+        document.getElementById('m4ContentBody').innerHTML = '';
+        renderEmptyState('nc');
+        renderEmptyState('m4');
+
+        ncExistingRecordId = null;
+        m4ExistingRecordId = null;
+        updateModeBadge('nc', 'empty');
+        updateModeBadge('m4', 'empty');
+
+        // Default values
+        $('#ncDateCreated').val(today);
+        $('#ncFooterDate').val(today);
+        $('#ncMonthYear').val(currentMonth);
+        $('#m4Date').val(today);
+        $('#m4MonthYear').val(currentMonth);
+
+        if (state.currentUser?.name) {
+            $('#ncCreatedName').val(state.currentUser.name);
+            $('#ncFooterCreatedName').val(state.currentUser.name);
+            $('#m4CreatedName').val(state.currentUser.name);
+        }
+
+        // Load daftar lane untuk datalist suggestion
+        populateLaneDatalists();
+
+        populateReferenceSelects();
+        switchSupportTab('nursecall');
+        openModal('supportModal');
+    }
+
+    async function populateLaneDatalists() {
+        try {
+            // Fetch lane list Nursecall & 4M secara paralel
+            const [ncLanes, m4Lanes] = await Promise.all([
+                api('/support/nursecall/lanes').catch(() => []),
+                api('/support/4m/lanes').catch(() => []),
+            ]);
+
+            // Gabung, unique
+            const all = new Set([...(ncLanes || []), ...(m4Lanes || [])]);
+            const options = [...all].map(l =>
+                `<option value="${escapeHtml(l)}"></option>`
+            ).join('');
+
+            // Inject ke 2 datalist
+            $('#ncLaneList').html(options);
+            $('#m4LaneList').html(options);
+        } catch (err) {
+            console.warn('[populateLaneDatalists]', err);
+        }
+    }
+
+    async function checkByLane(which, noLane) {
+        if (!noLane) return;
+
+        const isNc = which === 'nc';
+        const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
+        const endpoint = isNc
+            ? '/support/nursecall/by-lane'
+            : '/support/4m/by-lane';
+
+        try {
+            const res = await api(endpoint, {
+                query: { no_lane: noLane, month_year: monthYear || '' }
+            });
+
+            // ══════════════════════════════════════════════════
+            // KONDISI 3: TIDAK ADA RECORD untuk lane ini
+            // ══════════════════════════════════════════════════
+            if (!res || !res.record) {
+                // Reset header (kecuali No Lane yang baru diketik)
+                if (isNc) {
+                    $('#ncType').val('');
+                    $('#ncCreatedName').val(state.currentUser?.name || '');
+                    $('#ncApprovedName').val('');
+                    $('#ncComment').val('');
+                    $('#ncFooterCreatedName').val(state.currentUser?.name || '');
+                    $('#ncFooterApprovedName').val('');
+                    ncExistingRecordId = null;
+                    document.getElementById('ncContentBody').innerHTML = '';
+                    renderEmptyState('nc');
+                } else {
+                    $('#m4Type').val('');
+                    $('#m4CreatedName').val(state.currentUser?.name || '');
+                    $('#m4ApprovedName').val('');
+                    m4ExistingRecordId = null;
+                    document.getElementById('m4ContentBody').innerHTML = '';
+                    renderEmptyState('m4');
+                }
+                updateModeBadge(which, 'new-lane');
+                return;
+            }
+
+            // ══════════════════════════════════════════════════
+            // RECORD DITEMUKAN
+            // ══════════════════════════════════════════════════
+            const rec = res.record;
+            const items = res.items || [];
+            const sameMonth = !!res.is_same_month;
+
+            // ── Prefill Type + TTD (selalu, karena biasanya sama) ──
+            if (isNc) {
+                if (rec.type)               $('#ncType').val(rec.type);
+                if (rec.created_by_name)    $('#ncCreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name)   $('#ncApprovedName').val(rec.approved_by_name);
+                if (rec.footer_created_name)  $('#ncFooterCreatedName').val(rec.footer_created_name);
+                if (rec.footer_approved_name) $('#ncFooterApprovedName').val(rec.footer_approved_name);
+            } else {
+                if (rec.type)               $('#m4Type').val(rec.type);
+                if (rec.created_by_name)    $('#m4CreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name)   $('#m4ApprovedName').val(rec.approved_by_name);
+            }
+
+            if (sameMonth) {
+                // ══════════════════════════════════════════════
+                // KONDISI 1: BULAN SAMA → LOAD FULL
+                // ══════════════════════════════════════════════
+                if (isNc) {
+                    if (rec.date_created)  $('#ncDateCreated').val(rec.date_created);
+                    if (rec.footer_comment) $('#ncComment').val(rec.footer_comment);
+                    if (rec.footer_date)    $('#ncFooterDate').val(rec.footer_date);
+
+                    renderNursecallItems(items);
+                    ncExistingRecordId = rec.id;
+                    updateModeBadge('nc', 'edit', items.length);
+                } else {
+                    if (rec.date) $('#m4Date').val(rec.date);
+
+                    renderRecord4mItems(items);
+                    m4ExistingRecordId = rec.id;
+                    updateModeBadge('m4', 'edit', items.length);
+                }
+
+                showToast(
+                    `Lane ${noLane} ditemukan — ${items.length} baris content dimuat`,
+                    'info'
+                );
+
+            } else {
+                // ══════════════════════════════════════════════
+                // KONDISI 2: BULAN BEDA → PREFILL HEADER, CONTENT KOSONG
+                // ══════════════════════════════════════════════
+                if (isNc) {
+                    $('#ncMonthYear').val(monthYear);
+                    $('#ncDateCreated').val(new Date().toISOString().split('T')[0]);
+                    $('#ncFooterDate').val(new Date().toISOString().split('T')[0]);
+                    ncExistingRecordId = null;
+                    document.getElementById('ncContentBody').innerHTML = '';
+                    renderEmptyState('nc');
+                } else {
+                    $('#m4MonthYear').val(monthYear);
+                    $('#m4Date').val(new Date().toISOString().split('T')[0]);
+                    m4ExistingRecordId = null;
+                    document.getElementById('m4ContentBody').innerHTML = '';
+                    renderEmptyState('m4');
+                }
+
+                updateModeBadge(which, 'new-month', rec.month_year);
+                showToast(
+                    `Lane ${noLane} sudah ada (bulan ${rec.month_year}). Siap buat record bulan ${monthYear}.`,
+                    'info'
+                );
+            }
+
+        } catch (err) {
+            console.warn('[checkByLane]', which, err);
+        }
+    }
+
+    function renderEmptyState(which) {
+        const tbodyId = which === 'nc' ? 'ncContentBody' : 'm4ContentBody';
+        const colspan = which === 'nc' ? 11 : 8;
+        document.getElementById(tbodyId).innerHTML = `
+            <tr class="empty-row">
+                <td colspan="${colspan}" style="text-align:center;padding:30px;color:#9ca3af">
+                    <i class="ti ti-inbox" style="font-size:32px;display:block;margin-bottom:8px;opacity:0.5"></i>
+                    Pilih Reference Data di atas atau klik "+ Tambah Baris"
+                </td>
+            </tr>
+        `;
+    }
+
+    function removeEmptyState(which) {
+        const tbodyId = which === 'nc' ? 'ncContentBody' : 'm4ContentBody';
+        $(`#${tbodyId} .empty-row`).remove();
+    }
+
+    function switchSupportTab(tab) {
+        $('.support-tab').removeClass('active').filter(`[data-tab="${tab}"]`).addClass('active');
+        $('.support-form').removeClass('active').filter(`[data-tab="${tab}"]`).addClass('active');
+    }
+
+    async function autoLoadLatestFromDB(which, currentMonth, today) {
+        const endpoint = which === 'nc'
+            ? '/support/nursecall/latest'
+            : '/support/4m/latest';
+
+        try {
+            const res = await api(endpoint);
+            if (!res || !res.record) return; // DB kosong → fresh
+
+            const rec  = res.record;
+            const sameMonth = String(rec.month_year || '') === currentMonth;
+
+            if (which === 'nc') {
+                // ── Pre-fill No Lane + Type (biasanya tetap sama) ──
+                if (rec.no_lane)          $('#ncNoLane').val(rec.no_lane);
+                if (rec.type)             $('#ncType').val(rec.type);
+
+                // ── TTD names (kalau belum diisi dari user) ──
+                if (!rec.created_by_name && state.currentUser?.name) {
+                    $('#ncCreatedName').val(state.currentUser.name);
+                    $('#ncFooterCreatedName').val(state.currentUser.name);
+                } else if (rec.created_by_name) {
+                    $('#ncCreatedName').val(rec.created_by_name);
+                    $('#ncFooterCreatedName').val(rec.footer_created_name || rec.created_by_name);
+                }
+                if (rec.approved_by_name) $('#ncApprovedName').val(rec.approved_by_name);
+
+                if (sameMonth) {
+                    // ═══ BULAN SAMA → load full ═══
+                    $('#ncMonthYear').val(rec.month_year);
+                    $('#ncDateCreated').val(rec.date_created || today);
+
+                    if (rec.footer_comment)         $('#ncComment').val(rec.footer_comment);
+                    if (rec.footer_date)            $('#ncFooterDate').val(rec.footer_date);
+                    if (rec.footer_created_name)    $('#ncFooterCreatedName').val(rec.footer_created_name);
+                    if (rec.footer_approved_name)   $('#ncFooterApprovedName').val(rec.footer_approved_name);
+
+                    const items = res.items || [];
+                    renderNursecallItems(items);
+
+                    ncExistingRecordId = rec.id;
+                    updateModeBadge('nc', 'edit', items.length);
+                } else {
+                    // ═══ BULAN BARU → content kosong, bulan = sekarang ═══
+                    $('#ncMonthYear').val(currentMonth);
+                    $('#ncDateCreated').val(today);
+                    $('#ncFooterDate').val(today);
+                    // Footer lainnya dibiarkan (isi TTD dari record lama sudah ke-prefill)
+                    renderEmptyState('nc');
+                    updateModeBadge('nc', 'new');
+                }
+
+            } else {
+                // ═══ SAMA untuk 4M ═══
+                if (rec.no_lane) $('#m4NoLane').val(rec.no_lane);
+                if (rec.type)    $('#m4Type').val(rec.type);
+
+                if (!rec.created_by_name && state.currentUser?.name) {
+                    $('#m4CreatedName').val(state.currentUser.name);
+                } else if (rec.created_by_name) {
+                    $('#m4CreatedName').val(rec.created_by_name);
+                }
+                if (rec.approved_by_name) $('#m4ApprovedName').val(rec.approved_by_name);
+
+                if (sameMonth) {
+                    $('#m4MonthYear').val(rec.month_year);
+                    $('#m4Date').val(rec.date || today);
+
+                    const items = res.items || [];
+                    renderRecord4mItems(items);
+
+                    m4ExistingRecordId = rec.id;
+                    updateModeBadge('m4', 'edit', items.length);
+                } else {
+                    $('#m4MonthYear').val(currentMonth);
+                    $('#m4Date').val(today);
+                    renderEmptyState('m4');
+                    updateModeBadge('m4', 'new');
+                }
+            }
+
+        } catch (err) {
+            console.warn('[autoLoadLatestFromDB]', which, err);
+            // Kalau error, biarkan form fresh — jangan crash
+        }
+    }
+
+    // Render items ke content Nursecall
+    function renderNursecallItems(items) {
+        document.getElementById('ncContentBody').innerHTML = '';
+
+        if (!items || items.length === 0) {
+            renderEmptyState('nc');
+            return;
+        }
+
+        items.forEach(it => {
+            addNursecallRow();
+            const $row = $('#ncContentBody tr').last();
+
+            if (it.task_id) {
+                $row.attr('data-task-id', it.task_id);
+                const t = (referenceTasksCache || []).find(x => x.id === parseInt(it.task_id));
+                if (t?.taskCode) {
+                    $row.attr('data-task-code', t.taskCode);
+                    applyRowBadge($row, t);
+                }
+            }
+
+            if (it.date)         $row.find('.nc-date').val(it.date);
+            if (it.time)         $row.find('.nc-time').val(String(it.time).slice(0, 5));
+            if (it.problem)      $row.find('.nc-problem').val(it.problem);
+            if (it.source)       $row.find('.nc-source').val(it.source);
+            if (it.action)       $row.find('.nc-action').val(it.action);
+            if (it.nurse_leader) $row.find('.nc-nurse-leader').val(it.nurse_leader);
+            if (it.status)       $row.find('.nc-status').val(it.status);
+            if (it.judgement)    $row.find('.nc-judgement').val(it.judgement);
+            if (it.group_leader) $row.find('.nc-group-leader').val(it.group_leader);
+        });
+    }
+
+    // Render items ke content 4M
+    function renderRecord4mItems(items) {
+        document.getElementById('m4ContentBody').innerHTML = '';
+
+        if (!items || items.length === 0) {
+            renderEmptyState('m4');
+            return;
+        }
+
+        items.forEach(it => {
+            addRecord4mRow();
+            const $row = $('#m4ContentBody tr').last();
+
+            if (it.task_id) {
+                $row.attr('data-task-id', it.task_id);
+                const t = (referenceTasksCache || []).find(x => x.id === parseInt(it.task_id));
+                if (t?.taskCode) {
+                    $row.attr('data-task-code', t.taskCode);
+                    applyRowBadge($row, t);
+                }
+            }
+
+            if (it.date)         $row.find('.m4-date').val(it.date);
+            if (it.shift)        $row.find('.m4-shift').val(it.shift);
+            if (it.problem)      $row.find('.m4-problem').val(it.problem);
+            if (it.category)     $row.find('.m4-category').val(it.category);
+            if (it.team_leader)  $row.find('.m4-team-leader').val(it.team_leader);
+            if (it.group_leader) $row.find('.m4-group-leader').val(it.group_leader);
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    // REFERENCE — fetch dari /tasks/onprogress
+    // ─────────────────────────────────────────────
+    async function populateReferenceSelects() {
+        const loading = '<option value="">-- Memuat task PDCA... --</option>';
+        $('#ncReferenceTask').html(loading);
+        $('#m4ReferenceTask').html(loading);
+
+        try {
+            const res = await api('/tasks/onprogress', { query: { limit: 500 } });
+            const list = Array.isArray(res) ? res : (res?.data || []);
+
+            // ⚠️ FIX: response sudah camelCase, jangan pakai normalizeTask()
+            referenceTasksCache = list.map(t => ({
+                id:              t.id,
+                taskCode:        t.taskCode        || t.task_code       || '',
+                operatorName:    t.operatorName    || t.operator_name   || '',
+                date:            t.date            || t.task_date       || '',   // ← FIX
+                section:         t.section         || '',
+                category:        (t.category       || '').toLowerCase(),
+                picSection:      (t.picSection     || t.pic_section     || '').toLowerCase(),
+                problem:         t.problem         || '',
+                tempAction:      t.tempAction      || t.temporary_action|| '',
+                permAction:      t.permAction      || t.permanent_action|| '',
+                deadline:        t.deadline        || '',
+                pic:             t.pic             || '',
+                stage:           (t.stage          || 'plan').toLowerCase(),
+                status:          (t.status         || 'open').toLowerCase(),
+                leaderSignature: t.leaderSignature || t.ttd_leader      || '',
+                approvedAt:      t.approvedAt      || t.approved_at     || null,
+                createdAt:       t.createdAt       || t.created_at      || null,
+                createdByName:   t.createdByName   || t.created_by_name || '',
+            }));
+
+            if (referenceTasksCache.length === 0) {
+                const empty = '<option value="">-- Tidak ada POST IT on-progress --</option>';
+                $('#ncReferenceTask').html(empty);
+                $('#m4ReferenceTask').html(empty);
+                return;
+            }
+
+            const opts = ['<option value="">-- Pilih POST IT untuk tambah baris --</option>'];
+            referenceTasksCache.forEach(t => {
+                const short = (t.problem || '').slice(0, 60);
+                opts.push(`<option value="${t.id}">${escapeHtml(
+                    `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}`
+                )}</option>`);
+            });
+            const html = opts.join('');
+            $('#ncReferenceTask').html(html);
+            $('#m4ReferenceTask').html(html);
+        } catch (err) {
+            console.error('[reference]', err);
+            const errOpt = '<option value="">-- Gagal memuat --</option>';
+            $('#ncReferenceTask').html(errOpt);
+            $('#m4ReferenceTask').html(errOpt);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // APPLY REFERENCE → HANYA isi Content
+    // ─────────────────────────────────────────────
+    function applyNursecallReference(taskId) {
+        if (!taskId) return;
+        const task = (referenceTasksCache || []).find(t => t.id === parseInt(taskId, 10));
+        if (!task) { showToast('Task tidak ditemukan', 'warning'); return; }
+
+        // Cek existing row by task_id
+        let $row = null;
+        $('#ncContentBody tr').each(function () {
+            if (String($(this).data('task-id')) === String(task.id)) {
+                $row = $(this);
+                return false;
+            }
+        });
+        const isUpdate = !!$row;
+
+        if (!$row) {
+            addNursecallRow();
+            $row = $('#ncContentBody tr').last();
+            $row.attr('data-task-id', task.id);
+            $row.attr('data-task-code', task.taskCode);
+        }
+
+        // Isi content dari task
+        $row.find('.nc-date').val(task.date || '');
+        if (task.createdAt) {
+            const d = new Date(String(task.createdAt).replace(' ', 'T'));
+            if (!isNaN(d.getTime())) {
+                const hh = String(d.getHours()).padStart(2, '0');
+                const mm = String(d.getMinutes()).padStart(2, '0');
+                $row.find('.nc-time').val(`${hh}:${mm}`);
+            }
+        }
+        $row.find('.nc-problem').val(task.problem || '');
+        $row.find('.nc-action').val(task.permAction || task.tempAction || '');
+        $row.find('.nc-nurse-leader').val(task.pic || '');
+        $row.find('.nc-group-leader').val(task.leaderSignature || '');
+
+        const catMap = { machine: 'machine', material: 'material', man: 'man_power', methode: 'dll' };
+        if (catMap[task.category]) $row.find('.nc-source').val(catMap[task.category]);
+
+        applyRowBadge($row, task);
+        $('#ncReferenceTask').val('').trigger('change');
+
+        $row.css('background', isUpdate ? '#fef3c7' : '#f0fdf4');
+        setTimeout(() => $row.css('background', ''), 1200);
+
+        showToast(
+            isUpdate ? `Update baris ${task.taskCode}` : `Tambah baris ${task.taskCode}`,
+            isUpdate ? 'info' : 'success'
+        );
+    }
+
+    function applyRecord4mReference(taskId) {
+        if (!taskId) return;
+        const task = (referenceTasksCache || []).find(t => t.id === parseInt(taskId, 10));
+        if (!task) return;
+
+        let $row = null;
+        $('#m4ContentBody tr').each(function () {
+            if (String($(this).data('task-id')) === String(task.id)) {
+                $row = $(this);
+                return false;
+            }
+        });
+        const isUpdate = !!$row;
+
+        if (!$row) {
+            addRecord4mRow();
+            $row = $('#m4ContentBody tr').last();
+            $row.attr('data-task-id', task.id);
+            $row.attr('data-task-code', task.taskCode);
+        }
+
+        $row.find('.m4-date').val(task.date || '');
+        $row.find('.m4-problem').val(task.problem || '');
+        if (['man','machine','material','methode'].includes(task.category)) {
+            $row.find('.m4-category').val(task.category);
+        }
+        if (task.createdByName)   $row.find('.m4-team-leader').val(task.createdByName);
+        if (task.leaderSignature) $row.find('.m4-group-leader').val(task.leaderSignature);
+
+        applyRowBadge($row, task);
+        $('#m4ReferenceTask').val('').trigger('change');
+
+        $row.css('background', isUpdate ? '#fef3c7' : '#f0fdf4');
+        setTimeout(() => $row.css('background', ''), 1200);
+
+        showToast(
+            isUpdate ? `Update baris ${task.taskCode}` : `Tambah baris ${task.taskCode}`,
+            isUpdate ? 'info' : 'success'
+        );
+    }
+
+    function applyRowBadge($row, task) {
+        $row.find('.task-source-badge').remove();
+        if (!task?.taskCode) return;
+        $row.find('td').eq(3).prepend(
+            `<span class="task-source-badge"><i class="ti ti-git-branch"></i> ${escapeHtml(task.taskCode)}</span>`
+        );
+    }
+
+    // ─────────────────────────────────────────────
+    // DYNAMIC ROWS
+    // ─────────────────────────────────────────────
+    function addNursecallRow() {
+        removeEmptyState('nc');  
+        const tbody = document.getElementById('ncContentBody');
+        const today = new Date().toISOString().split('T')[0];
+        const now   = new Date();
+        const t     = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="row-num"></td>
+            <td><input type="date" class="nc-date" value="${today}"></td>
+            <td><input type="time" class="nc-time" value="${t}"></td>
+            <td><textarea class="nc-problem" rows="1" placeholder="Masalah..."></textarea></td>
+            <td><select class="nc-source">
+                <option value="">- Pilih -</option>
+                <option value="part">Part</option>
+                <option value="machine">Machine</option>
+                <option value="man_power">Man Power</option>
+                <option value="tool">Tool</option>
+                <option value="material">Material</option>
+                <option value="dll">DLL</option>
+            </select></td>
+            <td><textarea class="nc-action" rows="1" placeholder="Tindakan..."></textarea></td>
+            <td><input type="text" class="nc-nurse-leader" placeholder="Nama"></td>
+            <td><select class="nc-status">
+                <option value="">-</option><option value="O">O</option><option value="X">X</option>
+            </select></td>
+            <td><select class="nc-judgement">
+                <option value="">-</option><option value="O">O</option><option value="X">X</option>
+            </select></td>
+            <td><input type="text" class="nc-group-leader" placeholder="Nama"></td>
+            <td><button type="button" class="btn-remove-row" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+        renumberRows(tbody);
+    }
+
+    function addRecord4mRow() {
+        removeEmptyState('m4');  
+        const tbody = document.getElementById('m4ContentBody');
+        const today = new Date().toISOString().split('T')[0];
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="row-num"></td>
+            <td><input type="date" class="m4-date" value="${today}"></td>
+            <td><select class="m4-shift">
+                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+            </select></td>
+            <td><textarea class="m4-problem" rows="1" placeholder="Masalah..."></textarea></td>
+            <td><select class="m4-category">
+                <option value="">- Pilih -</option>
+                <option value="man">Man</option>
+                <option value="machine">Machine</option>
+                <option value="material">Material</option>
+                <option value="methode">Methode</option>
+            </select></td>
+            <td><input type="text" class="m4-team-leader" placeholder="Nama"></td>
+            <td><input type="text" class="m4-group-leader" placeholder="Nama"></td>
+            <td><button type="button" class="btn-remove-row" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+        renumberRows(tbody);
+    }
+
+    function removeRow(btn) {
+        const tr = btn.closest('tr');
+        const tbody = tr.parentNode;
+        if (tbody.children.length <= 1) { showToast('Minimal 1 baris', 'warning'); return; }
+        tr.remove();
+        renumberRows(tbody);
+    }
+
+    function renumberRows(tbody) {
+        Array.from(tbody.children).forEach((tr, i) => {
+            const el = tr.querySelector('.row-num');
+            if (el) el.textContent = i + 1;
+        });
+    }
+
+    async function checkExistingNursecall(noLane, type, month) {
+        try {
+            const res = await api('/support/nursecall/find', {
+                query: { no_lane: noLane, type, month_year: month }
+            });
+
+            if (!res || !res.record) {
+                ncExistingRecordId = null;
+                updateModeBadge('nc', 'new');
+                renderEmptyState('nc');
+                return;
+            }
+
+            ncExistingRecordId = res.record.id;
+            const rec = res.record;
+            const items = res.items || [];
+
+            if (rec.date_created)        $('#ncDateCreated').val(rec.date_created);
+            if (rec.created_by_name)     $('#ncCreatedName').val(rec.created_by_name);
+            if (rec.approved_by_name)    $('#ncApprovedName').val(rec.approved_by_name);
+            if (rec.footer_comment)      $('#ncComment').val(rec.footer_comment);
+            if (rec.footer_date)         $('#ncFooterDate').val(rec.footer_date);
+            if (rec.footer_created_name) $('#ncFooterCreatedName').val(rec.footer_created_name);
+            if (rec.footer_approved_name)$('#ncFooterApprovedName').val(rec.footer_approved_name);
+
+            document.getElementById('ncContentBody').innerHTML = '';
+
+            if (items.length === 0) {
+                addNursecallRow();
+            } else {
+                items.forEach(it => {
+                    addNursecallRow();
+                    const $row = $('#ncContentBody tr').last();
+                    if (it.task_id) {
+                        $row.attr('data-task-id', it.task_id);
+                        const t = (referenceTasksCache || []).find(x => x.id === parseInt(it.task_id));
+                        if (t) { $row.attr('data-task-code', t.taskCode); applyRowBadge($row, t); }
+                    }
+                    if (it.date)         $row.find('.nc-date').val(it.date);
+                    if (it.time)         $row.find('.nc-time').val(String(it.time).slice(0, 5));
+                    if (it.problem)      $row.find('.nc-problem').val(it.problem);
+                    if (it.source)       $row.find('.nc-source').val(it.source);
+                    if (it.action)       $row.find('.nc-action').val(it.action);
+                    if (it.nurse_leader) $row.find('.nc-nurse-leader').val(it.nurse_leader);
+                    if (it.status)       $row.find('.nc-status').val(it.status);
+                    if (it.judgement)    $row.find('.nc-judgement').val(it.judgement);
+                    if (it.group_leader) $row.find('.nc-group-leader').val(it.group_leader);
+                });
+            }
+
+            renderNursecallItems(res.items || []);
+            updateModeBadge('nc', 'edit', res.items?.length || 0);
+        } catch (err) {
+            console.warn('[checkExistingNursecall]', err);
+            ncExistingRecordId = null;
+            updateModeBadge('nc', 'new');
+        }
+    }
+
+    async function checkExistingRecord4m(noLane, type, month) {
+        try {
+            const res = await api('/support/4m/find', {
+                query: { no_lane: noLane, type, month_year: month }
+            });
+
+            if (!res || !res.record) {
+                m4ExistingRecordId = null;
+                updateModeBadge('m4', 'new');
+                return;
+            }
+
+            m4ExistingRecordId = res.record.id;
+            const rec = res.record;
+            const items = res.items || [];
+
+            if (rec.date)            $('#m4Date').val(rec.date);
+            if (rec.created_by_name) $('#m4CreatedName').val(rec.created_by_name);
+            if (rec.approved_by_name)$('#m4ApprovedName').val(rec.approved_by_name);
+
+            document.getElementById('m4ContentBody').innerHTML = '';
+
+            if (items.length === 0) {
+                addRecord4mRow();
+            } else {
+                items.forEach(it => {
+                    addRecord4mRow();
+                    const $row = $('#m4ContentBody tr').last();
+                    if (it.task_id) {
+                        $row.attr('data-task-id', it.task_id);
+                        const t = (referenceTasksCache || []).find(x => x.id === parseInt(it.task_id));
+                        if (t) { $row.attr('data-task-code', t.taskCode); applyRowBadge($row, t); }
+                    }
+                    if (it.date)         $row.find('.m4-date').val(it.date);
+                    if (it.shift)        $row.find('.m4-shift').val(it.shift);
+                    if (it.problem)      $row.find('.m4-problem').val(it.problem);
+                    if (it.category)     $row.find('.m4-category').val(it.category);
+                    if (it.team_leader)  $row.find('.m4-team-leader').val(it.team_leader);
+                    if (it.group_leader) $row.find('.m4-group-leader').val(it.group_leader);
+                });
+            }
+
+            updateModeBadge('m4', 'edit', items.length);
+        } catch (err) {
+            console.warn('[checkExistingRecord4m]', err);
+            m4ExistingRecordId = null;
+            updateModeBadge('m4', 'new');
+        }
+    }
+
+    function updateModeBadge(which, mode, extra = null) {
+        const id = which === 'nc' ? '#ncModeIndicator' : '#m4ModeIndicator';
+        if (!id) return;
+
+        let html = '';
+
+        switch (mode) {
+            case 'empty':
+                html = `<span class="record-mode-badge mode-empty">
+                    <i class="ti ti-info-circle"></i> Pilih / ketik No Lane dulu
+                </span>`;
+                break;
+
+            case 'new-lane':
+                html = `<span class="record-mode-badge mode-new">
+                    <i class="ti ti-plus"></i> Lane baru — silakan isi header
+                </span>`;
+                break;
+
+            case 'new-month':
+                const refMonth = extra || 'bulan lalu';
+                html = `<span class="record-mode-badge mode-new-month">
+                    <i class="ti ti-calendar-plus"></i> Lane existing (${escapeHtml(refMonth)}) — record baru
+                </span>`;
+                break;
+
+            case 'new':
+                html = `<span class="record-mode-badge mode-new">
+                    <i class="ti ti-plus"></i> Record baru
+                </span>`;
+                break;
+
+            case 'edit':
+                const count = extra || 0;
+                html = `<span class="record-mode-badge mode-edit">
+                    <i class="ti ti-edit"></i> Melanjutkan record (${count} baris)
+                </span>`;
+                break;
+        }
+
+        $(id).html(html);
+    }
+
+    // ─────────────────────────────────────────────
+    // SAVE
+    // ─────────────────────────────────────────────
+    async function saveNursecall() {
+        const header = {
+            no_lane:          $('#ncNoLane').val().trim(),
+            type:             $('#ncType').val().trim(),
+            month_year:       $('#ncMonthYear').val(),
+            date_created:     $('#ncDateCreated').val(),
+            created_by_name:  $('#ncCreatedName').val().trim(),
+            approved_by_name: $('#ncApprovedName').val().trim(),
+        };
+
+        if (!header.no_lane || !header.type || !header.month_year || !header.date_created) {
+            showAlert('warning', 'Header Belum Lengkap', 'Isi No Lane, Type, Bulan/Tahun, dan Tanggal Dibuat.');
+            return;
+        }
+
+        const items = [];
+        $('#ncContentBody tr').each(function () {
+            const $t = $(this);
+            const item = {
+                task_id:      $t.data('task-id') || null,
+                date:         $t.find('.nc-date').val() || '',
+                time:         $t.find('.nc-time').val() || '',
+                problem:      $t.find('.nc-problem').val().trim(),
+                source:       $t.find('.nc-source').val(),
+                action:       $t.find('.nc-action').val().trim(),
+                nurse_leader: $t.find('.nc-nurse-leader').val().trim(),
+                status:       $t.find('.nc-status').val(),
+                judgement:    $t.find('.nc-judgement').val(),
+                group_leader: $t.find('.nc-group-leader').val().trim(),
+            };
+            if (item.problem || item.action || item.nurse_leader) items.push(item);
+        });
+
+        if (items.length === 0) {
+            showAlert('warning', 'Content Kosong', 'Isi minimal 1 baris content.');
+            return;
+        }
+
+        const footer = {
+            comment:          $('#ncComment').val().trim(),
+            date:             $('#ncFooterDate').val(),
+            created_by_name:  $('#ncFooterCreatedName').val().trim(),
+            approved_by_name: $('#ncFooterApprovedName').val().trim(),
+        };
+
+        const payload = { ...header, items, footer };
+
+        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res = await api('/support/nursecall', { method: 'POST', body: payload });
+            Swal.close();
+
+            ncExistingRecordId = res?.record_id || null;
+            referenceTasksCache = null;
+
+            populateLaneDatalists();
+            closeModal('supportModal');
+            showToast(
+                res?.message || (res?.is_new ? 'Nursecall dibuat' : 'Nursecall diperbarui'),
+                'success'
+            );
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Menyimpan', err.message);
+        }
+    }
+
+    async function saveRecord4m() {
+        const header = {
+            no_lane:          $('#m4NoLane').val().trim(),
+            type:             $('#m4Type').val().trim(),
+            month_year:       $('#m4MonthYear').val(),
+            date:             $('#m4Date').val(),
+            created_by_name:  $('#m4CreatedName').val().trim(),
+            approved_by_name: $('#m4ApprovedName').val().trim(),
+        };
+
+        if (!header.no_lane || !header.type || !header.month_year || !header.date) {
+            showAlert('warning', 'Header Belum Lengkap', 'Isi No Lane, Type, Bulan/Tahun, dan Tanggal.');
+            return;
+        }
+
+        const items = [];
+        $('#m4ContentBody tr').each(function () {
+            const $t = $(this);
+            const item = {
+                task_id:      $t.data('task-id') || null,
+                date:         $t.find('.m4-date').val() || '',
+                shift:        $t.find('.m4-shift').val() || '',
+                problem:      $t.find('.m4-problem').val().trim(),
+                category:     $t.find('.m4-category').val(),
+                team_leader:  $t.find('.m4-team-leader').val().trim(),
+                group_leader: $t.find('.m4-group-leader').val().trim(),
+            };
+            if (item.problem || item.category) items.push(item);
+        });
+
+        if (items.length === 0) {
+            showAlert('warning', 'Content Kosong', 'Isi minimal 1 baris content.');
+            return;
+        }
+
+        const payload = { ...header, items };
+
+        Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        try {
+            const res = await api('/support/4m', { method: 'POST', body: payload });
+            Swal.close();
+
+            m4ExistingRecordId = res?.record_id || null;
+            referenceTasksCache = null;
+
+            populateLaneDatalists();
+            closeModal('supportModal');
+            showToast(
+                res?.message || (res?.is_new ? 'Record 4M dibuat' : 'Record 4M diperbarui'),
+                'success'
+            );
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Menyimpan', err.message);
+        }
     }
     </script>
 </body>

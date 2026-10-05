@@ -7,6 +7,7 @@ use App\Models\TaskHistory;
 use Bpjs\Framework\Helpers\BaseController;
 use Bpjs\Framework\Core\Request;
 use Bpjs\Framework\Helpers\Date;
+use Bpjs\Framework\Helpers\DB;
 use Bpjs\Framework\Helpers\View;
 
 class TaskController extends BaseController
@@ -61,9 +62,76 @@ class TaskController extends BaseController
         return $this->json($tasks,200);
     }
 
+    public function getTaskOnProgress(Request $request)
+    {
+        try {
+            $query = Task::query();
+
+            $query->where(function ($q) {
+                $q->where('status', '!=', 'cancelled');
+            });
+
+            if ($request->section && $request->section !== 'all') {
+                $query->where('section', '=', $request->section);
+            }
+
+            $tasks = $query->orderBy('task_date', 'desc')
+                        ->orderBy('created_at', 'desc')
+                        ->limit((int) ($request->limit ?? 500))
+                        ->get(\PDO::FETCH_ASSOC);
+
+            $data = array_map(function ($t) {
+                return [
+                    'id'              => (int) $t['id'],
+                    'taskCode'        => $t['task_code']         ?? '',
+                    'operatorName'    => $t['operator_name']     ?? '',
+                    'date'            => $t['task_date']         ?? '',
+                    'section'         => $t['section']           ?? '',
+                    'category'        => strtolower($t['category']    ?? ''),
+                    'picSection'      => strtolower($t['pic_section'] ?? ''),
+                    'problem'         => $t['problem']           ?? '',
+                    'tempAction'      => $t['temporary_action']  ?? '',
+                    'permAction'      => $t['permanent_action']  ?? '',
+                    'deadline'        => $t['deadline']          ?? '',
+                    'pic'             => $t['pic']               ?? '',
+                    'stage'           => strtolower($t['stage']  ?? 'plan'),
+                    'status'          => strtolower($t['status'] ?? 'open'),
+                    'leaderSignature' => $t['leader_signature']  ?? ($t['ttd_leader'] ?? ''),
+                    'approvedAt'      => $t['approved_at']       ?? null,
+                    'createdByName'   => $t['created_by_name']   ?? '',
+                    'createdAt'       => $t['created_at']        ?? null,
+                ];
+            }, $tasks);
+
+            return $this->json($data, 200);
+
+        } catch (\Throwable $e) {
+            error_log('[TaskController::getTaskOnProgress] ' . $e->getMessage()
+                . ' @ ' . $e->getFile() . ':' . $e->getLine());
+
+            return $this->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     // POST /api/tasks - Create task (Operator)
     public function store(Request $request)
     {
+        $conn     = DB::getConnection();
+        $date     = date('Ymd');
+        $lockName = "task_code_{$date}";
+        $stmt = $conn->prepare("SELECT GET_LOCK(?, 5)");
+        $stmt->execute([$lockName]);
+
+        if ((int) $stmt->fetchColumn() !== 1) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Server sibuk, silakan coba lagi.',
+            ], 503);
+        }
+
         try {
             $taskCode = $this->generateTaskCode();
 
@@ -118,6 +186,8 @@ class TaskController extends BaseController
                 'class'   => get_class($e),
                 'trace'   => array_slice(explode("\n", $e->getTraceAsString()), 0, 8),
             ], 500);
+        } finally {
+            $conn->prepare("SELECT RELEASE_LOCK(?)")->execute([$lockName]);
         }
     }
 
@@ -677,8 +747,10 @@ class TaskController extends BaseController
         $prefix = "PDCA-{$date}-";
 
         $lastTask = Task::query()
+            ->withTrashed()
             ->where('task_code', 'LIKE', "{$prefix}%")
             ->orderBy('task_code', 'desc')
+            ->limit(1)
             ->first();
 
         $lastNumber = 0;
