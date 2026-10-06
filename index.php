@@ -60,6 +60,8 @@ if($runtime === 'octane'){
     return;
 }
 
+date_default_timezone_set(env('TIMEZONE', 'Asia/Jakarta'));
+
 // ---------------------------------------------------------------
 //  Handle The Incoming Request
 // ---------------------------------------------------------------

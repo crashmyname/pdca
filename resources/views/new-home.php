@@ -1446,6 +1446,747 @@
             color: #92400e;
             border: 1px solid #fcd34d;
         }
+
+        /* ── Doc Card Base ── */
+        .doc-upload-card {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            background: white;
+            transition: all 0.25s;
+            position: relative;
+        }
+        .doc-upload-card.doc-card-upload:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+        }
+
+        /* ── Card Hijau (ada data) ── */
+        .doc-upload-card.doc-filled {
+            border-color: #86efac;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15);
+        }
+        .doc-upload-card.doc-filled::before {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #16a34a;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(22, 163, 74, 0.4);
+            z-index: 2;
+        }
+        .doc-upload-card.doc-filled .doc-upload-header .doc-title {
+            color: #166534;
+        }
+        .doc-upload-card.doc-filled .doc-badge-auto,
+        .doc-upload-card.doc-filled .doc-badge-manual {
+            background: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+
+        /* ── Card Body ── */
+        .doc-card-body {
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* ── Empty State ── */
+        .doc-empty-state {
+            text-align: center;
+            padding: 8px 4px;
+        }
+        .doc-empty-state .ti {
+            font-size: 28px;
+            color: #d1d5db;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .doc-empty-text {
+            font-size: 12px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        .doc-empty-hint {
+            font-size: 10px;
+            color: #d1d5db;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* ── Preview Data (untuk auto card) ── */
+        .doc-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .doc-preview-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #374151;
+        }
+        .doc-preview-row .ti {
+            font-size: 14px;
+            color: #16a34a;
+            flex-shrink: 0;
+        }
+        .doc-preview-row .doc-preview-label {
+            color: #6b7280;
+            font-weight: 500;
+            min-width: 70px;
+        }
+        .doc-preview-row .doc-preview-value {
+            font-weight: 700;
+            color: #111827;
+        }
+        .doc-preview-count {
+            display: inline-block;
+            background: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            border: 1px solid #86efac;
+        }
+        .doc-preview-actions {
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+        }
+
+        /* ── File Preview (upload success) ── */
+        .doc-file-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .doc-file-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #166534;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .doc-file-meta {
+            font-size: 10px;
+            color: #6b7280;
+        }
+        .doc-file-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .doc-file-actions .btn {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* ── Upload Progress ── */
+        .doc-upload-progress {
+            margin-top: 8px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .doc-upload-progress > div {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.2s;
+        }
+        /* ═══════════════════════════════════════════════════ */
+        /* SUPPORT REPORT — Style Form Resmi (Stanley-like)    */
+        /* ═══════════════════════════════════════════════════ */
+        .sr-page {
+            background: #ffffff;
+            padding: 12mm 10mm;
+            margin-bottom: 20px;
+            font-family: Arial, 'Helvetica Neue', sans-serif;
+            color: #000;
+            page-break-after: always;
+            box-sizing: border-box;
+        }
+        .sr-page:last-child {
+            page-break-after: auto;
+            margin-bottom: 0;
+        }
+
+        /* ── TOP HEADER ── */
+        .sr-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .sr-top-logo {
+            width: 130px;
+            flex-shrink: 0;
+        }
+        .sr-top-logo img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .sr-top-title {
+            flex: 1;
+            text-align: center;
+            padding-top: 6px;
+        }
+        .sr-top-title .sr-main-title {
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #000;
+            margin-bottom: 3px;
+        }
+        .sr-top-title .sr-sub-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #000;
+        }
+        .sr-top-sig {
+            width: 240px;
+            flex-shrink: 0;
+        }
+        .sr-top-sig .sr-sig-date {
+            font-size: 9px;
+            text-align: right;
+            margin-bottom: 3px;
+        }
+        .sr-top-sig table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .sr-top-sig td {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            vertical-align: top;
+        }
+        .sr-top-sig .sr-sig-header {
+            text-align: center;
+            font-size: 8px;
+            font-weight: 700;
+            background: #f0f0f0;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 2px 4px;
+        }
+        .sr-top-sig .sr-sig-body {
+            height: 55px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 9px;
+            color: #333;
+            position: relative;
+        }
+        .sr-top-sig .sr-sig-body .signature-qrcode {
+            width: 50px !important;
+            height: 50px !important;
+            margin: 0 auto 2px !important;
+        }
+        .sr-top-sig .sr-sig-body .signature-qrcode img,
+        .sr-top-sig .sr-sig-body .signature-qrcode canvas {
+            width: 50px !important;
+            height: 50px !important;
+        }
+        .sr-top-sig .sr-sig-name {
+            font-size: 9px;
+            text-align: center;
+            font-weight: 600;
+            color: #000;
+            margin-top: 2px;
+        }
+
+        /* ── INFO ROW (No Lane, Type) ── */
+        .sr-info-row {
+            display: flex;
+            gap: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            margin: 8px 0 6px;
+            text-transform: uppercase;
+        }
+        .sr-info-row .sr-info-item {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .sr-info-row .sr-info-label {
+            min-width: 60px;
+            color: #000;
+        }
+        .sr-info-row .sr-info-sep {
+            width: 6px;
+            color: #000;
+        }
+        .sr-info-row .sr-info-value {
+            color: #000;
+            font-weight: 600;
+        }
+
+        /* ── MAIN TABLE ── */
+        .sr-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5px;
+            margin-bottom: 8px;
+            table-layout: fixed;
+        }
+        .sr-table th,
+        .sr-table td {
+            border: 1px solid #000;
+            padding: 3px 4px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .sr-table th {
+            background: #ffffff;
+            text-align: center;
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.2px;
+            padding: 3px 2px;
+            line-height: 1.15;
+        }
+        .sr-table td {
+            text-align: left;
+            font-size: 9.5px;
+            height: 20px;
+        }
+        .sr-table td.center { text-align: center; }
+        .sr-table td.check { text-align: center; font-size: 12px; font-weight: 700; }
+
+        /* Kolom widths */
+        .sr-table .col-tgl       { width: 52px; }
+        .sr-table .col-jam       { width: 42px; }
+        .sr-table .col-masalah   { width: 130px; }
+        .sr-table .col-sumber    { width: 32px; }
+        .sr-table .col-tindakan  { width: 130px; }
+        .sr-table .col-nurse     { width: 55px; }
+        .sr-table .col-status    { width: 42px; }
+        .sr-table .col-judge     { width: 50px; }
+        .sr-table .col-gleader   { width: 55px; }
+
+        .sr-table .sr-sumber-header {
+            text-align: center;
+            font-size: 8px;
+            line-height: 1.1;
+        }
+        .sr-table .sr-status-x { color: #dc2626; font-weight: 700; }
+        .sr-table .sr-status-o { color: #000; font-weight: 700; }
+
+        /* ── BOTTOM SECTION ── */
+        .sr-bottom {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+            align-items: stretch;
+        }
+        .sr-bottom-left {
+            flex: 1;
+            font-size: 8.5px;
+            line-height: 1.5;
+            color: #000;
+        }
+        .sr-bottom-left .sr-keterangan-title {
+            font-weight: 700;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            font-size: 9px;
+        }
+        .sr-bottom-left ol {
+            padding-left: 16px;
+            margin: 0;
+        }
+        .sr-bottom-left ol li {
+            margin-bottom: 1px;
+        }
+
+        .sr-bottom-right {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .sr-bottom-right .sr-komentar-box {
+            border: 1px solid #000;
+            padding: 3px 5px;
+            min-height: 60px;
+            font-size: 8.5px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .sr-bottom-right .sr-komentar-header {
+            font-weight: 700;
+            font-size: 9px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+        .sr-bottom-right .sr-tanggal-row {
+            display: flex;
+            gap: 6px;
+            font-size: 9px;
+            align-items: center;
+        }
+        .sr-bottom-right .sr-tanggal-label {
+            font-weight: 700;
+            text-transform: uppercase;
+            min-width: 55px;
+        }
+        .sr-bottom-right .sr-tanggal-value {
+            flex: 1;
+            border-bottom: 1px solid #000;
+            padding: 1px 3px;
+            font-size: 9px;
+        }
+
+        /* ── FOOTER FORM CODE ── */
+        .sr-form-code {
+            text-align: right;
+            font-size: 8.5px;
+            color: #000;
+            margin-top: 8px;
+            padding-top: 3px;
+            font-style: italic;
+        }
+
+        /* Signature di bottom-right (Manager) */
+        .sr-manager-sig {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .sr-manager-sig .sr-manager-sig-box {
+            flex: 1;
+            border: 1px solid #000;
+            padding: 3px 5px;
+            text-align: center;
+            min-height: 50px;
+        }
+        .sr-manager-sig .sr-manager-sig-box .sr-sig-header {
+            font-weight: 700;
+            font-size: 8px;
+            text-transform: uppercase;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+        }
+        .sr-manager-sig .sr-manager-sig-box .signature-qrcode {
+            width: 40px !important;
+            height: 40px !important;
+            margin: 2px auto !important;
+        }
+        .sr-manager-sig .sr-manager-sig-box .signature-qrcode img,
+        .sr-manager-sig .sr-manager-sig-box .signature-qrcode canvas {
+            width: 40px !important;
+            height: 40px !important;
+        }
+        .sr-manager-sig .sr-manager-sig-box .sr-sig-name {
+            font-size: 8px;
+            font-weight: 600;
+            min-height: 10px;
+            border-top: 1px solid #000;
+            padding-top: 2px;
+        }
+
+        /* ── PRINT ── */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+            body > * { display: none !important; }
+            body.print-support-report #supportReportModal.active {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                background: #fff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                z-index: auto !important;
+                overflow: visible !important;
+                animation: none !important;
+            }
+            body.print-support-report #supportReportModal.active .modal-content {
+                display: block !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            body.print-support-report #supportReportModal.active .modal-header,
+            body.print-support-report #supportReportModal.active .modal-footer,
+            body.print-support-report #supportReportModal.active .support-tabs,
+            body.print-support-report #supportReportModal.active .report-filter {
+                display: none !important;
+            }
+            body.print-support-report #supportReportModal.active .modal-body {
+                display: block !important;
+                padding: 0 !important;
+            }
+            body.print-support-report #srReportContainer {
+                border: none !important;
+                padding: 0 !important;
+                background: #fff !important;
+                border-radius: 0 !important;
+            }
+            .sr-page {
+                padding: 0 !important;
+                margin: 0 !important;
+                border: none !important;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+        /* ═══════════════════════════════════════════════════ */
+        /* 4M REPORT — Layout 2 kolom (kiri & kanan)          */
+        /* ═══════════════════════════════════════════════════ */
+        .sr-4m-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .sr-4m-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            table-layout: fixed;
+        }
+        .sr-4m-table th,
+        .sr-4m-table td {
+            border: 1px solid #000;
+            padding: 2px 3px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        .sr-4m-table th {
+            background: #ffffff;
+            text-align: center;
+            font-weight: 700;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1px;
+            line-height: 1.1;
+            padding: 3px 2px;
+        }
+        .sr-4m-table td {
+            text-align: center;
+            font-size: 9px;
+            height: 22px;
+        }
+        .sr-4m-table td.tgl-num {
+            font-size: 11px;
+            font-weight: 700;
+            width: 22px;
+            line-height: 1.1;
+            text-align: center;
+        }
+        .sr-4m-table td.problem-cell {
+            text-align: left;
+            font-size: 8.5px;
+            padding-left: 4px;
+        }
+        .sr-4m-table td.tl-cell,
+        .sr-4m-table td.gl-cell {
+            font-size: 8.5px;
+        }
+        .sr-4m-table td.check {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Kolom widths (2 tabel sama) */
+        .sr-4m-table .c-tgl    { width: 26px; }
+        .sr-4m-table .c-shift  { width: 28px; }
+        .sr-4m-table .c-prob   { width: auto; }
+        .sr-4m-table .c-cat    { width: 44px; }
+        .sr-4m-table .c-tl     { width: 48px; }
+        .sr-4m-table .c-gl     { width: 48px; }
+
+        /* Print 4M */
+        @media print {
+            .sr-4m-grid {
+                gap: 4px !important;
+            }
+            .sr-4m-table {
+                font-size: 8px !important;
+            }
+            .sr-4m-table td.tgl-num {
+                font-size: 10px !important;
+            }
+        }
+        /* ── Doc Preview Modal ── */
+        #docPreviewModal .modal-content {
+            max-width: 900px;
+        }
+        .doc-preview-meta {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 20px;
+            font-size: 12px;
+        }
+        .doc-preview-meta-item {
+            display: flex;
+            gap: 6px;
+        }
+        .doc-preview-meta-label {
+            color: #6b7280;
+            font-weight: 600;
+            min-width: 90px;
+        }
+        .doc-preview-meta-value {
+            color: #111827;
+            font-weight: 600;
+            flex: 1;
+            word-break: break-word;
+        }
+        .doc-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        .doc-preview-table th {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 8px 6px;
+            text-align: left;
+            border: 1px solid #e5e7eb;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .doc-preview-table td {
+            padding: 6px 8px;
+            border: 1px solid #e5e7eb;
+            vertical-align: top;
+            color: #374151;
+            font-size: 11.5px;
+        }
+        .doc-preview-table tr:nth-child(even) td { background: #fafafa; }
+        .doc-preview-table .dp-row-num {
+            text-align: center;
+            width: 30px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .doc-preview-table .dp-center { text-align: center; }
+        .doc-preview-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 16px 0 6px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 4px;
+        }
+        /* ── Preview Items di Card ── */
+        .doc-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .doc-item-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 5px 6px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 4px;
+            border-left: 2px solid #16a34a;
+            font-size: 11px;
+            line-height: 1.35;
+        }
+        .doc-item-row .doc-item-num {
+            font-weight: 700;
+            color: #16a34a;
+            min-width: 14px;
+            flex-shrink: 0;
+        }
+        .doc-item-row .doc-item-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .doc-item-row .doc-item-title {
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+            margin-bottom: 2px;
+        }
+        .doc-item-row .doc-item-meta {
+            font-size: 10px;
+            color: #6b7280;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .doc-item-row .doc-item-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .doc-items-more {
+            text-align: center;
+            font-size: 10px;
+            color: #16a34a;
+            font-weight: 600;
+            margin-top: 4px;
+            font-style: italic;
+        }
+        .doc-items-empty {
+            text-align: center;
+            padding: 8px;
+            color: #9ca3af;
+            font-size: 11px;
+            font-style: italic;
+        }
+        .doc-preview-actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+        }
+        .doc-preview-actions .btn {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1492,6 +2233,9 @@
                 </button>
                 <button class="btn" onclick="openReport()" id="reportBtnHeader" style="display:none">
                     <i class="ti ti-file-analytics"></i> Report
+                </button>
+                <button class="btn" onclick="openSupportReport()" id="supportReportBtnHeader" style="display:none">
+                    <i class="ti ti-headset"></i> Report Support
                 </button>
                 <button class="btn btn-success" onclick="toggleRegister()" id="registerBtnHeader" style="display:none">
                     <i class="ti ti-user-plus"></i> User Baru
@@ -1752,80 +2496,58 @@
                     <div class="form-section" id="documentsSection">
                         <div class="form-section-title">
                             <i class="ti ti-paperclip"></i> Dokumen Pendukung
-                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Semua wajib "Sudah" untuk approve</span>
+                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Semua wajib terisi untuk approve</span>
                         </div>
 
                         <div class="doc-upload-grid">
 
-                            <!-- 4M -->
-                            <div class="doc-upload-card" data-type="4m">
+                            <!-- Lembar Point 4M — MANUAL UPLOAD -->
+                            <div class="doc-upload-card doc-card-upload" data-type="4m" data-doc-type="lembar_point_4m">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-file-text"></i>
-                                    <span class="doc-title">4M</span>
+                                    <span class="doc-title">Lembar Point 4M</span>
+                                    <span class="doc-badge-manual"><i class="ti ti-upload"></i> Upload</span>
                                 </div>
-                                <div class="doc-status-radio">
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_4m" value="sudah">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-check"></i>
-                                            <span class="radio-label">Sudah</span>
-                                        </div>
-                                    </label>
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_4m" value="belum">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-x"></i>
-                                            <span class="radio-label">Belum</span>
-                                        </div>
-                                    </label>
+                                <div class="doc-card-body" id="docBody4m">
+                                    <div class="doc-empty-state">
+                                        <i class="ti ti-cloud-upload"></i>
+                                        <div class="doc-empty-text">Belum ada file</div>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="pickTaskDocFile()" style="margin-top:8px">
+                                            <i class="ti ti-upload"></i> Upload File
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Logbook -->
-                            <div class="doc-upload-card" data-type="logbook">
+                            <!-- Record Perubahan 4M — AUTO dari Support 4M -->
+                            <div class="doc-upload-card doc-card-info" data-type="logbook" data-doc-type="four_m">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-notebook"></i>
-                                    <span class="doc-title">Logbook</span>
+                                    <span class="doc-title">Record Perubahan 4M</span>
+                                    <span class="doc-badge-auto"><i class="ti ti-bolt"></i> Auto</span>
                                 </div>
-                                <div class="doc-status-radio">
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_logbook" value="sudah">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-check"></i>
-                                            <span class="radio-label">Sudah</span>
-                                        </div>
-                                    </label>
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_logbook" value="belum">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-x"></i>
-                                            <span class="radio-label">Belum</span>
-                                        </div>
-                                    </label>
+                                <div class="doc-card-body" id="docBodyLogbook">
+                                    <div class="doc-empty-state">
+                                        <i class="ti ti-inbox"></i>
+                                        <div class="doc-empty-text">Belum ada data</div>
+                                        <div class="doc-empty-hint">Isi di Support → Record 4M</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Nursecall -->
-                            <div class="doc-upload-card" data-type="nursecall">
+                            <!-- Nursecall — AUTO dari Support Nursecall -->
+                            <div class="doc-upload-card doc-card-info" data-type="nursecall" data-doc-type="nursecall">
                                 <div class="doc-upload-header">
                                     <i class="ti ti-bell"></i>
                                     <span class="doc-title">Nursecall</span>
+                                    <span class="doc-badge-auto"><i class="ti ti-bolt"></i> Auto</span>
                                 </div>
-                                <div class="doc-status-radio">
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_nursecall" value="sudah">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-check"></i>
-                                            <span class="radio-label">Sudah</span>
-                                        </div>
-                                    </label>
-                                    <label class="radio-card">
-                                        <input type="radio" name="doc_status_nursecall" value="belum">
-                                        <div class="radio-card-content">
-                                            <i class="ti ti-circle-x"></i>
-                                            <span class="radio-label">Belum</span>
-                                        </div>
-                                    </label>
+                                <div class="doc-card-body" id="docBodyNursecall">
+                                    <div class="doc-empty-state">
+                                        <i class="ti ti-inbox"></i>
+                                        <div class="doc-empty-text">Belum ada data</div>
+                                        <div class="doc-empty-hint">Isi di Support → Nursecall</div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1910,6 +2632,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="file" id="docFileInput4m" accept=".pdf,.jpg,.jpeg,.png" style="display:none" onchange="handleTaskDocFile(this)">
                     <input type="hidden" id="taskId">
                 </form>
             </div>
@@ -2481,22 +3204,19 @@
                     <?= csrf() ?>
                     <!-- HEADER -->
                     <div class="form-section">
-                        <div class="form-section-title"><i class="ti ti-file-info"></i> Header</div>
+                        <div class="form-section-title" style="justify-content:space-between">
+                            <span><i class="ti ti-file-info"></i> Header</span>
+                            <button type="button" class="btn btn-sm" onclick="resetHeader('nc')" title="Reset form ke kondisi awal">
+                                <i class="ti ti-refresh"></i> Reset
+                            </button>
+                        </div>
                         <div id="ncModeIndicator" style="margin-bottom:10px"></div>
-                        <div class="form-grid">
-                            <div class="form-group">
+                            <div class="form-grid">
+                                <div class="form-group">
                                 <label class="form-label required">No Lane</label>
-                                <input type="text" 
-                                    class="form-input" 
-                                    id="ncNoLane" 
-                                    required 
-                                    list="ncLaneList"
-                                    placeholder="Ketik / pilih lane..."
-                                    autocomplete="off">
-                                <datalist id="ncLaneList"></datalist>
-                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
-                                    <i class="ti ti-info-circle"></i> Pilih lane existing atau ketik lane baru
-                                </small>
+                                <select class="form-select" id="ncNoLane" required>
+                                    <option value="">-- Ketik atau pilih lane --</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Type</label>
@@ -2601,38 +3321,21 @@
                 <form id="record4mForm" class="support-form" data-tab="4m">
                     <?= csrf() ?>
 
-                    <!-- REFERENCE DATA -->
-                    <div class="form-section reference-section">
-                        <div class="form-section-title" style="color:#1e40af;border-bottom-color:#bfdbfe">
-                            <i class="ti ti-database-import"></i> Reference Data PDCA
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:center">
-                            <select class="form-select" id="ncReferenceTask" onchange="applyNursecallReference(this.value)" style="flex:1">
-                                <option value="">-- Memuat... --</option>
-                            </select>
-                        </div>
-                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
-                            <i class="ti ti-info-circle"></i> Pilih POST IT → otomatis jadi 1 baris di Content. Pilih ulang task yang sama untuk update datanya.
-                        </small>
-                    </div>
                     <!-- HEADER -->
                     <div class="form-section">
-                        <div class="form-section-title"><i class="ti ti-file-info"></i> Header</div>
+                        <div class="form-section-title" style="justify-content:space-between">
+                            <span><i class="ti ti-file-info"></i> Header</span>
+                            <button type="button" class="btn btn-sm" onclick="resetHeader('m4')" title="Reset form ke kondisi awal">
+                                <i class="ti ti-refresh"></i> Reset
+                            </button>
+                        </div>
                         <div id="m4ModeIndicator" style="margin-bottom:10px"></div>
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label required">No Lane</label>
-                                <input type="text" 
-                                    class="form-input" 
-                                    id="m4NoLane" 
-                                    required 
-                                    list="m4LaneList"
-                                    placeholder="Ketik / pilih lane..."
-                                    autocomplete="off">
-                                <datalist id="m4LaneList"></datalist>
-                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
-                                    <i class="ti ti-info-circle"></i> Pilih lane existing atau ketik lane baru
-                                </small>
+                                <select class="form-select" id="m4NoLane" required>
+                                    <option value="">-- Ketik atau pilih lane --</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Type</label>
@@ -2655,6 +3358,21 @@
                                 <input type="text" class="form-input" id="m4ApprovedName">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- REFERENCE DATA -->
+                    <div class="form-section reference-section">
+                        <div class="form-section-title" style="color:#1e40af;border-bottom-color:#bfdbfe">
+                            <i class="ti ti-database-import"></i> Reference Data PDCA
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <select class="form-select" id="m4ReferenceTask" onchange="applyRecord4mReference(this.value)" style="flex:1">
+                                <option value="">-- Memuat... --</option>
+                            </select>
+                        </div>
+                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
+                            <i class="ti ti-info-circle"></i> Pilih POST IT → otomatis jadi 1 baris di Content. Pilih ulang task yang sama untuk update datanya.
+                        </small>
                     </div>
 
                     <!-- CONTENT -->
@@ -2692,6 +3410,93 @@
                     </div>
                 </form>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Report Modal -->
+    <div class="modal" id="supportReportModal">
+        <div class="modal-content" style="max-width: 1100px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="ti ti-file-analytics"></i> Report Support
+                </h3>
+                <button class="modal-close" onclick="closeModal('supportReportModal')">×</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Tabs -->
+                <div class="support-tabs">
+                    <button type="button" class="support-tab active" data-report-tab="nursecall"
+                            onclick="switchReportTab('nursecall')">
+                        <i class="ti ti-bell"></i> Nursecall
+                    </button>
+                    <button type="button" class="support-tab" data-report-tab="4m"
+                            onclick="switchReportTab('4m')">
+                        <i class="ti ti-file-text"></i> Record 4M
+                    </button>
+                </div>
+
+                <!-- Filter -->
+                <div class="report-filter" style="margin-bottom:16px">
+                    <div class="filter-row">
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:150px">
+                            <label class="form-label">Bulan / Tahun</label>
+                            <input type="month" class="form-input" id="srMonthYear">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;flex:1;min-width:200px">
+                            <label class="form-label">No Lane</label>
+                            <select class="form-select" id="srNoLane">
+                                <option value="">Semua Lane</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary" onclick="loadSupportReport()">
+                                <i class="ti ti-filter"></i> Tampilkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Content -->
+                <div id="srReportContainer" style="background:white;padding:20px;border:1px solid #e5e7eb;border-radius:8px">
+                    <div style="text-align:center;color:#9ca3af;padding:40px">
+                        <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
+                        <div>Pilih filter lalu klik "Tampilkan"</div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('supportReportModal')">Tutup</button>
+                <button class="btn" onclick="printSupportReport()">
+                    <i class="ti ti-printer"></i> Print
+                </button>
+                <button class="btn btn-danger" onclick="exportSupportPDF()">
+                    <i class="ti ti-file-type-pdf"></i> Export PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doc Preview Modal — untuk lihat detail data Nursecall/4M dari card task -->
+    <div class="modal" id="docPreviewModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="docPreviewTitle">
+                    <i class="ti ti-file-search"></i> Preview Data
+                </h3>
+                <button class="modal-close" onclick="closeModal('docPreviewModal')">×</button>
+            </div>
+            <div class="modal-body" id="docPreviewBody">
+                <div style="text-align:center;padding:40px;color:#9ca3af">
+                    <i class="ti ti-loader-2 ti-spin" style="font-size:36px;display:block;margin-bottom:10px"></i>
+                    Memuat data...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal('docPreviewModal')">Tutup</button>
             </div>
         </div>
     </div>
@@ -3003,30 +3808,13 @@
             if (e.target === this) closeModal(this.id);
         });
 
-        // Nursecall — saat No Lane atau Bulan berubah
-        $(document).on('change blur', '#ncNoLane, #ncMonthYear', function () {
-            const noLane = $('#ncNoLane').val().trim();
-            if (!noLane) {
-                updateModeBadge('nc', 'empty');
-                return;
-            }
-            clearTimeout(window._ncLaneTimer);
-            window._ncLaneTimer = setTimeout(() => {
-                checkByLane('nc', noLane);
-            }, 400);
+        $(document).on('change', '#ncMonthYear', function () {
+            const noLane = $('#ncNoLane').val();
+            if (noLane) checkByLane('nc', noLane);
         });
-
-        // 4M
-        $(document).on('change blur', '#m4NoLane, #m4MonthYear', function () {
-            const noLane = $('#m4NoLane').val().trim();
-            if (!noLane) {
-                updateModeBadge('m4', 'empty');
-                return;
-            }
-            clearTimeout(window._m4LaneTimer);
-            window._m4LaneTimer = setTimeout(() => {
-                checkByLane('m4', noLane);
-            }, 400);
+        $(document).on('change', '#m4MonthYear', function () {
+            const noLane = $('#m4NoLane').val();
+            if (noLane) checkByLane('m4', noLane);
         });
 
         $('#nursecallForm').on('submit', function (e) { e.preventDefault(); saveNursecall(); });
@@ -3066,6 +3854,15 @@
         });
         $(document).on('change', 'input[name^="doc_status_"]', function () {
             updateApproveButtonState();
+        });
+
+        $(document).on('change', '#section', function () {
+            const section = $(this).val();
+            const date    = $('#taskDate').val();
+            if (!section || !date) return;
+
+            const fakeTask = { section: section, date: date };
+            checkTaskDocs(fakeTask);
         });
     }
 
@@ -3447,6 +4244,7 @@
         const $noticeBar = $('#noticeBar');
         const $registerBtnHeader = $('#registerBtnHeader');
         const $reportBtnHeader = $('#reportBtnHeader');
+        const $supportReportBtnHeader = $('#supportReportBtnHeader');
 
         if (state.currentUser) {
             const rawRole = String(state.currentUser.role || '').toLowerCase();
@@ -3478,6 +4276,7 @@
             }
 
             $reportBtnHeader.show();
+            $supportReportBtnHeader.show();
 
             let hint = '';
             if (canApprove()) {
@@ -3505,6 +4304,7 @@
             $noticeBar.attr('class', 'notice-bar warning');
             $registerBtnHeader.hide();
             $reportBtnHeader.hide();
+            $supportReportBtnHeader.hide();
             $('#profileBtn').hide();
         }
     }
@@ -3854,6 +4654,7 @@
             basePayload.pic_section = picSection;
         }
 
+        // ── Validasi dasar ──
         if (!basePayload.operator_name || !basePayload.task_date || !basePayload.section || !basePayload.problem) {
             showAlert('warning', 'Form Tidak Lengkap', 'Mohon isi semua field yang wajib!');
             return;
@@ -3864,14 +4665,18 @@
             return;
         }
 
+        const docLp4m = $('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled');
+        const docM4   = $('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled');
+        const docNc   = $('.doc-upload-card[data-doc-type="nursecall"]').hasClass('doc-filled');
+
         const leaderPayload = {
             temporary_action:      $('#tempAction').val().trim(),
             permanent_action:      $('#permAction').val().trim(),
             deadline:              $('#deadline').val() || null,
             pic:                   $('#pic').val() ? $('#pic').val().trim() : '',
-            doc_4m_status:         $('input[name="doc_status_4m"]:checked').val()        || 'belum',
-            doc_logbook_status:    $('input[name="doc_status_logbook"]:checked').val()   || 'belum',
-            doc_nursecall_status:  $('input[name="doc_status_nursecall"]:checked').val() || 'belum',
+            doc_4m_status:         docLp4m ? 'sudah' : 'belum',
+            doc_logbook_status:    docM4   ? 'sudah' : 'belum',
+            doc_nursecall_status:  docNc   ? 'sudah' : 'belum',
         };
 
         Swal.fire({
@@ -4018,6 +4823,7 @@
             $('#saveBtn').prop('disabled', false);
         }
 
+        await checkTaskDocs(task);
         openModal('taskModal');
         setTimeout(() => updateApproveButtonState(), 50);
     }
@@ -4057,26 +4863,36 @@
         const id = $('#taskId').val();
         if (!id) return;
 
-        // Cek status dari radio
         const missing = [];
-        ['4m', 'logbook', 'nursecall'].forEach(t => {
-            const status = $(`input[name="doc_status_${t}"]:checked`).val() || 'belum';
-            if (status !== 'sudah') missing.push(DOC_LABEL[t] || t.toUpperCase());
-        });
+
+        if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
+            missing.push('Lembar Point 4M');
+        }
+        if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
+            missing.push('Record Perubahan 4M');
+        }
+        if (!$('.doc-upload-card[data-doc-type="nursecall"]').hasClass('doc-filled')) {
+            missing.push('Nursecall');
+        }
 
         if (missing.length > 0) {
             showAlert(
                 'warning',
                 'Dokumen Belum Lengkap',
-                'Tandai "Sudah" untuk dokumen berikut sebelum approve:<br><br>' +
+                'Lengkapi dokumen berikut sebelum approve:<br><br>' +
                 '<ul style="text-align:left;padding-left:20px;margin:8px 0">' +
                 missing.map(m => `<li><strong>${m}</strong></li>`).join('') +
-                '</ul>'
+                '</ul>' +
+                '<small style="color:#6b7280;display:block;margin-top:8px">' +
+                '• <strong>Lembar Point 4M</strong>: upload file via tombol Upload<br>' +
+                '• <strong>Record Perubahan 4M</strong>: isi lewat tombol "Report Support" → tab 4M<br>' +
+                '• <strong>Nursecall</strong>: isi lewat tombol "Report Support" → tab Nursecall' +
+                '</small>'
             );
             return;
         }
 
-        const task = state.tasks.find(t => t.id === id);
+        const task = state.tasks.find(t => t.id == id);
         const title = task ? escapeHtml(task.problem) : 'task ini';
 
         const confirmed = await showConfirm(
@@ -5408,10 +6224,16 @@
         if (!$btn.length) return;
 
         const missing = [];
-        ['4m', 'logbook', 'nursecall'].forEach(t => {
-            const status = $(`input[name="doc_status_${t}"]:checked`).val() || 'belum';
-            if (status !== 'sudah') missing.push(DOC_LABEL[t] || t.toUpperCase());
-        });
+
+        if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
+            missing.push('Lembar Point 4M');
+        }
+        if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
+            missing.push('Record Perubahan 4M');
+        }
+        if (!$('.doc-upload-card[data-doc-type="nursecall"]').hasClass('doc-filled')) {
+            missing.push('Nursecall');
+        }
 
         if (missing.length === 0) {
             $btn.prop('disabled', false)
@@ -5419,7 +6241,7 @@
                 .html('<i class="ti ti-check"></i> Approve');
         } else {
             $btn.prop('disabled', true)
-                .attr('title', 'Tandai "Sudah" dulu: ' + missing.join(', '))
+                .attr('title', 'Lengkapi dulu: ' + missing.join(', '))
                 .html('<i class="ti ti-lock"></i> Approve');
         }
     }
@@ -5486,6 +6308,190 @@
                 <span>${escapeHtml(c.label)}</span>
             </div>
         `).join(''));
+    }
+
+    // ============================================================
+    // DOC PREVIEW — Lihat detail data Nursecall/4M
+    // ============================================================
+    async function previewDocData(type, recordId, noLane, taskId) {
+        const isNc = type === 'nursecall';
+        taskId = parseInt(taskId || 0, 10);
+
+        $('#docPreviewTitle').html(
+            `<i class="ti ti-${isNc ? 'bell' : 'notebook'}"></i> ` +
+            `Preview ${isNc ? 'Nursecall' : 'Record Perubahan 4M'}`
+        );
+
+        $('#docPreviewBody').html(`
+            <div style="text-align:center;padding:40px;color:#9ca3af">
+                <i class="ti ti-loader-2 ti-spin" style="font-size:36px;display:block;margin-bottom:10px"></i>
+                Memuat data...
+            </div>
+        `);
+
+        openModal('docPreviewModal');
+
+        try {
+            const endpoint = isNc
+                ? `/support/nursecall/${recordId}`
+                : `/support/4m/${recordId}`;
+
+            const res = await api(endpoint);
+
+            if (!res || !res.record) {
+                $('#docPreviewBody').html(`
+                    <div style="text-align:center;padding:40px;color:#9ca3af">
+                        <i class="ti ti-alert-circle" style="font-size:36px;display:block;margin-bottom:10px"></i>
+                        Data tidak ditemukan
+                    </div>
+                `);
+                return;
+            }
+
+            const rec = res.record;
+            let items = res.items || [];
+
+            let isFiltered = false;
+            if (taskId) {
+                const filtered = items.filter(it => parseInt(it.task_id || 0, 10) === taskId);
+                if (filtered.length > 0) {
+                    items = filtered;
+                    isFiltered = true;
+                }
+            }
+
+            // ═══════════════════════════════════════════════════
+            // META INFO
+            // ═══════════════════════════════════════════════════
+            let monthLabel = rec.month_year || '-';
+            if (rec.month_year && rec.month_year.length === 7) {
+                const [y, m] = rec.month_year.split('-');
+                const mNames = ['Januari','Februari','Maret','April','Mei','Juni',
+                                'Juli','Agustus','September','Oktober','November','Desember'];
+                monthLabel = mNames[parseInt(m, 10) - 1] + '/' + y;
+            }
+
+            let metaHtml = '';
+            if (isNc) {
+                metaHtml = `
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">No Lane</span><span class="doc-preview-meta-value">${escapeHtml(rec.no_lane || '-')}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Type</span><span class="doc-preview-meta-value">${escapeHtml(rec.type || '-')}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Bulan / Tahun</span><span class="doc-preview-meta-value">${escapeHtml(monthLabel)}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Tanggal Dibuat</span><span class="doc-preview-meta-value">${rec.date_created ? formatDateLong(rec.date_created) : '-'}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Baris Ditampilkan</span><span class="doc-preview-meta-value">${items.length} baris</span></div>
+                    ${rec.footer_comment ? `<div class="doc-preview-meta-item" style="grid-column: 1/-1"><span class="doc-preview-meta-label">Komentar</span><span class="doc-preview-meta-value">${escapeHtml(rec.footer_comment)}</span></div>` : ''}
+                `;
+            } else {
+                metaHtml = `
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">No Lane</span><span class="doc-preview-meta-value">${escapeHtml(rec.no_lane || '-')}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Type</span><span class="doc-preview-meta-value">${escapeHtml(rec.type || '-')}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Bulan / Tahun</span><span class="doc-preview-meta-value">${escapeHtml(monthLabel)}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Tanggal</span><span class="doc-preview-meta-value">${rec.date ? formatDateLong(rec.date) : '-'}</span></div>
+                    <div class="doc-preview-meta-item"><span class="doc-preview-meta-label">Baris Ditampilkan</span><span class="doc-preview-meta-value">${items.length} baris</span></div>
+                `;
+            }
+
+            const filterNote = isFiltered
+                ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:#1e40af">
+                    <i class="ti ti-filter"></i> Menampilkan <strong>${items.length} baris</strong> khusus dari task ini
+                </div>`
+                : '';
+
+            // ═══════════════════════════════════════════════════
+            // CONTENT TABLE
+            // ═══════════════════════════════════════════════════
+            let tableHtml = '';
+
+            if (isNc) {
+                tableHtml = `
+                    <table class="doc-preview-table">
+                        <thead>
+                            <tr>
+                                <th class="dp-row-num">#</th>
+                                <th style="width:80px">Tanggal</th>
+                                <th style="width:55px">Jam</th>
+                                <th>Masalah</th>
+                                <th style="width:70px">Sumber</th>
+                                <th>Tindakan</th>
+                                <th style="width:90px">Nurse Leader</th>
+                                <th style="width:55px">Status</th>
+                                <th style="width:70px">Judgement</th>
+                                <th style="width:90px">Group Leader</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.length === 0
+                                ? `<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:20px">Belum ada baris untuk task ini</td></tr>`
+                                : items.map((it, i) => `
+                                    <tr>
+                                        <td class="dp-row-num">${i + 1}</td>
+                                        <td class="dp-center">${it.date ? formatDate(it.date) : '-'}</td>
+                                        <td class="dp-center">${it.time ? String(it.time).slice(0, 5) : '-'}</td>
+                                        <td>${escapeHtml(it.problem || '-')}</td>
+                                        <td class="dp-center">${escapeHtml(SR_SOURCE_LABEL[it.source] || it.source || '-')}</td>
+                                        <td>${escapeHtml(it.action || '-')}</td>
+                                        <td class="dp-center">${escapeHtml(it.nurse_leader || '-')}</td>
+                                        <td class="dp-center"><strong>${escapeHtml(it.status || '-')}</strong></td>
+                                        <td class="dp-center"><strong>${escapeHtml(it.judgement || '-')}</strong></td>
+                                        <td class="dp-center">${escapeHtml(it.group_leader || '-')}</td>
+                                    </tr>
+                                `).join('')
+                            }
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                tableHtml = `
+                    <table class="doc-preview-table">
+                        <thead>
+                            <tr>
+                                <th class="dp-row-num">#</th>
+                                <th style="width:90px">Tanggal</th>
+                                <th style="width:55px">Shift</th>
+                                <th>Masalah</th>
+                                <th style="width:90px">Category</th>
+                                <th style="width:100px">Team Leader</th>
+                                <th style="width:100px">Group Leader</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${items.length === 0
+                                ? `<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px">Belum ada baris untuk task ini</td></tr>`
+                                : items.map((it, i) => `
+                                    <tr>
+                                        <td class="dp-row-num">${i + 1}</td>
+                                        <td class="dp-center">${it.date ? formatDate(it.date) : '-'}</td>
+                                        <td class="dp-center">${escapeHtml(it.shift || '-')}</td>
+                                        <td>${escapeHtml(it.problem || '-')}</td>
+                                        <td class="dp-center">${escapeHtml(SR_CATEGORY_LABEL[it.category] || it.category || '-')}</td>
+                                        <td class="dp-center">${escapeHtml(it.team_leader || '-')}</td>
+                                        <td class="dp-center">${escapeHtml(it.group_leader || '-')}</td>
+                                    </tr>
+                                `).join('')
+                            }
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            $('#docPreviewBody').html(`
+                <div class="doc-preview-meta">${metaHtml}</div>
+                ${filterNote}
+                <div class="doc-preview-section-title">
+                    <i class="ti ti-list"></i> Content (${items.length} baris)
+                </div>
+                ${tableHtml}
+            `);
+
+        } catch (err) {
+            console.error('[previewDocData]', err);
+            $('#docPreviewBody').html(`
+                <div style="text-align:center;padding:40px;color:#dc2626">
+                    <i class="ti ti-alert-circle" style="font-size:36px;display:block;margin-bottom:10px"></i>
+                    Gagal memuat data: ${escapeHtml(err.message || 'Error')}
+                </div>
+            `);
+        }
     }
 
     // ============================================================
@@ -6027,64 +7033,129 @@
     // OPEN MODAL
     // ─────────────────────────────────────────────
     function openSupportModal() {
-        // Reset form
         $('#nursecallForm')[0].reset();
         $('#record4mForm')[0].reset();
 
-        const today = new Date().toISOString().split('T')[0];
-        const currentMonth = today.slice(0, 7);
+        initLaneSelect2();
+        resetHeader('nc');
+        resetHeader('m4');
 
-        // Reset content
-        document.getElementById('ncContentBody').innerHTML = '';
-        document.getElementById('m4ContentBody').innerHTML = '';
-        renderEmptyState('nc');
-        renderEmptyState('m4');
-
-        ncExistingRecordId = null;
-        m4ExistingRecordId = null;
-        updateModeBadge('nc', 'empty');
-        updateModeBadge('m4', 'empty');
-
-        // Default values
-        $('#ncDateCreated').val(today);
-        $('#ncFooterDate').val(today);
-        $('#ncMonthYear').val(currentMonth);
-        $('#m4Date').val(today);
-        $('#m4MonthYear').val(currentMonth);
-
-        if (state.currentUser?.name) {
-            $('#ncCreatedName').val(state.currentUser.name);
-            $('#ncFooterCreatedName').val(state.currentUser.name);
-            $('#m4CreatedName').val(state.currentUser.name);
-        }
-
-        // Load daftar lane untuk datalist suggestion
-        populateLaneDatalists();
+        populateLaneOptions();
 
         populateReferenceSelects();
+        populateReferenceSelects();
+
         switchSupportTab('nursecall');
         openModal('supportModal');
     }
 
-    async function populateLaneDatalists() {
+    let laneSelect2Inited = false;
+
+    function initLaneSelect2() {
+        if (laneSelect2Inited) return;
+        if (typeof $.fn.select2 === 'undefined') return;
+
+        const commonOpts = {
+            placeholder: '-- Ketik atau pilih lane --',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#supportModal'),
+            tags: true,
+            tokenSeparators: [],
+            language: {
+                noResults:    () => 'Tidak ada lane. Ketik lalu tekan Enter untuk membuat baru.',
+                searching:    () => 'Mencari...',
+            },
+            createTag: function (params) {
+                const term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term + ' (baru)', newTag: true };
+            },
+        };
+
+        $('#ncNoLane').select2($.extend({}, commonOpts, {
+            placeholder: '-- Ketik atau pilih lane --',
+        }));
+        $('#m4NoLane').select2($.extend({}, commonOpts, {
+            placeholder: '-- Ketik atau pilih lane --',
+        }));
+
+        $('#ncNoLane').on('select2:select', function (e) {
+            const noLane = $(this).val();
+            if (!noLane) return;
+
+            const isNewTag = !!(e.params?.data?.newTag);
+            if (isNewTag) {
+                clearFormExceptLane('nc');
+            }
+
+            setTimeout(() => checkByLane('nc', noLane), 100);
+        });
+
+        $('#m4NoLane').on('select2:select', function (e) {
+            const noLane = $(this).val();
+            if (!noLane) return;
+
+            const isNewTag = !!(e.params?.data?.newTag);
+            if (isNewTag) {
+                clearFormExceptLane('m4');
+            }
+
+            setTimeout(() => checkByLane('m4', noLane), 100);
+        });
+
+        $('#ncNoLane').on('select2:clear', function () {
+            clearFormExceptLane('nc');
+            updateModeBadge('nc', 'empty');
+        });
+        $('#m4NoLane').on('select2:clear', function () {
+            clearFormExceptLane('m4');
+            updateModeBadge('m4', 'empty');
+        });
+
+        laneSelect2Inited = true;
+    }
+
+    async function populateLaneOptions(forceReload = false) {
         try {
-            // Fetch lane list Nursecall & 4M secara paralel
-            const [ncLanes, m4Lanes] = await Promise.all([
-                api('/support/nursecall/lanes').catch(() => []),
-                api('/support/4m/lanes').catch(() => []),
-            ]);
+            if (forceReload || !window._laneCache) {
+                const [ncLanes, m4Lanes] = await Promise.all([
+                    api('/support/nursecall/lanes').catch(() => []),
+                    api('/support/4m/lanes').catch(() => []),
+                ]);
 
-            // Gabung, unique
-            const all = new Set([...(ncLanes || []), ...(m4Lanes || [])]);
-            const options = [...all].map(l =>
-                `<option value="${escapeHtml(l)}"></option>`
-            ).join('');
+                const all = new Set([
+                    ...(ncLanes || []),
+                    ...(m4Lanes || []),
+                ]);
+                window._laneCache = [...all].sort();
+            }
 
-            // Inject ke 2 datalist
-            $('#ncLaneList').html(options);
-            $('#m4LaneList').html(options);
+            const lanes = window._laneCache || [];
+
+            ['#ncNoLane', '#m4NoLane'].forEach(sel => {
+                const $sel = $(sel);
+                const current = $sel.val();
+
+                const existing = [];
+                $sel.find('option').each(function () {
+                    const v = $(this).val();
+                    if (v && !lanes.includes(v)) existing.push(v);
+                });
+
+                $sel.empty().append('<option value="">-- Ketik atau pilih lane --</option>');
+                lanes.forEach(l => {
+                    $sel.append(`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`);
+                });
+                existing.forEach(v => {
+                    $sel.append(`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`);
+                });
+
+                if (current) $sel.val(current).trigger('change.select2');
+            });
+
         } catch (err) {
-            console.warn('[populateLaneDatalists]', err);
+            console.warn('[populateLaneOptions]', err);
         }
     }
 
@@ -6093,7 +7164,7 @@
 
         const isNc = which === 'nc';
         const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
-        const endpoint = isNc
+        const endpoint  = isNc
             ? '/support/nursecall/by-lane'
             : '/support/4m/by-lane';
 
@@ -6102,59 +7173,31 @@
                 query: { no_lane: noLane, month_year: monthYear || '' }
             });
 
-            // ══════════════════════════════════════════════════
-            // KONDISI 3: TIDAK ADA RECORD untuk lane ini
-            // ══════════════════════════════════════════════════
             if (!res || !res.record) {
-                // Reset header (kecuali No Lane yang baru diketik)
-                if (isNc) {
-                    $('#ncType').val('');
-                    $('#ncCreatedName').val(state.currentUser?.name || '');
-                    $('#ncApprovedName').val('');
-                    $('#ncComment').val('');
-                    $('#ncFooterCreatedName').val(state.currentUser?.name || '');
-                    $('#ncFooterApprovedName').val('');
-                    ncExistingRecordId = null;
-                    document.getElementById('ncContentBody').innerHTML = '';
-                    renderEmptyState('nc');
-                } else {
-                    $('#m4Type').val('');
-                    $('#m4CreatedName').val(state.currentUser?.name || '');
-                    $('#m4ApprovedName').val('');
-                    m4ExistingRecordId = null;
-                    document.getElementById('m4ContentBody').innerHTML = '';
-                    renderEmptyState('m4');
-                }
+                clearFormExceptLane(which);
                 updateModeBadge(which, 'new-lane');
                 return;
             }
 
-            // ══════════════════════════════════════════════════
-            // RECORD DITEMUKAN
-            // ══════════════════════════════════════════════════
-            const rec = res.record;
-            const items = res.items || [];
+            const rec       = res.record;
+            const items     = res.items || [];
             const sameMonth = !!res.is_same_month;
 
-            // ── Prefill Type + TTD (selalu, karena biasanya sama) ──
             if (isNc) {
-                if (rec.type)               $('#ncType').val(rec.type);
-                if (rec.created_by_name)    $('#ncCreatedName').val(rec.created_by_name);
-                if (rec.approved_by_name)   $('#ncApprovedName').val(rec.approved_by_name);
+                if (rec.type)                 $('#ncType').val(rec.type);
+                if (rec.created_by_name)      $('#ncCreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name)     $('#ncApprovedName').val(rec.approved_by_name);
                 if (rec.footer_created_name)  $('#ncFooterCreatedName').val(rec.footer_created_name);
                 if (rec.footer_approved_name) $('#ncFooterApprovedName').val(rec.footer_approved_name);
             } else {
-                if (rec.type)               $('#m4Type').val(rec.type);
-                if (rec.created_by_name)    $('#m4CreatedName').val(rec.created_by_name);
-                if (rec.approved_by_name)   $('#m4ApprovedName').val(rec.approved_by_name);
+                if (rec.type)                 $('#m4Type').val(rec.type);
+                if (rec.created_by_name)      $('#m4CreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name)     $('#m4ApprovedName').val(rec.approved_by_name);
             }
 
             if (sameMonth) {
-                // ══════════════════════════════════════════════
-                // KONDISI 1: BULAN SAMA → LOAD FULL
-                // ══════════════════════════════════════════════
                 if (isNc) {
-                    if (rec.date_created)  $('#ncDateCreated').val(rec.date_created);
+                    if (rec.date_created)   $('#ncDateCreated').val(rec.date_created);
                     if (rec.footer_comment) $('#ncComment').val(rec.footer_comment);
                     if (rec.footer_date)    $('#ncFooterDate').val(rec.footer_date);
 
@@ -6175,19 +7218,18 @@
                 );
 
             } else {
-                // ══════════════════════════════════════════════
-                // KONDISI 2: BULAN BEDA → PREFILL HEADER, CONTENT KOSONG
-                // ══════════════════════════════════════════════
+                const today = new Date().toISOString().split('T')[0];
+
                 if (isNc) {
                     $('#ncMonthYear').val(monthYear);
-                    $('#ncDateCreated').val(new Date().toISOString().split('T')[0]);
-                    $('#ncFooterDate').val(new Date().toISOString().split('T')[0]);
+                    $('#ncDateCreated').val(today);
+                    $('#ncFooterDate').val(today);
                     ncExistingRecordId = null;
                     document.getElementById('ncContentBody').innerHTML = '';
                     renderEmptyState('nc');
                 } else {
                     $('#m4MonthYear').val(monthYear);
-                    $('#m4Date').val(new Date().toISOString().split('T')[0]);
+                    $('#m4Date').val(today);
                     m4ExistingRecordId = null;
                     document.getElementById('m4ContentBody').innerHTML = '';
                     renderEmptyState('m4');
@@ -6199,10 +7241,63 @@
                     'info'
                 );
             }
-
+            populateReferenceSelects(which);
         } catch (err) {
             console.warn('[checkByLane]', which, err);
         }
+    }
+
+    function resetHeader(which) {
+        const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.slice(0, 7);
+        const userName = state.currentUser?.name || '';
+
+        if (which === 'nc') {
+            // ── Header ──
+            setSelect2Value($('#ncNoLane'), '', '');
+            $('#ncType').val('');
+            $('#ncMonthYear').val(currentMonth);
+            $('#ncDateCreated').val(today);
+            $('#ncCreatedName').val(userName);
+            $('#ncApprovedName').val('');
+
+            // ── Content ──
+            document.getElementById('ncContentBody').innerHTML = '';
+            renderEmptyState('nc');
+
+            // ── Footer ──
+            $('#ncComment').val('');
+            $('#ncFooterDate').val(today);
+            $('#ncFooterCreatedName').val(userName);
+            $('#ncFooterApprovedName').val('');
+
+            // ── State ──
+            ncExistingRecordId = null;
+            updateModeBadge('nc', 'empty');
+
+        } else {
+            // ── Header 4M ──
+            setSelect2Value($('#m4NoLane'), '', '');
+            $('#m4Type').val('');
+            $('#m4MonthYear').val(currentMonth);
+            $('#m4Date').val(today);
+            $('#m4CreatedName').val(userName);
+            $('#m4ApprovedName').val('');
+
+            // ── Content ──
+            document.getElementById('m4ContentBody').innerHTML = '';
+            renderEmptyState('m4');
+
+            // ── State ──
+            m4ExistingRecordId = null;
+            updateModeBadge('m4', 'empty');
+        }
+    }
+
+    function resetAllSupport() {
+        resetHeader('nc');
+        resetHeader('m4');
+        showToast('Form support direset', 'info');
     }
 
     function renderEmptyState(which) {
@@ -6380,63 +7475,83 @@
         });
     }
 
-    // ─────────────────────────────────────────────
-    // REFERENCE — fetch dari /tasks/onprogress
-    // ─────────────────────────────────────────────
-    async function populateReferenceSelects() {
-        const loading = '<option value="">-- Memuat task PDCA... --</option>';
-        $('#ncReferenceTask').html(loading);
-        $('#m4ReferenceTask').html(loading);
+    // ============================================================
+    // REFERENCE — fetch dari endpoint baru
+    // ============================================================
+    async function populateReferenceSelects(which) {
+        if (!which) {
+            populateReferenceSelectsFor('nc');
+            populateReferenceSelectsFor('m4');
+            return;
+        }
+        await populateReferenceSelectsFor(which);
+    }
+
+    async function populateReferenceSelectsFor(which) {
+        const isNc = which === 'nc';
+        const noLane    = isNc ? $('#ncNoLane').val()    : $('#m4NoLane').val();
+        const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
+        const docType   = isNc ? 'nursecall' : '4m';
+        const $select   = isNc ? $('#ncReferenceTask') : $('#m4ReferenceTask');
+
+        if (!$select.length) return;
+
+        $select.html('<option value="">-- Memuat task PDCA... --</option>');
 
         try {
-            const res = await api('/tasks/onprogress', { query: { limit: 500 } });
+            const res = await api('/support/reference-tasks', {
+                query: {
+                    doc_type:   docType,
+                    no_lane:    noLane    || '',
+                    month_year: monthYear || '',
+                }
+            });
+
             const list = Array.isArray(res) ? res : (res?.data || []);
 
-            // ⚠️ FIX: response sudah camelCase, jangan pakai normalizeTask()
-            referenceTasksCache = list.map(t => ({
-                id:              t.id,
-                taskCode:        t.taskCode        || t.task_code       || '',
-                operatorName:    t.operatorName    || t.operator_name   || '',
-                date:            t.date            || t.task_date       || '',   // ← FIX
-                section:         t.section         || '',
-                category:        (t.category       || '').toLowerCase(),
-                picSection:      (t.picSection     || t.pic_section     || '').toLowerCase(),
-                problem:         t.problem         || '',
-                tempAction:      t.tempAction      || t.temporary_action|| '',
-                permAction:      t.permAction      || t.permanent_action|| '',
-                deadline:        t.deadline        || '',
-                pic:             t.pic             || '',
-                stage:           (t.stage          || 'plan').toLowerCase(),
-                status:          (t.status         || 'open').toLowerCase(),
-                leaderSignature: t.leaderSignature || t.ttd_leader      || '',
-                approvedAt:      t.approvedAt      || t.approved_at     || null,
-                createdAt:       t.createdAt       || t.created_at      || null,
-                createdByName:   t.createdByName   || t.created_by_name || '',
-            }));
+            if (isNc) {
+                window._refTasksNc = list;
+            } else {
+                window._refTasksM4 = list;
+            }
 
-            if (referenceTasksCache.length === 0) {
-                const empty = '<option value="">-- Tidak ada POST IT on-progress --</option>';
-                $('#ncReferenceTask').html(empty);
-                $('#m4ReferenceTask').html(empty);
+            if (list.length === 0) {
+                $select.html('<option value="">-- Tidak ada task tersedia --</option>');
                 return;
             }
 
-            const opts = ['<option value="">-- Pilih POST IT untuk tambah baris --</option>'];
-            referenceTasksCache.forEach(t => {
-                const short = (t.problem || '').slice(0, 60);
+            const opts = ['<option value="">-- Pilih POST IT --</option>'];
+            list.forEach(t => {
+                const short = (t.problem || '').slice(0, 55);
+                const flag  = t.inRecord ? ' [ADA]' : '';
                 opts.push(`<option value="${t.id}">${escapeHtml(
-                    `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}`
+                    `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}${flag}`
                 )}</option>`);
             });
-            const html = opts.join('');
-            $('#ncReferenceTask').html(html);
-            $('#m4ReferenceTask').html(html);
+            $select.html(opts.join(''));
+
         } catch (err) {
-            console.error('[reference]', err);
-            const errOpt = '<option value="">-- Gagal memuat --</option>';
-            $('#ncReferenceTask').html(errOpt);
-            $('#m4ReferenceTask').html(errOpt);
+            console.error('[populateReferenceSelects]', err);
+            $select.html('<option value="">-- Gagal memuat --</option>');
         }
+    }
+
+    function buildReferenceDropdown(selector, tasks, systemLabel) {
+        const $sel = $(selector);
+
+        if (!tasks || tasks.length === 0) {
+            $sel.html(`<option value="">-- Semua task sudah di-assign ke ${systemLabel} --</option>`);
+            return;
+        }
+
+        const opts = [`<option value="">-- Pilih POST IT untuk tambah baris --</option>`];
+        tasks.forEach(t => {
+            const short = (t.problem || '').slice(0, 60);
+            opts.push(`<option value="${t.id}">${escapeHtml(
+                `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}`
+            )}</option>`);
+        });
+        $sel.html(opts.join(''));
     }
 
     // ─────────────────────────────────────────────
@@ -6444,7 +7559,7 @@
     // ─────────────────────────────────────────────
     function applyNursecallReference(taskId) {
         if (!taskId) return;
-        const task = (referenceTasksCache || []).find(t => t.id === parseInt(taskId, 10));
+        const task = (window._refTasksNc || []).find(t => t.id === parseInt(taskId, 10));
         if (!task) { showToast('Task tidak ditemukan', 'warning'); return; }
 
         // Cek existing row by task_id
@@ -6496,7 +7611,7 @@
 
     function applyRecord4mReference(taskId) {
         if (!taskId) return;
-        const task = (referenceTasksCache || []).find(t => t.id === parseInt(taskId, 10));
+        const task = (window._refTasksM4 || []).find(t => t.id === parseInt(taskId, 10));
         if (!task) return;
 
         let $row = null;
@@ -6837,7 +7952,10 @@
             ncExistingRecordId = res?.record_id || null;
             referenceTasksCache = null;
 
-            populateLaneDatalists();
+            window._laneCache = null;
+            populateLaneOptions(true);
+            populateReferenceSelects();
+            ncExistingRecordId = res?.record_id || null;
             closeModal('supportModal');
             showToast(
                 res?.message || (res?.is_new ? 'Nursecall dibuat' : 'Nursecall diperbarui'),
@@ -6895,7 +8013,10 @@
             m4ExistingRecordId = res?.record_id || null;
             referenceTasksCache = null;
 
-            populateLaneDatalists();
+            window._laneCache = null;
+            populateLaneOptions(true);
+            populateReferenceSelects();
+            ncExistingRecordId = res?.record_id || null;
             closeModal('supportModal');
             showToast(
                 res?.message || (res?.is_new ? 'Record 4M dibuat' : 'Record 4M diperbarui'),
@@ -6906,6 +8027,1146 @@
             showAlert('error', 'Gagal Menyimpan', err.message);
         }
     }
+    function clearFormExceptLane(which) {
+        const today = new Date().toISOString().split('T')[0];
+        const currentMonth = today.slice(0, 7);
+        const userName = state.currentUser?.name || '';
+
+        if (which === 'nc') {
+            const currentLane = $('#ncNoLane').val();
+
+            $('#ncType').val('');
+            $('#ncMonthYear').val(currentMonth);
+            $('#ncDateCreated').val(today);
+            $('#ncCreatedName').val(userName);
+            $('#ncApprovedName').val('');
+
+            document.getElementById('ncContentBody').innerHTML = '';
+            renderEmptyState('nc');
+
+            $('#ncComment').val('');
+            $('#ncFooterDate').val(today);
+            $('#ncFooterCreatedName').val(userName);
+            $('#ncFooterApprovedName').val('');
+
+            ncExistingRecordId = null;
+
+            if (currentLane) {
+                setSelect2Value($('#ncNoLane'), currentLane, currentLane);
+            }
+
+        } else {
+            const currentLane = $('#m4NoLane').val();
+
+            $('#m4Type').val('');
+            $('#m4MonthYear').val(currentMonth);
+            $('#m4Date').val(today);
+            $('#m4CreatedName').val(userName);
+            $('#m4ApprovedName').val('');
+
+            document.getElementById('m4ContentBody').innerHTML = '';
+            renderEmptyState('m4');
+
+            m4ExistingRecordId = null;
+
+            if (currentLane) {
+                setSelect2Value($('#m4NoLane'), currentLane, currentLane);
+            }
+        }
+    }
+
+    // ============================================================
+    // SUPPORT REPORT — Nursecall & 4M
+    // ============================================================
+    let srActiveTab = 'nursecall';
+    let srReportData = null;
+
+    function openSupportReport() {
+        if (!state.currentUser) {
+            showAlert('warning', 'Akses Ditolak', 'Silakan login sebagai leader.');
+            return;
+        }
+
+        // Default bulan = bulan sekarang
+        const today = new Date();
+        const ym = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+        if (!$('#srMonthYear').val()) $('#srMonthYear').val(ym);
+
+        // Populate lane filter
+        populateReportLaneFilter();
+
+        // Reset report
+        srReportData = null;
+        $('#srReportContainer').html(`
+            <div style="text-align:center;color:#9ca3af;padding:40px">
+                <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
+                <div>Pilih filter lalu klik "Tampilkan"</div>
+            </div>
+        `);
+
+        srActiveTab = 'nursecall';
+        switchReportTab('nursecall');
+
+        openModal('supportReportModal');
+    }
+
+    function switchReportTab(tab) {
+        srActiveTab = tab;
+        $('.support-tab[data-report-tab]').removeClass('active')
+            .filter(`[data-report-tab="${tab}"]`).addClass('active');
+        // Auto reload kalau sudah pernah load
+        if (srReportData !== null) loadSupportReport();
+    }
+
+    async function populateReportLaneFilter() {
+        try {
+            if (!window._laneCache) {
+                const [ncLanes, m4Lanes] = await Promise.all([
+                    api('/support/nursecall/lanes').catch(() => []),
+                    api('/support/4m/lanes').catch(() => []),
+                ]);
+                window._laneCache = [...new Set([...(ncLanes || []), ...(m4Lanes || [])])].sort();
+            }
+
+            const $sel = $('#srNoLane');
+            const current = $sel.val();
+            $sel.empty().append('<option value="">Semua Lane</option>');
+            (window._laneCache || []).forEach(l => {
+                $sel.append(`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`);
+            });
+            if (current) $sel.val(current);
+        } catch (err) {
+            console.warn('[populateReportLaneFilter]', err);
+        }
+    }
+
+    async function loadSupportReport() {
+        const monthYear = $('#srMonthYear').val() || '';
+        const noLane    = $('#srNoLane').val()    || '';
+
+        const endpoint = srActiveTab === 'nursecall'
+            ? '/support/nursecall/report'
+            : '/support/4m/report';
+
+        Swal.fire({
+            title: 'Memuat report...',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+            const res = await api(endpoint, {
+                query: { month_year: monthYear, no_lane: noLane }
+            });
+            Swal.close();
+
+            const list = Array.isArray(res) ? res : (res?.data || []);
+            srReportData = list;
+
+            if (list.length === 0) {
+                $('#srReportContainer').html(`
+                    <div style="text-align:center;color:#9ca3af;padding:40px">
+                        <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
+                        <div>Tidak ada data untuk filter yang dipilih</div>
+                    </div>
+                `);
+                return;
+            }
+
+            renderSupportReport(list);
+
+        } catch (err) {
+            Swal.close();
+            showAlert('error', 'Gagal Memuat Report', err.message);
+        }
+    }
+
+    // ============================================================
+    // SUPPORT REPORT — DISPATCHER
+    // ============================================================
+    function renderSupportReport(list) {
+        if (srActiveTab === 'nursecall') {
+            renderNursecallReport(list);
+        } else {
+            renderRecord4mReport(list);
+        }
+    }
+
+    // ============================================================
+    // NURSECALL REPORT — Format "CATATAN FREKUENSI NURSE CALL"
+    // ============================================================
+    function renderNursecallReport(list) {
+        const html = list.map((entry, idx) => {
+            const rec   = entry.record;
+            const items = entry.items || [];
+            const sigKey = 'nc';
+
+            // Bulan / Tahun label
+            let monthLabel = rec.month_year || '-';
+            if (rec.month_year && rec.month_year.length === 7) {
+                const [y, m] = rec.month_year.split('-');
+                const monthNames = ['Januari','Februari','Maret','April','Mei','Juni',
+                                    'Juli','Agustus','September','Oktober','November','Desember'];
+                monthLabel = monthNames[parseInt(m, 10) - 1] + '/' + y;
+            }
+
+            const headerDate = rec.date_created || rec.footer_date || '';
+            const headerDateLabel = headerDate
+                ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                : '';
+
+            const sigCreated  = rec.footer_created_name  || rec.created_by_name  || '';
+            const sigApproved = rec.footer_approved_name || rec.approved_by_name || '';
+
+            // ── Tabel content Nursecall (15 baris min) ──
+            const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
+            const minRows = 15;
+            let rowsHtml = '';
+
+            for (let i = 0; i < minRows; i++) {
+                const it = items[i];
+                if (it) {
+                    const sumber = String(it.source || '').toLowerCase();
+                    const sumberCells = sumberCols.map(col => {
+                        const checked = sumber === col;
+                        return `<td class="check">${checked ? '✓' : '&ndash;'}</td>`;
+                    }).join('');
+
+                    const statusVal = String(it.status || '').toUpperCase();
+                    const judgeVal  = String(it.judgement || '').toUpperCase();
+
+                    rowsHtml += `
+                        <tr>
+                            <td style="text-align:center">${it.date ? formatDateSlash(it.date) : ''}</td>
+                            <td style="text-align:center">${it.time ? String(it.time).slice(0, 5) : ''}</td>
+                            <td>${escapeHtml(it.problem || '')}</td>
+                            ${sumberCells}
+                            <td>${escapeHtml(it.action || '')}</td>
+                            <td style="text-align:center">${escapeHtml(it.nurse_leader || '')}</td>
+                            <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
+                            <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
+                            <td style="text-align:center">${escapeHtml(it.group_leader || '')}</td>
+                        </tr>
+                    `;
+                } else {
+                    rowsHtml += `
+                        <tr>
+                            <td>&nbsp;</td><td></td><td></td>
+                            <td></td><td></td><td></td><td></td><td></td><td></td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                    `;
+                }
+            }
+
+            const tableHtml = `
+                <table class="sr-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="col-tgl">TGL</th>
+                            <th rowspan="2" class="col-jam">JAM</th>
+                            <th rowspan="2" class="col-masalah">MASALAH</th>
+                            <th colspan="6">SUMBER MASALAH</th>
+                            <th rowspan="2" class="col-tindakan">TINDAKAN</th>
+                            <th rowspan="2" class="col-nurse">NURSE<br>LEADER</th>
+                            <th rowspan="2" class="col-status">STATUS</th>
+                            <th rowspan="2" class="col-judge">JUDGEMENT</th>
+                            <th rowspan="2" class="col-gleader">GROUP<br>LEADER</th>
+                        </tr>
+                        <tr>
+                            <th class="col-sumber sr-sumber-header">PART</th>
+                            <th class="col-sumber sr-sumber-header">MACHINE</th>
+                            <th class="col-sumber sr-sumber-header">MAN<br>POWER</th>
+                            <th class="col-sumber sr-sumber-header">TOOL</th>
+                            <th class="col-sumber sr-sumber-header">MATERIAL</th>
+                            <th class="col-sumber sr-sumber-header">DLL</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHtml}</tbody>
+                </table>
+            `;
+
+            const keterangan = `
+                <div class="sr-bottom-left">
+                    <div class="sr-keterangan-title">KETERANGAN :</div>
+                    <ol>
+                        <li>PENDATAAN DIISI / DILAKUKAN OLEH OPERATOR</li>
+                        <li>DI CHECK DAN DILAKUKAN TINDAKAN OLEH PETUGAS ( NURSE LEADER, SHIFT LEADER )</li>
+                        <li>CLOSE = O</li>
+                        <li>OPEN = X</li>
+                        <li>UNTUK KOLOM TANDA TANGAN MANAGER DAN GENERAL MANAGER DIISI KETIKA AKHIR BULAN,<br>
+                            APABILA DIPERTENGAHAN BULAN KOLOM SUDAH TERISI PENUH MAKA CUKUP DENGAN DI CORET SAJA</li>
+                    </ol>
+                </div>
+            `;
+
+            const komentarText = rec.footer_comment || '';
+            const komentarDate = rec.footer_date || '';
+
+            const komentarHtml = `
+                <div class="sr-bottom-right">
+                    <div class="sr-komentar-box">
+                        <div class="sr-komentar-header">KOMENTAR :</div>
+                        <div>${escapeHtml(komentarText)}</div>
+                    </div>
+                    <div class="sr-tanggal-row">
+                        <span class="sr-tanggal-label">TANGGAL :</span>
+                        <span class="sr-tanggal-value">${komentarDate ? formatDateSlash(komentarDate) : ''}</span>
+                    </div>
+                    <div class="sr-manager-sig">
+                        <div class="sr-manager-sig-box">
+                            <div class="sr-sig-header">MANAGER</div>
+                            <div class="signature-qrcode" data-type="mgr-${sigKey}-${idx}" data-signature=""></div>
+                            <div class="sr-sig-name">&nbsp;</div>
+                        </div>
+                        <div class="sr-manager-sig-box">
+                            <div class="sr-sig-header">GENERAL MANAGER</div>
+                            <div class="signature-qrcode" data-type="gm-${sigKey}-${idx}" data-signature=""></div>
+                            <div class="sr-sig-name">&nbsp;</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return `
+                <div class="sr-page">
+                    <div class="sr-top">
+                        <div class="sr-top-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stanley_Black_Decker_logo.svg/320px-Stanley_Black_Decker_logo.svg.png" 
+                                alt="Logo" 
+                                onerror="this.style.display='none'">
+                        </div>
+                        <div class="sr-top-title">
+                            <div class="sr-main-title">CATATAN FREKUENSI NURSE CALL</div>
+                            <div class="sr-sub-title">BULAN / TAHUN : ${escapeHtml(monthLabel)}</div>
+                        </div>
+                        <div class="sr-top-sig">
+                            <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
+                            <table>
+                                <tr>
+                                    <td class="sr-sig-header">DIBUAT</td>
+                                    <td class="sr-sig-header">DISETUJUI</td>
+                                </tr>
+                                <tr>
+                                    <td class="sr-sig-body">
+                                        <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                    </td>
+                                    <td class="sr-sig-body">
+                                        <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="sr-info-row">
+                        <div class="sr-info-item">
+                            <span class="sr-info-label">NO LANE</span>
+                            <span class="sr-info-sep">:</span>
+                            <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
+                        </div>
+                        <div class="sr-info-item">
+                            <span class="sr-info-label">TYPE</span>
+                            <span class="sr-info-sep">:</span>
+                            <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
+                        </div>
+                    </div>
+
+                    ${tableHtml}
+
+                    <div class="sr-bottom">
+                        ${keterangan}
+                        ${komentarHtml}
+                    </div>
+
+                    <div class="sr-form-code">Q-108-ISE-001-FORM-001-REV.0</div>
+                </div>
+            `;
+        }).join('');
+
+        $('#srReportContainer').html(html);
+
+        // Render QR
+        setTimeout(() => {
+            list.forEach((entry, idx) => {
+                const rec = entry.record;
+                const sigCreated  = rec.footer_created_name  || rec.created_by_name  || '';
+                const sigApproved = rec.footer_approved_name || rec.approved_by_name || '';
+
+                if (sigCreated) {
+                    const el = document.querySelector(`[data-type="created-nc-${idx}"]`);
+                    if (el) renderQRCode(el, sigCreated);
+                }
+                if (sigApproved) {
+                    const el = document.querySelector(`[data-type="approved-nc-${idx}"]`);
+                    if (el) renderQRCode(el, sigApproved);
+                }
+            });
+        }, 200);
+    }
+
+    // ============================================================
+    // 4M REPORT — Format "RECORD PERUBAHAN 4 M" (2 kolom)
+    // ============================================================
+    function renderRecord4mReport(list) {
+        const html = list.map((entry, idx) => {
+            const rec   = entry.record;
+            const items = entry.items || [];
+            const sigKey = 'm4';
+
+            // Bulan / Tahun
+            let monthLabel = rec.month_year || '-';
+            let yearNum = '', monthNum = '';
+            if (rec.month_year && rec.month_year.length === 7) {
+                const [y, m] = rec.month_year.split('-');
+                yearNum = y;
+                monthNum = m;
+                const monthNames = ['Januari','Februari','Maret','April','Mei','Juni',
+                                    'Juli','Agustus','September','Oktober','November','Desember'];
+                monthLabel = monthNames[parseInt(m, 10) - 1] + '/' + y;
+            }
+
+            const headerDate = rec.date || '';
+            const headerDateLabel = headerDate
+                ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+                : '';
+
+            const sigCreated  = rec.created_by_name  || '';
+            const sigApproved = rec.approved_by_name || '';
+
+            // ── Group items by date + shift ──
+            const byDate = {};
+            items.forEach(it => {
+                if (!it.date) return;
+                if (!byDate[it.date]) byDate[it.date] = {};
+                byDate[it.date][String(it.shift || '1')] = it;
+            });
+
+            // Total hari dalam bulan
+            let totalDays = 31;
+            if (yearNum && monthNum) {
+                totalDays = new Date(parseInt(yearNum, 10), parseInt(monthNum, 10), 0).getDate();
+            }
+
+            // Split: kiri = 1..ceil(half), kanan = ceil(half)+1..totalDays
+            const halfPoint = Math.ceil(totalDays / 2);
+            const leftDays  = [];
+            const rightDays = [];
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = `${yearNum}-${monthNum}-${String(d).padStart(2, '0')}`;
+                if (d <= halfPoint) leftDays.push({ day: d, dateStr });
+                else                rightDays.push({ day: d, dateStr });
+            }
+
+            const build4mRows = (days) => {
+                let rows = '';
+                days.forEach(({ day, dateStr }) => {
+                    const dayData = byDate[dateStr] || {};
+                    const shifts = ['1', '2', '3'];
+                    const shiftLabels = ['I', 'II', 'III'];
+
+                    shifts.forEach((shift, sIdx) => {
+                        const it = dayData[shift];
+                        const tglCell = sIdx === 0
+                            ? `<td class="tgl-num" rowspan="3">${day}</td>`
+                            : '';
+
+                        const problem  = it ? escapeHtml(it.problem || '') : '';
+                        const cat      = it ? String(it.category || '').toLowerCase() : '';
+
+                        const manChk      = cat === 'man'      ? '✓' : '&ndash;';
+                        const machineChk  = cat === 'machine'  ? '✓' : '&ndash;';
+                        const materialChk = cat === 'material' ? '✓' : '&ndash;';
+                        const methodeChk  = cat === 'methode'  ? '✓' : '&ndash;';
+
+                        const teamLeader  = it ? escapeHtml(it.team_leader  || '') : '';
+                        const groupLeader = it ? escapeHtml(it.group_leader || '') : '';
+
+                        rows += `
+                            <tr>
+                                ${tglCell}
+                                <td>${shiftLabels[sIdx]}</td>
+                                <td class="problem-cell">${problem}</td>
+                                <td class="check">${manChk}</td>
+                                <td class="check">${machineChk}</td>
+                                <td class="check">${materialChk}</td>
+                                <td class="check">${methodeChk}</td>
+                                <td class="tl-cell">${teamLeader}</td>
+                                <td class="gl-cell">${groupLeader}</td>
+                            </tr>
+                        `;
+                    });
+                });
+                return rows;
+            };
+
+            const tableHeader = `
+                <thead>
+                    <tr>
+                        <th class="c-tgl">TGL</th>
+                        <th class="c-shift">SHIFT</th>
+                        <th class="c-prob">MASALAH</th>
+                        <th class="c-cat">MAN</th>
+                        <th class="c-cat">MACHINE</th>
+                        <th class="c-cat">MATERIAL</th>
+                        <th class="c-cat">METHODE</th>
+                        <th class="c-tl">TEAM<br>LEADER</th>
+                        <th class="c-gl">GROUP<br>LEADER</th>
+                    </tr>
+                </thead>
+            `;
+
+            const leftTable = `
+                <table class="sr-4m-table">
+                    ${tableHeader}
+                    <tbody>${build4mRows(leftDays)}</tbody>
+                </table>
+            `;
+            const rightTable = `
+                <table class="sr-4m-table">
+                    ${tableHeader}
+                    <tbody>${build4mRows(rightDays)}</tbody>
+                </table>
+            `;
+
+            return `
+                <div class="sr-page">
+                    <!-- TOP HEADER -->
+                    <div class="sr-top">
+                        <div class="sr-top-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stanley_Black_Decker_logo.svg/320px-Stanley_Black_Decker_logo.svg.png" 
+                                alt="Logo" 
+                                onerror="this.style.display='none'">
+                        </div>
+                        <div class="sr-top-title">
+                            <div class="sr-main-title">RECORD PERUBAHAN 4 M</div>
+                        </div>
+                        <div class="sr-top-sig">
+                            <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
+                            <table>
+                                <tr>
+                                    <td class="sr-sig-header">DIBUAT</td>
+                                    <td class="sr-sig-header">DISETUJUI</td>
+                                </tr>
+                                <tr>
+                                    <td class="sr-sig-body">
+                                        <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                    </td>
+                                    <td class="sr-sig-body">
+                                        <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- INFO ROW -->
+                    <div class="sr-info-row">
+                        <div class="sr-info-item">
+                            <span class="sr-info-label">NO LANE</span>
+                            <span class="sr-info-sep">:</span>
+                            <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
+                        </div>
+                        <div class="sr-info-item">
+                            <span class="sr-info-label">TYPE</span>
+                            <span class="sr-info-sep">:</span>
+                            <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
+                        </div>
+                        <div class="sr-info-item">
+                            <span class="sr-info-label">BULAN / TAHUN</span>
+                            <span class="sr-info-sep">:</span>
+                            <span class="sr-info-value">${escapeHtml(monthLabel)}</span>
+                        </div>
+                    </div>
+
+                    <!-- 2 COLUMN TABLE -->
+                    <div class="sr-4m-grid">
+                        ${leftTable}
+                        ${rightTable}
+                    </div>
+
+                    <div class="sr-form-code">Q-108-ISE-001-FORM-002-REV.0</div>
+                </div>
+            `;
+        }).join('');
+
+        $('#srReportContainer').html(html);
+
+        // Render QR
+        setTimeout(() => {
+            list.forEach((entry, idx) => {
+                const rec = entry.record;
+                const sigCreated  = rec.created_by_name  || '';
+                const sigApproved = rec.approved_by_name || '';
+
+                if (sigCreated) {
+                    const el = document.querySelector(`[data-type="created-m4-${idx}"]`);
+                    if (el) renderQRCode(el, sigCreated);
+                }
+                if (sigApproved) {
+                    const el = document.querySelector(`[data-type="approved-m4-${idx}"]`);
+                    if (el) renderQRCode(el, sigApproved);
+                }
+            });
+        }, 200);
+    }
+
+    // Helper: format tanggal ke "2026/10/05"
+    function formatDateSlash(d) {
+        if (!d) return '';
+        const date = new Date(d);
+        if (isNaN(date.getTime())) return d;
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${y}/${m}/${dd}`;
+    }
+
+    // ============================================================
+    // AUTO-DETECT DOKUMEN PENDUKUNG (v2 — card informatif)
+    // ============================================================
+    async function checkTaskDocs(task) {
+        if (!task) {
+            resetDocCards();
+            return;
+        }
+
+        const noLane    = task.section || '';
+        const monthYear = (task.date || '').slice(0, 7);
+        const taskId    = task.id    || parseInt($('#taskId').val() || '0', 10) || 0;
+
+        try {
+            const res = await api('/support/check-task-docs', {
+                query: {
+                    no_lane:    noLane,
+                    month_year: monthYear,
+                    task_id:    taskId,
+                }
+            });
+            renderDocCards(res || {});
+        } catch (err) {
+            console.warn('[checkTaskDocs]', err);
+            resetDocCards();
+        }
+    }
+
+    function resetDocCards() {
+        // Lembar Point 4M
+        $('#docBody4m').html(`
+            <div class="doc-empty-state">
+                <i class="ti ti-cloud-upload"></i>
+                <div class="doc-empty-text">Belum ada file</div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="pickTaskDocFile()" style="margin-top:8px">
+                    <i class="ti ti-upload"></i> Upload File
+                </button>
+            </div>
+        `);
+        $('.doc-upload-card[data-doc-type="lembar_point_4m"]').removeClass('doc-filled');
+
+        // Record 4M
+        $('#docBodyLogbook').html(`
+            <div class="doc-empty-state">
+                <i class="ti ti-inbox"></i>
+                <div class="doc-empty-text">Belum ada data</div>
+                <div class="doc-empty-hint">Isi di Support → Record 4M</div>
+            </div>
+        `);
+        $('.doc-upload-card[data-doc-type="four_m"]').removeClass('doc-filled');
+
+        // Nursecall
+        $('#docBodyNursecall').html(`
+            <div class="doc-empty-state">
+                <i class="ti ti-inbox"></i>
+                <div class="doc-empty-text">Belum ada data</div>
+                <div class="doc-empty-hint">Isi di Support → Nursecall</div>
+            </div>
+        `);
+        $('.doc-upload-card[data-doc-type="nursecall"]').removeClass('doc-filled');
+
+        updateApproveButtonState();
+    }
+
+    function renderDocCards(res) {
+        // ═══════════════════════════════════════════════════
+        // 1. LEMBAR POINT 4M (UPLOAD) — tetap seperti sebelumnya
+        // ═══════════════════════════════════════════════════
+        const lp = res.lembar_point_4m || {};
+        const $cardLp = $('.doc-upload-card[data-doc-type="lembar_point_4m"]');
+
+        if (lp.uploaded) {
+            $cardLp.addClass('doc-filled');
+            const sizeLabel = formatFileSize(lp.file_size || 0);
+            $('#docBody4m').html(`
+                <div class="doc-file-preview">
+                    <div class="doc-file-name">
+                        <i class="ti ti-file-check"></i>
+                        ${escapeHtml(lp.file_name || 'File')}
+                    </div>
+                    <div class="doc-file-meta">
+                        ${sizeLabel} · ${escapeHtml(lp.uploaded_by || '-')} · ${escapeHtml(formatDateTime(lp.uploaded_at))}
+                    </div>
+                    <div class="doc-file-actions">
+                        <a href="${escapeHtml(lp.file_url)}" target="_blank" class="btn btn-sm btn-primary">
+                            <i class="ti ti-eye"></i> Preview
+                        </a>
+                        <a href="${escapeHtml(lp.file_url)}" download class="btn btn-sm">
+                            <i class="ti ti-download"></i> Unduh
+                        </a>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteTaskDoc()">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `);
+        } else {
+            $cardLp.removeClass('doc-filled');
+            $('#docBody4m').html(`
+                <div class="doc-empty-state">
+                    <i class="ti ti-cloud-upload"></i>
+                    <div class="doc-empty-text">Belum ada file</div>
+                    <button type="button" class="btn btn-sm btn-primary" onclick="pickTaskDocFile()" style="margin-top:8px">
+                        <i class="ti ti-upload"></i> Upload File
+                    </button>
+                </div>
+            `);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 2. RECORD PERUBAHAN 4M — tampilkan items langsung
+        // ═══════════════════════════════════════════════════
+        const m4 = res.four_m || {};
+        const $cardM4 = $('.doc-upload-card[data-doc-type="four_m"]');
+
+        if (m4.exists) {
+            $cardM4.addClass('doc-filled');
+
+            const items = m4.items_preview || [];
+            let itemsHtml = '';
+
+            if (items.length === 0) {
+                itemsHtml = `<div class="doc-items-empty">Belum ada baris data</div>`;
+            } else {
+                itemsHtml = `<div class="doc-items-list">`;
+                items.forEach((it, i) => {
+                    itemsHtml += `
+                        <div class="doc-item-row">
+                            <span class="doc-item-num">${i + 1}.</span>
+                            <div class="doc-item-body">
+                                <div class="doc-item-title">${escapeHtml(it.problem || '(no problem)')}</div>
+                                <div class="doc-item-meta">
+                                    <span><i class="ti ti-calendar"></i> ${it.date ? formatDate(it.date) : '-'}</span>
+                                    <span><i class="ti ti-clock"></i> Shift ${escapeHtml(it.shift || '-')}</span>
+                                    <span><i class="ti ti-tag"></i> ${escapeHtml(SR_CATEGORY_LABEL[it.category] || it.category || '-')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                itemsHtml += `</div>`;
+
+                if (m4.items_count > items.length) {
+                    itemsHtml += `<div class="doc-items-more">+${m4.items_count - items.length} baris lainnya...</div>`;
+                }
+            }
+
+            $('#docBodyLogbook').html(`
+                ${itemsHtml}
+               <div class="doc-preview-actions">
+                    <button type="button" class="btn btn-sm btn-primary" 
+                            onclick="previewDocData('four_m', ${m4.record_id}, '${escapeHtml(m4.no_lane || '')}', ${parseInt($('#taskId').val() || '0', 10)})">
+                        <i class="ti ti-eye"></i> Lihat Semua (${m4.items_count} baris)
+                    </button>
+                </div>
+            `);
+        } else {
+            $cardM4.removeClass('doc-filled');
+            $('#docBodyLogbook').html(`
+                <div class="doc-empty-state">
+                    <i class="ti ti-inbox"></i>
+                    <div class="doc-empty-text">Belum ada data</div>
+                    <div class="doc-empty-hint">Isi di Support → Record 4M</div>
+                </div>
+            `);
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 3. NURSECALL — tampilkan items langsung
+        // ═══════════════════════════════════════════════════
+        const nc = res.nursecall || {};
+        const $cardNc = $('.doc-upload-card[data-doc-type="nursecall"]');
+
+        if (nc.exists) {
+            $cardNc.addClass('doc-filled');
+
+            const items = nc.items_preview || [];
+            let itemsHtml = '';
+
+            if (items.length === 0) {
+                itemsHtml = `<div class="doc-items-empty">Belum ada baris data</div>`;
+            } else {
+                itemsHtml = `<div class="doc-items-list">`;
+                items.forEach((it, i) => {
+                    itemsHtml += `
+                        <div class="doc-item-row">
+                            <span class="doc-item-num">${i + 1}.</span>
+                            <div class="doc-item-body">
+                                <div class="doc-item-title">${escapeHtml(it.problem || '(no problem)')}</div>
+                                <div class="doc-item-meta">
+                                    <span><i class="ti ti-calendar"></i> ${it.date ? formatDate(it.date) : '-'}</span>
+                                    <span><i class="ti ti-clock"></i> ${it.time ? String(it.time).slice(0, 5) : '-'}</span>
+                                    <span><i class="ti ti-alert-circle"></i> ${escapeHtml(SR_SOURCE_LABEL[it.source] || it.source || '-')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                itemsHtml += `</div>`;
+
+                if (nc.items_count > items.length) {
+                    itemsHtml += `<div class="doc-items-more">+${nc.items_count - items.length} baris lainnya...</div>`;
+                }
+            }
+
+            $('#docBodyNursecall').html(`
+                ${itemsHtml}
+                <div class="doc-preview-actions">
+                    <button type="button" class="btn btn-sm btn-primary" 
+                            onclick="previewDocData('nursecall', ${nc.record_id}, '${escapeHtml(nc.no_lane || '')}', ${parseInt($('#taskId').val() || '0', 10)})">
+                        <i class="ti ti-eye"></i> Lihat Semua (${nc.items_count} baris)
+                    </button>
+                </div>
+            `);
+        } else {
+            $cardNc.removeClass('doc-filled');
+            $('#docBodyNursecall').html(`
+                <div class="doc-empty-state">
+                    <i class="ti ti-inbox"></i>
+                    <div class="doc-empty-text">Belum ada data</div>
+                    <div class="doc-empty-hint">Isi di Support → Nursecall</div>
+                </div>
+            `);
+        }
+
+        updateApproveButtonState();
+    }
+
+    // ============================================================
+    // UPLOAD LEMBAR POINT 4M
+    // ============================================================
+    function pickTaskDocFile() {
+        const taskId = parseInt($('#taskId').val() || '0', 10);
+        if (!taskId) {
+            showAlert('warning', 'Simpan Task Dulu', 'Simpan task terlebih dahulu sebelum upload dokumen.');
+            return;
+        }
+
+        let $input = $('#docFileInput4m');
+        if (!$input.length) {
+            $input = $('<input type="file" id="docFileInput4m" accept=".pdf,.jpg,.jpeg,.png" style="display:none">');
+            $input.on('change', function () { handleTaskDocFile(this); });
+            $('body').append($input);
+        }
+        $input.trigger('click');
+    }
+
+    async function handleTaskDocFile(input) {
+        const file = input.files?.[0];
+        input.value = '';
+        if (!file) return;
+
+        const taskId = parseInt($('#taskId').val() || '0', 10);
+        if (!taskId) return;
+
+        // Validasi
+        if (file.size > 5 * 1024 * 1024) {
+            showAlert('warning', 'File Terlalu Besar', 'Maksimal 5 MB. Ukuran Anda: ' + formatFileSize(file.size));
+            return;
+        }
+        const allowed = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowed.includes(file.type)) {
+            showAlert('warning', 'Format Tidak Didukung', 'Hanya PDF / JPG / PNG.');
+            return;
+        }
+
+        // UI loading
+        const $body = $('#docBody4m');
+        const original = $body.html();
+        $body.html(`
+            <div style="text-align:center;padding:8px">
+                <i class="ti ti-loader-2 ti-spin" style="font-size:28px;color:#2563eb"></i>
+                <div style="font-size:12px;color:#6b7280;margin-top:6px">Mengupload...</div>
+                <div class="doc-upload-progress"><div id="docProgFill" style="width:0%"></div></div>
+            </div>
+        `);
+
+        const fd = new FormData();
+        fd.append('task_id',  taskId);
+        fd.append('doc_type', 'lembar_point_4m');
+        fd.append('file',     file);
+
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', API_BASE + '/support/upload-task-doc', true);
+            xhr.setRequestHeader('X-CSRF-TOKEN', window.CSRF_TOKEN || '');
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'application/json');
+
+            xhr.upload.onprogress = e => {
+                if (e.lengthComputable) {
+                    const pct = (e.loaded / e.total) * 100;
+                    $('#docProgFill').css('width', pct + '%');
+                }
+            };
+
+            xhr.onload = function () {
+                let res = null;
+                try { res = JSON.parse(xhr.responseText); } catch {}
+                if (xhr.status >= 200 && xhr.status < 300 && res && res.success) {
+                    showToast('File berhasil diupload', 'success');
+                    // Refresh card
+                    const task = state.tasks.find(t => t.id === taskId) || { id: taskId };
+                    checkTaskDocs(task);
+                } else {
+                    $body.html(original);
+                    showAlert('error', 'Upload Gagal', (res && res.message) || 'Terjadi kesalahan');
+                }
+            };
+            xhr.onerror = function () {
+                $body.html(original);
+                showAlert('error', 'Upload Gagal', 'Koneksi error');
+            };
+
+            xhr.send(fd);
+        } catch (err) {
+            $body.html(original);
+            showAlert('error', 'Upload Gagal', err.message);
+        }
+    }
+
+    async function deleteTaskDoc() {
+        const taskId = parseInt($('#taskId').val() || '0', 10);
+        if (!taskId) return;
+
+        const ok = await showConfirm(
+            'Hapus File?',
+            'File Lembar Point 4M akan dihapus permanen.',
+            'Ya, Hapus', 'Batal', 'warning'
+        );
+        if (!ok) return;
+
+        try {
+            await api('/support/delete-task-doc', {
+                method: 'POST',
+                body: { task_id: taskId, doc_type: 'lembar_point_4m' }
+            });
+            showToast('File dihapus', 'info');
+            const task = state.tasks.find(t => t.id === taskId) || { id: taskId };
+            checkTaskDocs(task);
+        } catch (err) {
+            showAlert('error', 'Gagal Hapus', err.message);
+        }
+    }
+
+    // Label maps
+    const SR_SOURCE_LABEL = {
+        part:      'Part',
+        machine:   'Machine',
+        man_power: 'Man Power',
+        tool:      'Tool',
+        material:  'Material',
+        dll:       'DLL',
+    };
+    const SR_CATEGORY_LABEL = {
+        man:      'Man',
+        machine:  'Machine',
+        material: 'Material',
+        methode:  'Methode',
+    };
+
+    function printSupportReport() {
+        if (!srReportData || srReportData.length === 0) {
+            showToast('Tidak ada data untuk dicetak', 'warning');
+            return;
+        }
+
+        document.body.classList.add('print-support-report');
+        setTimeout(() => {
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('print-support-report');
+            }, 800);
+        }, 150);
+    }
+
+    async function exportSupportPDF() {
+        if (!srReportData || srReportData.length === 0) {
+            showToast('Tidak ada data untuk di-export', 'warning');
+            return;
+        }
+
+        const original = document.getElementById('srReportContainer');
+        if (!original) return;
+
+        // Convert QR canvas to img (biar aman saat di-render html2canvas)
+        const qrCanvases = original.querySelectorAll('.signature-qrcode canvas');
+        qrCanvases.forEach(canvas => {
+            try {
+                const dataURL = canvas.toDataURL('image/png');
+                const img = document.createElement('img');
+                img.src = dataURL;
+                img.style.cssText = 'display:block;width:80px;height:80px;margin:0 auto 6px;';
+                canvas.parentNode.replaceChild(img, canvas);
+            } catch (e) { console.warn(e); }
+        });
+
+        // Wrapper untuk render off-screen
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = [
+            'position: absolute',
+            'left: -99999px',
+            'top: 0',
+            'width: 1123px',
+            'background: #ffffff',
+            'padding: 0',
+            'margin: 0',
+            'z-index: -1',
+            'box-sizing: border-box',
+        ].join(';');
+
+        const clone = original.cloneNode(true);
+        clone.removeAttribute('style');
+        clone.style.cssText = 'background:#ffffff; padding:16px; border:none; border-radius:0; width:1123px; box-sizing:border-box;';
+        wrapper.appendChild(clone);
+        document.body.appendChild(wrapper);
+
+        await new Promise(r => setTimeout(r, 300));
+
+        Swal.fire({
+            title: 'Menyiapkan PDF...',
+            html: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+            const pages = clone.querySelectorAll('.sr-page');
+            const pdfWidth = 297;
+            const pdfHeight = 210;
+            const margin = 1;
+            const contentWidth = pdfWidth - margin * 2;
+            const contentHeight = pdfHeight - margin * 2;
+
+            let firstPage = true;
+
+            for (const page of pages) {
+                const canvas = await html2canvas(page, {
+                    scale: 8,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    windowWidth: clone.offsetWidth,
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+                const scaleW = contentWidth  / canvas.width;
+                const scaleH = contentHeight / canvas.height;
+                const scale  = Math.min(scaleW, scaleH);
+
+                const imgW = canvas.width  * scale;
+                const imgH = canvas.height * scale;
+                const posX = margin + (contentWidth  - imgW) / 2;
+                const posY = margin;
+
+                if (!firstPage) pdf.addPage();
+                pdf.addImage(imgData, 'JPEG', posX, posY, imgW, imgH);
+                firstPage = false;
+            }
+
+            const tab = srActiveTab === 'nursecall' ? 'nursecall' : '4m';
+            const monthPart = $('#srMonthYear').val() || 'all';
+            pdf.save(`laporan-${tab}-${monthPart}.pdf`);
+
+            Swal.close();
+            showToast('PDF berhasil diunduh', 'success');
+
+        } catch (err) {
+            Swal.close();
+            console.error('[exportSupportPDF]', err);
+            showAlert('error', 'Gagal Export PDF', err.message);
+        } finally {
+            if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+        }
+    }
+    </script>
+    <script>
+        (function () {
+            function initAutoOpenSupport() {
+                var params = new URLSearchParams(window.location.search);
+                var openSupport = params.get('open_support');
+
+                if (!openSupport) return;
+
+                // Delay sampai semua script Support siap
+                var attempts = 0;
+                var maxAttempts = 20;
+
+                var tryOpen = setInterval(function () {
+                    attempts++;
+                    if (typeof window.openSupportModal === 'function') {
+                        clearInterval(tryOpen);
+
+                        // Buka Support Modal
+                        try {
+                            window.openSupportModal();
+
+                            // Set tab yang diminta
+                            var tab = params.get('tab');
+                            if (tab === '4m' && typeof window.switchSupportTab === 'function') {
+                                setTimeout(function () { window.switchSupportTab('4m'); }, 200);
+                            } else if (tab === 'nursecall' && typeof window.switchSupportTab === 'function') {
+                                setTimeout(function () { window.switchSupportTab('nursecall'); }, 200);
+                            }
+
+                            // Sembunyikan elemen PDCA yang tidak perlu
+                            var $hide = document.querySelectorAll('.header, .navbar, nav, .sidebar, .footer');
+                            for (var i = 0; i < $hide.length; i++) {
+                                $hide[i].style.display = 'none';
+                            }
+
+                            // Sembunyikan tombol close modal Support (biar user tidak bisa close dari dalam)
+                            setTimeout(function () {
+                                var closeBtns = document.querySelectorAll('#supportModal .modal-close, #supportModal [data-bs-dismiss="modal"]');
+                                for (var j = 0; j < closeBtns.length; j++) {
+                                    closeBtns[j].style.display = 'none';
+                                }
+                            }, 500);
+
+                        } catch (e) {
+                            console.error('[auto-open-support] error:', e);
+                        }
+                    }
+
+                    if (attempts >= maxAttempts) {
+                        clearInterval(tryOpen);
+                        console.warn('[auto-open-support] openSupportModal tidak ditemukan setelah ' + maxAttempts + ' percobaan');
+                    }
+                }, 250);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initAutoOpenSupport);
+            } else {
+                initAutoOpenSupport();
+            }
+        })();
     </script>
 </body>
 </html>
