@@ -1144,6 +1144,7 @@
             const byDate = {};
             items.forEach(it => {
                 if (!it.date) return;
+                const dateKey = String(it.date).split(' ')[0];
                 if (!byDate[it.date]) byDate[it.date] = {};
                 byDate[it.date][String(it.shift || '1')] = it;
             });
@@ -1175,17 +1176,20 @@
                             ? `<td class="tgl-num" rowspan="3">${day}</td>`
                             : '';
 
-                        const problemRaw  = it ? String(it.problem || '').trim() : '';
+                        const problemRaw = it ? String(it.problem || '').trim().toLowerCase() : '';
+                        const keywordsNo4M = ['tidak ada 4m', 'tidak ada', 'tidak', '-', 'no', 'none'];
+                        const isTidakAda = !problemRaw || keywordsNo4M.some(k => problemRaw.includes(k));
                         const problemText = !it
                             ? ''
-                            : (problemRaw !== '' ? 'Ada 4M' : 'Tidak Ada 4M');
+                            : (isTidakAda ? 'Tidak Ada 4M' : 'Ada 4M');
 
                         const cat = it ? String(it.category || '').toLowerCase() : '';
+                        const hasCategory = cat !== '';
 
-                        const manChk      = !it ? '' : (cat === 'man'      ? '✓' : '&ndash;');
-                        const machineChk  = !it ? '' : (cat === 'machine'  ? '✓' : '&ndash;');
-                        const materialChk = !it ? '' : (cat === 'material' ? '✓' : '&ndash;');
-                        const methodeChk  = !it ? '' : (cat === 'methode'  ? '✓' : '&ndash;');
+                        const manChk      = !it ? '' : (hasCategory ? (cat === 'man'      ? '✓' : '&ndash;') : '&ndash;');
+                        const machineChk  = !it ? '' : (hasCategory ? (cat === 'machine'  ? '✓' : '&ndash;') : '&ndash;');
+                        const materialChk = !it ? '' : (hasCategory ? (cat === 'material' ? '✓' : '&ndash;') : '&ndash;');
+                        const methodeChk  = !it ? '' : (hasCategory ? (cat === 'methode'  ? '✓' : '&ndash;') : '&ndash;');
 
                         const teamLeader  = it ? escapeHtml(shortName(it.team_leader))  : '';
                         const groupLeader = it ? escapeHtml(shortName(it.group_leader)) : '';
