@@ -121,47 +121,65 @@ class TaskController extends BaseController
     // POST /api/tasks - Create task (Operator)
     public function store(Request $request)
     {
-        $conn     = DB::getConnection();
-        $date     = date('Ymd');
-        $lockName = "task_code_{$date}";
-        $stmt = $conn->prepare("SELECT GET_LOCK(?, 5)");
-        $stmt->execute([$lockName]);
-
-        if ((int) $stmt->fetchColumn() !== 1) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Server sibuk, silakan coba lagi.',
-            ], 503);
-        }
-
         try {
-            $taskCode = $this->generateTaskCode();
-
             $user     = auth()->user();
             $userRole = strtolower($user->role ?? 'operator');
             $userName = $user->name ?? $request->operator_name ?? 'Operator';
+            $canEdit  = $this->canEditTask($user);
 
-            $canEdit = $this->canEditTask($user);
+            $task       = null;
+            $maxRetry   = 5;
+            $attempt    = 0;
+            $lastError  = null;
 
-            $task = Task::create([
-                'task_code'       => $taskCode,
-                'operator_name'   => $request->operator_name,
-                'task_date'       => $request->task_date,
-                'section'         => $request->section,
-                'problem'         => $request->problem,
-                'category'        => $canEdit ? ($request->category    ?: null) : null,
-                'pic_section'     => $canEdit ? ($request->pic_section ?: null) : null,
-                'temporary_action' => $canEdit ? ($request->temporary_action ?: null) : null,
-                'permanent_action' => $canEdit ? ($request->permanent_action ?: null) : null,
-                'deadline'         => $canEdit ? ($request->deadline ?: null) : null,
-                'pic'              => $canEdit ? ($request->pic ?: null) : null,
+            // ⭐ Retry loop kalau task_code duplicate
+            while ($attempt < $maxRetry) {
+                $attempt++;
+                try {
+                    $taskCode = $this->generateTaskCode();
 
-                'stage'           => 'plan',
-                'status'          => 'open',
-                'created_by_name' => $userName,
-                'created_by_role' => $userRole,
-                'created_by'      => $userName,
-            ]);
+                    $task = Task::create([
+                        'task_code'        => $taskCode,
+                        'operator_name'    => $request->operator_name,
+                        'task_date'        => $request->task_date,
+                        'section'          => $request->section,
+                        'problem'          => $request->problem,
+                        'category'         => $canEdit ? ($request->category    ?: null) : null,
+                        'pic_section'      => $canEdit ? ($request->pic_section ?: null) : null,
+                        'temporary_action' => $canEdit ? ($request->temporary_action ?: null) : null,
+                        'permanent_action' => $canEdit ? ($request->permanent_action ?: null) : null,
+                        'deadline'         => $canEdit ? ($request->deadline ?: null) : null,
+                        'pic'              => $canEdit ? ($request->pic ?: null) : null,
+                        'stage'            => 'plan',
+                        'status'           => 'open',
+                        'created_by_name'  => $userName,
+                        'created_by_role'  => $userRole,
+                        'created_by'       => $userName,
+                    ]);
+
+                    break; // sukses, keluar dari loop
+
+                } catch (\Throwable $e) {
+                    $lastError = $e;
+
+                    // Kalau bukan error duplicate → langsung fail
+                    $msg = strtolower($e->getMessage());
+                    if (strpos($msg, 'duplicate') === false && strpos($msg, 'uniq_task_code') === false) {
+                        throw $e;
+                    }
+
+                    // Duplicate → tunggu sebentar, coba lagi dengan nomor berikutnya
+                    usleep(50000); // 50ms
+                }
+            }
+
+            if (!$task) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Gagal generate task code setelah ' . $maxRetry . ' percobaan. ' 
+                                . ($lastError ? $lastError->getMessage() : ''),
+                ], 500);
+            }
 
             TaskHistory::create([
                 'task_id'         => $task->id,
@@ -188,8 +206,6 @@ class TaskController extends BaseController
                 'class'   => get_class($e),
                 'trace'   => array_slice(explode("\n", $e->getTraceAsString()), 0, 8),
             ], 500);
-        } finally {
-            $conn->prepare("SELECT RELEASE_LOCK(?)")->execute([$lockName]);
         }
     }
 
