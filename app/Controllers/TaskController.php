@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\NursecallItem;
+use App\Models\Record4mItem;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use Bpjs\Framework\Helpers\BaseController;
@@ -220,6 +222,7 @@ class TaskController extends BaseController
             'operator_name', 'task_date', 'section', 'problem',
             'category', 'pic_section',
             'temporary_action', 'permanent_action', 'deadline', 'pic',
+            'nurse_leader',
             'doc_4m_status', 'doc_logbook_status', 'doc_nursecall_status',
         ];
 
@@ -275,6 +278,64 @@ class TaskController extends BaseController
                 'changed_by_role' => strtolower($user->role),
                 'notes'           => 'Task updated by ' . $user->name,
             ]);
+
+            try {
+                $ncItems = NursecallItem::query()
+                    ->where('task_id', '=', $task->id)
+                    ->get(\PDO::FETCH_ASSOC);
+
+                if (!empty($ncItems)) {
+                    $syncData = [
+                        'problem'      => $task->problem ?? '',
+                        'action'       => $task->permanent_action ?? '',
+                        'nurse_leader' => $task->nurse_leader ?? '',
+                        'group_leader' => $task->leader_signature ?? '',
+                    ];
+
+                    $source = $this->mapCategoryToSource($task->category);
+                    if ($source !== null) {
+                        $syncData['source'] = $source;
+                    }
+
+                    foreach ($ncItems as $row) {
+                        $ncId = (int) ($row['id'] ?? 0);
+                        if (!$ncId) continue;
+
+                        $item = NursecallItem::findOrFail($ncId);
+                        $item->update($syncData);
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log('[TaskController::update] NursecallItem sync failed: ' . $e->getMessage());
+            }
+
+            try {
+                $m4Items = Record4mItem::query()
+                    ->where('task_id', '=', $task->id)
+                    ->get(\PDO::FETCH_ASSOC);
+
+                if (!empty($m4Items)) {
+                    $syncM4Data = [
+                        'problem'      => $task->problem ?? '',
+                        'team_leader'  => $task->nurse_leader ?? '',
+                        'group_leader' => $task->leader_signature ?? '',
+                    ];
+
+                    if ($task->category) {
+                        $syncM4Data['category'] = strtolower($task->category);
+                    }
+
+                    foreach ($m4Items as $row) {
+                        $m4Id = (int) ($row['id'] ?? 0);
+                        if (!$m4Id) continue;
+
+                        $item = Record4mItem::findOrFail($m4Id);
+                        $item->update($syncM4Data);
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log('[TaskController::update] Record4mItem sync failed: ' . $e->getMessage());
+            }
         }
 
         $this->broadcastPdcaStats();
@@ -363,14 +424,29 @@ class TaskController extends BaseController
             $user     = auth()->user();
             $userRole = strtolower($user->role);
 
-            $task->update([
+            $nurseLeaderUpdate = [];
+
+            if ($oldStage === 'PLAN' && $newStage === 'DO') {
+                $nurseLeaderUpdate['nurse_leader'] = $user->name;
+            } elseif ($oldStage === 'DO' && $newStage === 'CHECK') {
+                if (empty($task->nurse_leader)) {
+                    $nurseLeaderUpdate['nurse_leader'] = $user->name;
+                }
+            }
+            elseif (empty($task->nurse_leader) && in_array($newStage, ['DO', 'CHECK', 'ACT'], true)) {
+                $nurseLeaderUpdate['nurse_leader'] = $user->name;
+            }
+
+            $updateData = array_merge([
                 'stage'             => strtolower($request->stage),
                 'stage_updated_at'  => Date::Now(),
                 'stage_updated_by'  => $user->id ?? null,
                 'status'            => $newStatus,
                 'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
-            ]);
+            ], $nurseLeaderUpdate);
+
+            $task->update($updateData);
 
             TaskHistory::create([
                 'task_id'         => $task->id,
@@ -715,6 +791,17 @@ class TaskController extends BaseController
         ];
 
         return $stats;
+    }
+
+    private function mapCategoryToSource(?string $category): ?string
+    {
+        $cat = strtolower(trim((string) $category));
+        return [
+            'man'      => 'man_power',
+            'machine'  => 'machine',
+            'material' => 'material',
+            'methode'  => 'dll',
+        ][$cat] ?? null;
     }
 
     // GET /api/tasks/stats - Get statistics
