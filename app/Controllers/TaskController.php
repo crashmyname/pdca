@@ -6,6 +6,7 @@ use App\Models\NursecallItem;
 use App\Models\Record4mItem;
 use App\Models\Task;
 use App\Models\TaskHistory;
+use App\Services\AuditService;
 use Bpjs\Framework\Helpers\BaseController;
 use Bpjs\Framework\Core\Request;
 use Bpjs\Framework\Helpers\Date;
@@ -132,7 +133,6 @@ class TaskController extends BaseController
             $attempt    = 0;
             $lastError  = null;
 
-            // ⭐ Retry loop kalau task_code duplicate
             while ($attempt < $maxRetry) {
                 $attempt++;
                 try {
@@ -157,19 +157,25 @@ class TaskController extends BaseController
                         'created_by'       => $userName,
                     ]);
 
-                    break; // sukses, keluar dari loop
+                    AuditService::log(
+                        'tasks',
+                        (int) $task->id,
+                        'create',
+                        null,
+                        AuditService::snapshot(Task::class,$task->id),
+                        ['notes' => 'Task Baru dibuat']
+                    );
+
+                    break;
 
                 } catch (\Throwable $e) {
                     $lastError = $e;
 
-                    // Kalau bukan error duplicate → langsung fail
                     $msg = strtolower($e->getMessage());
                     if (strpos($msg, 'duplicate') === false && strpos($msg, 'uniq_task_code') === false) {
                         throw $e;
                     }
-
-                    // Duplicate → tunggu sebentar, coba lagi dengan nomor berikutnya
-                    usleep(50000); // 50ms
+                    usleep(50000);
                 }
             }
 
@@ -265,8 +271,21 @@ class TaskController extends BaseController
         if ($request->section)       $payload['section']       = $request->section;
         if ($request->problem)       $payload['problem']       = $request->problem;
 
+        $oldSnapShot = AuditService::snapshot(Task::class,$id);
+
         $task->update($payload);
         $task->refresh();
+
+        $newSnapShot = AuditService::snapshot(Task::class,$id);
+
+        AuditService::log(
+            'tasks',
+            (int) $id,
+            'update',
+            $oldSnapShot,
+            $newSnapShot,
+            ['notes' => 'Task Updated']
+        );
 
         $changedOld = [];
         $changedNew = [];
@@ -522,6 +541,8 @@ class TaskController extends BaseController
             $userRole = strtolower($user->role);
             $oldStatus = $task->status;
 
+            $oldSnapShot = AuditService::snapshot(Task::class,$id);
+
             $task->update([
                 'status'            => 'done',
                 'leader_signature' => $user->name ?? 'Leader',
@@ -530,6 +551,17 @@ class TaskController extends BaseController
                 'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
             ]);
+
+            $newSnapShot = AuditService::snapshot(Task::class,$id);
+
+            AuditService::log(
+                'tasks',
+                (int) $id,
+                'approve',
+                $oldSnapShot,
+                $newSnapShot,
+                ['notes' => 'Task DiApprove: '.($newSnapShot['task_code'] ?? '')]
+            );
 
             TaskHistory::create([
                 'task_id'         => $task->id,
@@ -569,7 +601,18 @@ class TaskController extends BaseController
             ], 403);
         }
 
+        $snapshot = AuditService::snapshot(Task::class,$id);
+
         $task->delete();
+
+        AuditService::log(
+            'tasks',
+            (int) $id,
+            'delete',
+            $snapshot,
+            null,
+            ['notes' => 'Task Dihapus: '.($snapshot['task_code'] ?? '')]
+        );
 
         $this->broadcastPdcaStats();
         return $this->json([

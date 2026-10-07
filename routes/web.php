@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\AuditLogController;
 use App\Controllers\AuthController;
 use App\Controllers\SsoController;
 use App\Controllers\SupportController;
@@ -134,4 +135,13 @@ Route::group([AuthMiddleware::class], function () {
     Route::get('/tasks/{task}/attachments', [TaskAttachmentController::class, 'index']);
     Route::post('/tasks/{task}/attachments', [TaskAttachmentController::class, 'store']);
     Route::delete('/tasks/{task}/attachments/{attachment}', [TaskAttachmentController::class, 'destroy']);
+    Route::get('/audit/view', function () {
+        return view('audit/index');
+    });
+    Route::get('/audit',                          [AuditLogController::class, 'index']);
+    Route::get('/audit/{id}',                     [AuditLogController::class, 'show']);
+    Route::get('/audit/by-record/{table}/{id}',   [AuditLogController::class, 'byRecord']);
+    Route::post('/audit/{id}/restore',            [AuditLogController::class, 'restore']);
+    Route::post('/audit/{id}/rollback', [AuditLogController::class, 'rollback']);
 });
+

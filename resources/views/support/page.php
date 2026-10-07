@@ -1281,6 +1281,7 @@
             if (e) e.preventDefault();
 
             var header = {
+                record_id: ncExistingRecordId || null, 
                 no_lane: $('#ncNoLane').val() ? $('#ncNoLane').val().trim() : '',
                 type: $('#ncType').val().trim(),
                 month_year: $('#ncMonthYear').val(),
@@ -1341,6 +1342,7 @@
             if (e) e.preventDefault();
 
             var header = {
+                record_id: m4ExistingRecordId || null, 
                 no_lane: $('#m4NoLane').val() ? $('#m4NoLane').val().trim() : '',
                 type: $('#m4Type').val().trim(),
                 month_year: $('#m4MonthYear').val(),

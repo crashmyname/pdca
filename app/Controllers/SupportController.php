@@ -159,6 +159,7 @@ class SupportController extends BaseController
                 $body = $request->json();
             }
 
+            $recordIdFromFront = (int) ($body['record_id'] ?? 0);
             $noLane      = trim((string) ($body['no_lane']         ?? ''));
             $type        = trim((string) ($body['type']            ?? ''));
             $monthYear   = trim((string) ($body['month_year']      ?? ''));
@@ -175,16 +176,31 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Content minimal 1 baris'], 422);
             }
 
-            // ── Cek existing ──
-            $existingRows = NursecallRecord::query()
-                ->where('no_lane',    '=', $noLane)
-                ->where('type',       '=', $type)
-                ->where('month_year', '=', $monthYear)
-                ->get(\PDO::FETCH_ASSOC);
+            $existingId = null;
 
-            $existingId = !empty($existingRows) ? (int) $existingRows[0]['id'] : null;
+            if ($recordIdFromFront) {
+                $recCheck = NursecallRecord::query()
+                    ->where('id', '=', $recordIdFromFront)
+                    ->limit(1)
+                    ->get(\PDO::FETCH_ASSOC);
+                if (!empty($recCheck)) {
+                    $existingId = (int) $recCheck[0]['id'];
+                }
+            }
+
+            if (!$existingId) {
+                $existingRows = NursecallRecord::query()
+                    ->where('no_lane',    '=', $noLane)
+                    ->where('type',       '=', $type)
+                    ->where('month_year', '=', $monthYear)
+                    ->get(\PDO::FETCH_ASSOC);
+                $existingId = !empty($existingRows) ? (int) $existingRows[0]['id'] : null;
+            }
 
             $headerData = [
+                'no_lane'              => $noLane,
+                'type'                 => $type,
+                'month_year'           => $monthYear,
                 'date_created'         => $dateCreated,
                 'created_by_name'      => $createdName ?: ($user->name ?? ''),
                 'approved_by_name'     => $approvedName ?: null,
@@ -198,24 +214,17 @@ class SupportController extends BaseController
             $isNew    = false;
 
             if ($existingId) {
-                // UPDATE header
                 $record = NursecallRecord::findOrFail($existingId);
                 $record->update($headerData);
                 $recordId = $existingId;
 
-                // Hapus items lama via deleteWhere (native BaseModel)
                 NursecallItem::deleteWhere(['record_id' => $existingId]);
             } else {
-                // CREATE header
-                $headerData['no_lane']    = $noLane;
-                $headerData['type']       = $type;
-                $headerData['month_year'] = $monthYear;
                 $headerData['created_by'] = $user->id ?? null;
 
                 $record   = NursecallRecord::create($headerData);
                 $recordId = ($record && isset($record->id)) ? (int) $record->id : 0;
 
-                // Fallback: query ulang jika ->id kosong
                 if (!$recordId) {
                     $newRows = NursecallRecord::query()
                         ->where('no_lane',    '=', $noLane)
@@ -231,7 +240,6 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Gagal mendapatkan record ID'], 500);
             }
 
-            // ── Prepare items untuk insertBatch ──
             $now = date('Y-m-d H:i:s');
             $itemsData = [];
             $rowNo = 1;
@@ -269,7 +277,6 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Semua baris content kosong'], 422);
             }
 
-            // ── Insert batch (native BaseModel) ──
             $result = NursecallItem::insertBatch($itemsData);
 
             if ($result === false) {
@@ -446,6 +453,7 @@ class SupportController extends BaseController
                 $body = $request->json();
             }
 
+            $recordIdFromFront = (int) ($body['record_id'] ?? 0);
             $noLane      = trim((string) ($body['no_lane']         ?? ''));
             $type        = trim((string) ($body['type']            ?? ''));
             $monthYear   = trim((string) ($body['month_year']      ?? ''));
@@ -461,16 +469,31 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Content minimal 1 baris'], 422);
             }
 
-            // ── Cek existing ──
-            $existingRows = Record4m::query()
-                ->where('no_lane',    '=', $noLane)
-                ->where('type',       '=', $type)
-                ->where('month_year', '=', $monthYear)
-                ->get(\PDO::FETCH_ASSOC);
+            $existingId = null;
 
-            $existingId = !empty($existingRows) ? (int) $existingRows[0]['id'] : null;
+            if ($recordIdFromFront) {
+                $recCheck = Record4m::query()
+                    ->where('id', '=', $recordIdFromFront)
+                    ->limit(1)
+                    ->get(\PDO::FETCH_ASSOC);
+                if (!empty($recCheck)) {
+                    $existingId = (int) $recCheck[0]['id'];
+                }
+            }
+
+            if (!$existingId) {
+                $existingRows = Record4m::query()
+                    ->where('no_lane',    '=', $noLane)
+                    ->where('type',       '=', $type)
+                    ->where('month_year', '=', $monthYear)
+                    ->get(\PDO::FETCH_ASSOC);
+                $existingId = !empty($existingRows) ? (int) $existingRows[0]['id'] : null;
+            }
 
             $headerData = [
+                'no_lane'          => $noLane,
+                'type'             => $type,
+                'month_year'       => $monthYear,
                 'date'             => $date,
                 'created_by_name'  => $createdName ?: ($user->name ?? ''),
                 'approved_by_name' => $approvedName ?: null,
@@ -480,18 +503,12 @@ class SupportController extends BaseController
             $isNew    = false;
 
             if ($existingId) {
-                // UPDATE header
                 $record = Record4m::findOrFail($existingId);
                 $record->update($headerData);
                 $recordId = $existingId;
 
-                // Hapus items lama
                 Record4mItem::deleteWhere(['record_id' => $existingId]);
             } else {
-                // CREATE header
-                $headerData['no_lane']    = $noLane;
-                $headerData['type']       = $type;
-                $headerData['month_year'] = $monthYear;
                 $headerData['created_by'] = $user->id ?? null;
 
                 $record   = Record4m::create($headerData);
@@ -512,7 +529,6 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Gagal mendapatkan record ID'], 500);
             }
 
-            // ── Prepare items ──
             $now = date('Y-m-d H:i:s');
             $itemsData = [];
             $rowNo = 1;
@@ -546,7 +562,6 @@ class SupportController extends BaseController
                 return $this->json(['success' => false, 'message' => 'Semua baris content kosong'], 422);
             }
 
-            // ── Insert batch ──
             $result = Record4mItem::insertBatch($itemsData);
 
             if ($result === false) {
