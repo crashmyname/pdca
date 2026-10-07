@@ -105,7 +105,7 @@
         .btn-sm { padding: 6px 12px; font-size: 13px; }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 12px 16px; }
 
         .notice-bar {
             background: var(--primary-light);
@@ -1618,7 +1618,7 @@
         /* ═══════════════════════════════════════════════════ */
         .sr-page {
             background: #ffffff;
-            padding: 12mm 10mm;
+            padding: 5mm 5mm;
             margin-bottom: 20px;
             font-family: Arial, 'Helvetica Neue', sans-serif;
             color: #000;
@@ -1717,10 +1717,11 @@
             margin-top: 2px;
         }
 
-        /* ── INFO ROW (No Lane, Type) ── */
+        /* ── INFO ROW — VERTICAL STACK ── */
         .sr-info-row {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 2px;
             font-size: 10px;
             font-weight: 700;
             margin: 8px 0 6px;
@@ -1778,88 +1779,153 @@
         .sr-table td.center { text-align: center; }
         .sr-table td.check { text-align: center; font-size: 12px; font-weight: 700; }
 
-        /* Kolom widths */
-        .sr-table .col-tgl       { width: 52px; }
-        .sr-table .col-jam       { width: 42px; }
-        .sr-table .col-masalah   { width: 130px; }
-        .sr-table .col-sumber    { width: 32px; }
-        .sr-table .col-tindakan  { width: 130px; }
-        .sr-table .col-nurse     { width: 55px; }
-        .sr-table .col-status    { width: 42px; }
-        .sr-table .col-judge     { width: 50px; }
-        .sr-table .col-gleader   { width: 55px; }
+        /* ── Kolom widths — TOTAL = 100% ── */
+        .sr-table .col-tgl       { width: 6%;  }     /* TGL */
+        .sr-table .col-jam       { width: 4%;  }     /* JAM */
+        .sr-table .col-masalah   { width: 20%; }     /* MASALAH */
+        .sr-table .col-sumber    { width: 4%;  }     /* × 6 = 36% (PART/MACHINE/MAN/TOOL/MATERIAL/DLL) */
+        .sr-table .col-tindakan  { width: 20%; }     /* TINDAKAN */
+        .sr-table .col-nurse     { width: 8%;  }     /* NURSE LEADER */
+        .sr-table .col-status    { width: 4%;  }     /* STATUS */
+        .sr-table .col-judge     { width: 4%;  }     /* JUDGEMENT */
+        .sr-table .col-gleader   { width: 8%;  }     /* GROUP LEADER */
+        /* Total: 5+4+18+36+18+8+4+4+3 = 100% ✅ */
 
         .sr-table .sr-sumber-header {
             text-align: center;
-            font-size: 8px;
-            line-height: 1.1;
+            font-size: 6px;              /* ⭐ dari 8px → 6px */
+            line-height: 1.05;
+            padding: 2px 1px;
+            word-break: break-word;
+            hyphens: auto;
         }
         .sr-table .sr-status-x { color: #dc2626; font-weight: 700; }
         .sr-table .sr-status-o { color: #000; font-weight: 700; }
 
-        /* ── BOTTOM SECTION ── */
+        /* ═══════════════════════════════════════════════════════ */
+        /* BOTTOM — KETERANGAN (kiri) + KOMENTAR & TTD (kanan)   */
+        /* ═══════════════════════════════════════════════════════ */
         .sr-bottom {
-            display: flex;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: 42% 58%;     /* ⭐ keterangan lebih lebar */
+            gap: 8px;
             margin-top: 6px;
-            align-items: stretch;
+            align-items: stretch;                /* ⭐ kedua kolom tinggi sama */
         }
+
+        /* ── Kolom KIRI: KETERANGAN ── */
         .sr-bottom-left {
-            flex: 1;
-            font-size: 8.5px;
-            line-height: 1.5;
+            font-size: 7.5px;
+            line-height: 1.35;
             color: #000;
+            padding-right: 4px;
         }
         .sr-bottom-left .sr-keterangan-title {
             font-weight: 700;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-            font-size: 9px;
+            margin-bottom: 1px;
+            font-size: 8px;
         }
         .sr-bottom-left ol {
-            padding-left: 16px;
+            padding-left: 12px;
             margin: 0;
         }
         .sr-bottom-left ol li {
-            margin-bottom: 1px;
+            margin-bottom: 0;
+            padding: 0;
+            word-break: normal;
         }
 
-        .sr-bottom-right {
-            width: 40%;
+        /* ── Kolom KANAN: KOMENTAR + TTD (stretch tinggi) ── */
+        .sr-signature-section {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 2px;
+            height: 100%;                        /* ⭐ ikuti tinggi kolom kiri */
         }
-        .sr-bottom-right .sr-komentar-box {
+
+        /* Header: KOMENTAR (kiri kecil) | TANGGAL (kanan lebar) */
+        .sr-signature-header {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            gap: 0;
+        }
+        .sr-signature-header > div {
+            padding: 0 2px;
+        }
+        .sr-signature-header .sr-hdr-right {
+            text-align: right;
+            white-space: nowrap;
+            font-size: 7.5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Isi: KOMENTAR (kiri sempit) + 2 TTD (kanan lebar) */
+        .sr-signature-content {
+            display: grid;
+            grid-template-columns: 50% 50%;
             border: 1px solid #000;
-            padding: 3px 5px;
-            min-height: 60px;
-            font-size: 8.5px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .sr-bottom-right .sr-komentar-header {
-            font-weight: 700;
-            font-size: 9px;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-        }
-        .sr-bottom-right .sr-tanggal-row {
-            display: flex;
-            gap: 6px;
-            font-size: 9px;
-            align-items: center;
-        }
-        .sr-bottom-right .sr-tanggal-label {
-            font-weight: 700;
-            text-transform: uppercase;
-            min-width: 55px;
-        }
-        .sr-bottom-right .sr-tanggal-value {
             flex: 1;
+            min-height: 90px;
+            background: #fff;
+        }
+
+        /* Kotak KOMENTAR */
+        .sr-signature-komentar {
+            border-right: 1px solid #000;
+            padding: 3px 5px;
+            font-size: 7.5px;
+            line-height: 1.3;
+            word-break: break-word;
+            white-space: pre-wrap;
+            color: #374151;
+            overflow: hidden;
+        }
+
+        /* Container 2 TTD */
+        .sr-ttd-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+        .sr-ttd-container > div + div {
+            border-left: 1px solid #000;
+        }
+
+        /* Kotak TTD individual */
+        .sr-ttd-box {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 3px;
+        }
+        .sr-ttd-box .sr-sig-header {
+            font-size: 7.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding-bottom: 2px;
             border-bottom: 1px solid #000;
-            padding: 1px 3px;
-            font-size: 9px;
+            margin-bottom: 2px;
+        }
+        .sr-ttd-box .signature-qrcode {
+            width: 40px !important;
+            height: 40px !important;
+            margin: 3px auto !important;
+        }
+        .sr-ttd-box .signature-qrcode img,
+        .sr-ttd-box .signature-qrcode canvas {
+            width: 40px !important;
+            height: 40px !important;
+        }
+        .sr-ttd-box .sr-sig-name {
+            font-size: 7.5px;
+            font-weight: 600;
+            border-top: 1px solid #000;
+            padding-top: 2px;
+            min-height: 10px;
         }
 
         /* ── FOOTER FORM CODE ── */
@@ -1966,19 +2032,23 @@
                 print-color-adjust: exact !important;
             }
         }
-        /* ═══════════════════════════════════════════════════ */
-        /* 4M REPORT — Layout 2 kolom (kiri & kanan)          */
-        /* ═══════════════════════════════════════════════════ */
+        /* ═══════════════════════════════════════════════════════ */
+        /* 4M REPORT — 2 kolom (kiri & kanan)                    */
+        /* ═══════════════════════════════════════════════════════ */
+
+        /* Layout 2 tabel sejajar */
         .sr-4m-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            margin-bottom: 8px;
+            gap: 4px;
+            margin-bottom: 6px;
         }
+
+        /* Table dasar */
         .sr-4m-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9px;
+            font-size: 8px;
             table-layout: fixed;
         }
         .sr-4m-table th,
@@ -1989,49 +2059,79 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
         }
+
+        /* ── Header ── */
         .sr-4m-table th {
             background: #ffffff;
             text-align: center;
             font-weight: 700;
-            font-size: 8px;
+            font-size: 7px;
             text-transform: uppercase;
-            letter-spacing: 0.1px;
+            letter-spacing: 0;                  /* ⭐ dari 0.1px → 0 biar gak melebar */
             line-height: 1.1;
-            padding: 3px 2px;
-        }
-        .sr-4m-table td {
-            text-align: center;
-            font-size: 9px;
-            height: 22px;
-        }
-        .sr-4m-table td.tgl-num {
-            font-size: 11px;
-            font-weight: 700;
-            width: 22px;
-            line-height: 1.1;
-            text-align: center;
-        }
-        .sr-4m-table td.problem-cell {
-            text-align: left;
-            font-size: 8.5px;
-            padding-left: 4px;
-        }
-        .sr-4m-table td.tl-cell,
-        .sr-4m-table td.gl-cell {
-            font-size: 8.5px;
-        }
-        .sr-4m-table td.check {
-            font-size: 12px;
-            font-weight: 700;
+            padding: 3px 1px;                   /* ⭐ padding horizontal kecil */
+            white-space: nowrap;                /* ⭐ header gak wrap */
         }
 
-        /* Kolom widths (2 tabel sama) */
-        .sr-4m-table .c-tgl    { width: 26px; }
-        .sr-4m-table .c-shift  { width: 28px; }
+        /* ── Body cells ── */
+        .sr-4m-table td {
+            text-align: center;
+            font-size: 8px;
+            height: 20px;
+        }
+
+        /* Kolom TGL — angka besar, rowspan 3 */
+        .sr-4m-table td.tgl-num {
+            font-size: 12px;
+            font-weight: 700;
+            width: 24px;
+            line-height: 1;
+            text-align: center;
+            padding: 0;
+            vertical-align: middle;
+        }
+
+        /* Kolom SHIFT */
+        .sr-4m-table td.shift-cell {
+            font-size: 8px;
+            text-align: center;
+            font-weight: 500;
+            width: 20px;
+        }
+
+        /* Kolom MASALAH */
+        .sr-4m-table td.problem-cell {
+            text-align: left;
+            font-size: 8px;
+            padding-left: 4px;
+            width: auto;
+            white-space: nowrap;                /* ⭐ biar "Tidak Ada 4M" gak wrap */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Kolom cek (MAN/MACHINE/MATERIAL/METHODE) */
+        .sr-4m-table td.check {
+            font-size: 10px;
+            font-weight: 700;
+            text-align: center;
+            width: 44px;
+        }
+
+        /* Kolom TEAM LEADER & GROUP LEADER */
+        .sr-4m-table td.tl-cell,
+        .sr-4m-table td.gl-cell {
+            font-size: 8px;
+            text-align: center;
+            width: 40px;
+        }
+
+        .sr-4m-table .c-tgl    { width: 24px; }
+        .sr-4m-table .c-shift  { width: 25px; }
         .sr-4m-table .c-prob   { width: auto; }
         .sr-4m-table .c-cat    { width: 44px; }
-        .sr-4m-table .c-tl     { width: 48px; }
-        .sr-4m-table .c-gl     { width: 48px; }
+        .sr-4m-table .c-tl     { width: 80px; }
+        .sr-4m-table .c-gl     { width: 80px; }
 
         /* Print 4M */
         @media print {
@@ -3508,6 +3608,7 @@
     // KONFIGURASI
     // ============================================================
     const API_BASE = '<?=url()?>';
+    const LOGO = '<?= asset("logo/ISE.png")?>'
 
     const SwalToast = Swal.mixin({
         toast: true,
@@ -5378,7 +5479,7 @@
 
         const clone = original.cloneNode(true);
         clone.removeAttribute('style');
-        clone.style.cssText = 'background:#ffffff; padding:24px; border:none; border-radius:0; width:794px; box-sizing:border-box;';
+        clone.style.cssText = 'background:#ffffff; padding:8px; border:none; border-radius:0; width:1123px; box-sizing:border-box;';
 
         wrapper.appendChild(clone);
         document.body.appendChild(wrapper);
@@ -5996,175 +6097,6 @@
     // const DOC_MAX_SIZE = 4 * 1024 * 1024;
     // const DOC_MIMES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
-    // function getDocEls(type) {
-    //     const t = String(type || '').toLowerCase();
-    //     const KEY_MAP = {
-    //         '4m':       '4m',
-    //         'logbook':  'Logbook',
-    //         'nursecall':'Nursecall',
-    //     };
-    //     const key = KEY_MAP[t];
-    //     if (!key) return null;
-
-    //     return {
-    //         card:    $(`.doc-upload-card[data-type="${t}"]`),
-    //         status:  $(`#docStatus${key}`),
-    //         drop:    $(`#docDrop${key}`),
-    //         preview: $(`#docPreview${key}`),
-    //         input:   $(`#docInput${key}`),
-    //         link:    $(`#docLink${key}`),
-    //         meta:    $(`#docMeta${key}`),
-    //     };
-    // }
-
-    // function isTaskLocked() {
-    //     const id = parseInt($('#taskId').val() || '0', 10);
-    //     if (!id) return false;
-    //     const task = state.tasks.find(t => t.id === id);
-    //     if (!task) return false;
-    //     return task.status === 'done' || task.status === 'cancelled';
-    // }
-
-    // function applyDocLockState() {
-    //     $('.doc-upload-card').toggleClass('locked', isTaskLocked());
-    // }
-
-    // function pickFile(type) {
-    //     if (isTaskLocked()) {
-    //         showToast('Task sudah di-approve, dokumen tidak bisa diubah', 'warning');
-    //         return;
-    //     }
-    //     const els = getDocEls(type);
-    //     if (els) els.input.trigger('click');
-    // }
-
-    // function handleDocDragOver(e) {
-    //     e.preventDefault();
-    //     e.currentTarget.classList.add('drag-over');
-    // }
-    // function handleDocDragLeave(e) {
-    //     e.currentTarget.classList.remove('drag-over');
-    // }
-    // function handleDocDrop(e, type) {
-    //     e.preventDefault();
-    //     e.currentTarget.classList.remove('drag-over');
-    //     const file = e.dataTransfer.files?.[0];
-    //     if (file) uploadDoc(type, file);
-    // }
-    // function handleFileSelect(e, type) {
-    //     const file = e.target.files?.[0];
-    //     if (file) uploadDoc(type, file);
-    //     e.target.value = '';
-    // }
-
-    // async function uploadDoc(type, file) {
-    //     type = String(type || '').toLowerCase();
-
-    //     if (file.size > DOC_MAX_SIZE) {
-    //         showAlert('warning', 'File Terlalu Besar', 'Maksimum 4 MB. File Anda: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
-    //         return;
-    //     }
-    //     if (!DOC_MIMES.includes(file.type)) {
-    //         showAlert('warning', 'Format Tidak Didukung', 'Hanya PDF / JPG / PNG.');
-    //         return;
-    //     }
-
-    //     const taskId = $('#taskId').val();
-    //     if (!taskId) {
-    //         showAlert('warning', 'Simpan Task Dulu', 'Simpan task terlebih dahulu sebelum upload dokumen.');
-    //         return;
-    //     }
-
-    //     $('#docProgressBar').show();
-    //     $('#docProgressFill').css('width', '0%');
-
-    //     const fd = new FormData();
-    //     fd.append('file_type', type);
-    //     fd.append('file', file);
-
-    //     try {
-    //         const token = window.CSRF_TOKEN || $('meta[name="csrf-token"]').attr('content') || '';
-    //         await $.ajax({
-    //             url: API_BASE + `/tasks/${taskId}/attachments`,
-    //             type: 'POST',
-    //             data: fd,
-    //             processData: false,
-    //             contentType: false,
-    //             dataType: 'json',
-    //             xhr: function () {
-    //                 const xhr = new window.XMLHttpRequest();
-    //                 xhr.upload.addEventListener('progress', function (e) {
-    //                     if (e.lengthComputable) {
-    //                         const pct = (e.loaded / e.total) * 100;
-    //                         $('#docProgressFill').css('width', pct + '%');
-    //                     }
-    //                 });
-    //                 return xhr;
-    //             },
-    //             headers: { 'X-CSRF-TOKEN': token }
-    //         });
-
-    //         await loadAttachments(taskId);
-
-    //         showToast(DOC_LABEL[type] + ' berhasil diupload', 'success');
-
-    //     } catch (err) {
-    //         const msg = err?.responseJSON?.message || err?.responseText || err?.statusText || err?.message || 'Upload gagal';
-    //         showAlert('error', 'Upload Gagal', msg);
-    //     } finally {
-    //         setTimeout(() => {
-    //             $('#docProgressBar').hide();
-    //             $('#docProgressFill').css('width', '0%');
-    //         }, 600);
-    //     }
-    // }
-
-    // function renderDocPreview(type, att) {
-    //     type = String(type || '').toLowerCase();
-    //     const els = getDocEls(type);
-    //     if (!els || !els.card.length) return;
-
-    //     if (!att) {
-    //         els.card.removeClass('has-file');
-    //         els.status.text('Belum ada');
-    //         els.drop.show();
-    //         els.preview.hide();
-    //         return;
-    //     }
-
-    //     els.card.addClass('has-file');
-    //     els.status.text('✓ Tersedia');
-    //     els.drop.hide();
-    //     els.preview.show();
-
-    //     const fileUrl = API_BASE.replace(/\/$/, '') + '/storage/' + (att.file_path || '');
-    //     els.link.attr('href', fileUrl).text(att.original_name || att.stored_name || '-');
-    //     els.meta.text(formatFileSize(att.file_size) + ' · ' + (att.uploaded_by_name || '-'));
-    // }
-
-    // async function removeDoc(type) {
-    //     type = String(type || '').toLowerCase();
-
-    //     const taskId = $('#taskId').val();
-    //     if (!taskId) return;
-
-    //     const confirmed = await showConfirm(
-    //         'Hapus Dokumen?',
-    //         `Hapus file <strong>${DOC_LABEL[type]}</strong>?`,
-    //         'Ya, Hapus', 'Batal', 'warning'
-    //     );
-    //     if (!confirmed) return;
-
-    //     try {
-    //         await api(`/tasks/${taskId}/attachments/${type}`, { method: 'DELETE' });
-    //         delete taskAttachments[type];
-    //         renderDocPreview(type, null);
-    //         showToast(DOC_LABEL[type] + ' dihapus', 'info');
-    //         updateApproveButtonState();
-    //     } catch (err) {
-    //         showAlert('error', 'Gagal Hapus', err.message);
-    //     }
-    // }
 
     function formatFileSize(bytes) {
         if (!bytes) return '0 B';
@@ -6173,33 +6105,6 @@
         return (bytes / 1024 / 1024).toFixed(2) + ' MB';
     }
 
-    // async function loadAttachments(taskId) {
-    //     taskAttachments = {};
-    //     ['4m', 'logbook', 'nursecall'].forEach(t => renderDocPreview(t, null));
-
-    //     if (!taskId) {
-    //         updateApproveButtonState();
-    //         return;
-    //     }
-
-    //     try {
-    //         const res = await api(`/tasks/${taskId}/attachments`);
-    //         const list = Array.isArray(res) ? res : (res?.data || []);
-
-    //         list.forEach(att => {
-    //             const type = String(att.file_type || '').toLowerCase();
-    //             if (!DOC_LABEL[type]) return;
-
-    //             att.file_type = type;
-    //             taskAttachments[type] = att;
-    //             renderDocPreview(type, att);
-    //         });
-    //     } catch (err) {
-    //         console.warn('[attachments] gagal load:', err);
-    //     } finally {
-    //         updateApproveButtonState();
-    //     }
-    // }
 
     // ============================================================
     // UTIL
@@ -6462,7 +6367,7 @@
                                         <td class="dp-row-num">${i + 1}</td>
                                         <td class="dp-center">${it.date ? formatDate(it.date) : '-'}</td>
                                         <td class="dp-center">${escapeHtml(it.shift || '-')}</td>
-                                        <td>${escapeHtml(it.problem || '-')}</td>
+                                        <td>${it.problem != '' || it.problem != null ? 'ADA 4M' : 'TIDAK ADA 4M'}</td>
                                         <td class="dp-center">${escapeHtml(SR_CATEGORY_LABEL[it.category] || it.category || '-')}</td>
                                         <td class="dp-center">${escapeHtml(it.team_leader || '-')}</td>
                                         <td class="dp-center">${escapeHtml(it.group_leader || '-')}</td>
@@ -8192,16 +8097,13 @@
         }
     }
 
-    // ============================================================
-    // NURSECALL REPORT — Format "CATATAN FREKUENSI NURSE CALL"
-    // ============================================================
     function renderNursecallReport(list) {
         const html = list.map((entry, idx) => {
-            const rec   = entry.record;
-            const items = entry.items || [];
+            const rec    = entry.record;
+            const items  = entry.items || [];
             const sigKey = 'nc';
 
-            // Bulan / Tahun label
+            // ── Bulan / Tahun ──
             let monthLabel = rec.month_year || '-';
             if (rec.month_year && rec.month_year.length === 7) {
                 const [y, m] = rec.month_year.split('-');
@@ -8215,10 +8117,15 @@
                 ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
                 : '';
 
-            const sigCreated  = rec.footer_created_name  || rec.created_by_name  || '';
-            const sigApproved = rec.footer_approved_name || rec.approved_by_name || '';
+            // Signature ATAS
+            const sigCreated  = rec.created_by_name  || '';
+            const sigApproved = rec.approved_by_name || '';
 
-            // ── Tabel content Nursecall (15 baris min) ──
+            // Signature BAWAH
+            const sigGroupLeader    = rec.footer_created_name  || '';
+            const sigSectionManager = rec.footer_approved_name || '';
+
+            // ── Tabel content ──
             const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
             const minRows = 15;
             let rowsHtml = '';
@@ -8242,10 +8149,10 @@
                             <td>${escapeHtml(it.problem || '')}</td>
                             ${sumberCells}
                             <td>${escapeHtml(it.action || '')}</td>
-                            <td style="text-align:center">${escapeHtml(it.nurse_leader || '')}</td>
+                            <td style="text-align:center">${escapeHtml(shortName(it.nurse_leader))}</td>
                             <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
                             <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
-                            <td style="text-align:center">${escapeHtml(it.group_leader || '')}</td>
+                            <td style="text-align:center">${escapeHtml(shortName(it.group_leader))}</td>
                         </tr>
                     `;
                 } else {
@@ -8286,6 +8193,7 @@
                 </table>
             `;
 
+            // ⭐ Kolom KIRI: KETERANGAN (tanpa <br> di poin 5)
             const keterangan = `
                 <div class="sr-bottom-left">
                     <div class="sr-keterangan-title">KETERANGAN :</div>
@@ -8294,8 +8202,7 @@
                         <li>DI CHECK DAN DILAKUKAN TINDAKAN OLEH PETUGAS ( NURSE LEADER, SHIFT LEADER )</li>
                         <li>CLOSE = O</li>
                         <li>OPEN = X</li>
-                        <li>UNTUK KOLOM TANDA TANGAN MANAGER DAN GENERAL MANAGER DIISI KETIKA AKHIR BULAN,<br>
-                            APABILA DIPERTENGAHAN BULAN KOLOM SUDAH TERISI PENUH MAKA CUKUP DENGAN DI CORET SAJA</li>
+                        <li>UNTUK KOLOM TANDA TANGAN MANAGER DAN GENERAL MANAGER DIISI KETIKA AKHIR BULAN, APABILA DIPERTENGAHAN BULAN KOLOM SUDAH TERISI PENUH MAKA CUKUP DENGAN DI CORET SAJA</li>
                     </ol>
                 </div>
             `;
@@ -8303,26 +8210,30 @@
             const komentarText = rec.footer_comment || '';
             const komentarDate = rec.footer_date || '';
 
-            const komentarHtml = `
-                <div class="sr-bottom-right">
-                    <div class="sr-komentar-box">
-                        <div class="sr-komentar-header">KOMENTAR :</div>
-                        <div>${escapeHtml(komentarText)}</div>
+            // ⭐ Kolom KANAN: KOMENTAR + TTD (satu section)
+            const signatureBlock = `
+                <div class="sr-signature-section">
+                    <!-- Header: KOMENTAR (kiri) | TANGGAL (kanan, tanpa kotak) -->
+                    <div class="sr-signature-header">
+                        <div>KOMENTAR :</div>
+                        <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
                     </div>
-                    <div class="sr-tanggal-row">
-                        <span class="sr-tanggal-label">TANGGAL :</span>
-                        <span class="sr-tanggal-value">${komentarDate ? formatDateSlash(komentarDate) : ''}</span>
-                    </div>
-                    <div class="sr-manager-sig">
-                        <div class="sr-manager-sig-box">
-                            <div class="sr-sig-header">MANAGER</div>
-                            <div class="signature-qrcode" data-type="mgr-${sigKey}-${idx}" data-signature=""></div>
-                            <div class="sr-sig-name">&nbsp;</div>
-                        </div>
-                        <div class="sr-manager-sig-box">
-                            <div class="sr-sig-header">GENERAL MANAGER</div>
-                            <div class="signature-qrcode" data-type="gm-${sigKey}-${idx}" data-signature=""></div>
-                            <div class="sr-sig-name">&nbsp;</div>
+
+                    <!-- Isi: komentar (kiri) + 2 TTD (kanan, border menyatu) -->
+                    <div class="sr-signature-content">
+                        <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+
+                        <div class="sr-ttd-container">
+                            <div class="sr-ttd-box">
+                                <div class="sr-sig-header">GROUP LEADER</div>
+                                <div class="signature-qrcode" data-type="footer-left-${sigKey}-${idx}" data-signature=""></div>
+                                <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                            </div>
+                            <div class="sr-ttd-box">
+                                <div class="sr-sig-header">SECTION MANAGER</div>
+                                <div class="signature-qrcode" data-type="footer-right-${sigKey}-${idx}" data-signature=""></div>
+                                <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -8330,10 +8241,11 @@
 
             return `
                 <div class="sr-page">
+                    <!-- TOP HEADER -->
                     <div class="sr-top">
                         <div class="sr-top-logo">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stanley_Black_Decker_logo.svg/320px-Stanley_Black_Decker_logo.svg.png" 
-                                alt="Logo" 
+                            <img src="${LOGO}"
+                                alt="Logo"
                                 onerror="this.style.display='none'">
                         </div>
                         <div class="sr-top-title">
@@ -8361,6 +8273,7 @@
                         </div>
                     </div>
 
+                    <!-- INFO ROW — NO LANE atas, TYPE bawah -->
                     <div class="sr-info-row">
                         <div class="sr-info-item">
                             <span class="sr-info-label">NO LANE</span>
@@ -8374,11 +8287,13 @@
                         </div>
                     </div>
 
+                    <!-- MAIN TABLE -->
                     ${tableHtml}
 
+                    <!-- BOTTOM — KETERANGAN (kiri) + KOMENTAR + TTD (kanan) -->
                     <div class="sr-bottom">
                         ${keterangan}
-                        ${komentarHtml}
+                        ${signatureBlock}
                     </div>
 
                     <div class="sr-form-code">Q-108-ISE-001-FORM-001-REV.0</div>
@@ -8388,20 +8303,26 @@
 
         $('#srReportContainer').html(html);
 
-        // Render QR
+        // Render QR — 4 signature
         setTimeout(() => {
             list.forEach((entry, idx) => {
                 const rec = entry.record;
-                const sigCreated  = rec.footer_created_name  || rec.created_by_name  || '';
-                const sigApproved = rec.footer_approved_name || rec.approved_by_name || '';
 
-                if (sigCreated) {
+                if (rec.created_by_name) {
                     const el = document.querySelector(`[data-type="created-nc-${idx}"]`);
-                    if (el) renderQRCode(el, sigCreated);
+                    if (el) renderQRCode(el, rec.created_by_name);
                 }
-                if (sigApproved) {
+                if (rec.approved_by_name) {
                     const el = document.querySelector(`[data-type="approved-nc-${idx}"]`);
-                    if (el) renderQRCode(el, sigApproved);
+                    if (el) renderQRCode(el, rec.approved_by_name);
+                }
+                if (rec.footer_created_name) {
+                    const el = document.querySelector(`[data-type="footer-left-nc-${idx}"]`);
+                    if (el) renderQRCode(el, rec.footer_created_name);
+                }
+                if (rec.footer_approved_name) {
+                    const el = document.querySelector(`[data-type="footer-right-nc-${idx}"]`);
+                    if (el) renderQRCode(el, rec.footer_approved_name);
                 }
             });
         }, 200);
@@ -8412,16 +8333,16 @@
     // ============================================================
     function renderRecord4mReport(list) {
         const html = list.map((entry, idx) => {
-            const rec   = entry.record;
-            const items = entry.items || [];
+            const rec    = entry.record;
+            const items  = entry.items || [];
             const sigKey = 'm4';
 
-            // Bulan / Tahun
+            // ── Bulan / Tahun ──
             let monthLabel = rec.month_year || '-';
             let yearNum = '', monthNum = '';
             if (rec.month_year && rec.month_year.length === 7) {
                 const [y, m] = rec.month_year.split('-');
-                yearNum = y;
+                yearNum  = y;
                 monthNum = m;
                 const monthNames = ['Januari','Februari','Maret','April','Mei','Juni',
                                     'Juli','Agustus','September','Oktober','November','Desember'];
@@ -8433,6 +8354,7 @@
                 ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
                 : '';
 
+            // Signature ATAS
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
 
@@ -8464,7 +8386,7 @@
                 let rows = '';
                 days.forEach(({ day, dateStr }) => {
                     const dayData = byDate[dateStr] || {};
-                    const shifts = ['1', '2', '3'];
+                    const shifts  = ['1', '2', '3'];
                     const shiftLabels = ['I', 'II', 'III'];
 
                     shifts.forEach((shift, sIdx) => {
@@ -8473,22 +8395,26 @@
                             ? `<td class="tgl-num" rowspan="3">${day}</td>`
                             : '';
 
-                        const problem  = it ? escapeHtml(it.problem || '') : '';
-                        const cat      = it ? String(it.category || '').toLowerCase() : '';
+                        const problemRaw  = it ? String(it.problem || '').trim() : '';
+                        const problemText = !it
+                            ? ''
+                            : (problemRaw !== '' ? 'Ada 4M' : 'Tidak Ada 4M');
 
-                        const manChk      = cat === 'man'      ? '✓' : '&ndash;';
-                        const machineChk  = cat === 'machine'  ? '✓' : '&ndash;';
-                        const materialChk = cat === 'material' ? '✓' : '&ndash;';
-                        const methodeChk  = cat === 'methode'  ? '✓' : '&ndash;';
+                        const cat = it ? String(it.category || '').toLowerCase() : '';
 
-                        const teamLeader  = it ? escapeHtml(it.team_leader  || '') : '';
-                        const groupLeader = it ? escapeHtml(it.group_leader || '') : '';
+                        const manChk      = !it ? '' : (cat === 'man'      ? '✓' : '&ndash;');
+                        const machineChk  = !it ? '' : (cat === 'machine'  ? '✓' : '&ndash;');
+                        const materialChk = !it ? '' : (cat === 'material' ? '✓' : '&ndash;');
+                        const methodeChk  = !it ? '' : (cat === 'methode'  ? '✓' : '&ndash;');
+
+                        const teamLeader  = it ? escapeHtml(shortName(it.team_leader))  : '';
+                        const groupLeader = it ? escapeHtml(shortName(it.group_leader)) : '';
 
                         rows += `
                             <tr>
                                 ${tglCell}
-                                <td>${shiftLabels[sIdx]}</td>
-                                <td class="problem-cell">${problem}</td>
+                                <td class="shift-cell">${shiftLabels[sIdx]}</td>
+                                <td class="problem-cell">${problemText}</td>
                                 <td class="check">${manChk}</td>
                                 <td class="check">${machineChk}</td>
                                 <td class="check">${materialChk}</td>
@@ -8536,8 +8462,8 @@
                     <!-- TOP HEADER -->
                     <div class="sr-top">
                         <div class="sr-top-logo">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Stanley_Black_Decker_logo.svg/320px-Stanley_Black_Decker_logo.svg.png" 
-                                alt="Logo" 
+                            <img src="${LOGO}"
+                                alt="Logo"
                                 onerror="this.style.display='none'">
                         </div>
                         <div class="sr-top-title">
@@ -8564,7 +8490,7 @@
                         </div>
                     </div>
 
-                    <!-- INFO ROW -->
+                    <!-- INFO ROW — 3 baris vertical -->
                     <div class="sr-info-row">
                         <div class="sr-info-item">
                             <span class="sr-info-label">NO LANE</span>
@@ -8577,7 +8503,7 @@
                             <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
                         </div>
                         <div class="sr-info-item">
-                            <span class="sr-info-label">BULAN / TAHUN</span>
+                            <span class="sr-info-label">BULAN</span>
                             <span class="sr-info-sep">:</span>
                             <span class="sr-info-value">${escapeHtml(monthLabel)}</span>
                         </div>
@@ -8589,33 +8515,35 @@
                         ${rightTable}
                     </div>
 
-                    <div class="sr-form-code">Q-108-ISE-001-FORM-002-REV.0</div>
+                    <div class="sr-form-code">FORM-4M-001-REV.00</div>
                 </div>
             `;
         }).join('');
 
         $('#srReportContainer').html(html);
 
-        // Render QR
         setTimeout(() => {
             list.forEach((entry, idx) => {
                 const rec = entry.record;
-                const sigCreated  = rec.created_by_name  || '';
-                const sigApproved = rec.approved_by_name || '';
 
-                if (sigCreated) {
+                if (rec.created_by_name) {
                     const el = document.querySelector(`[data-type="created-m4-${idx}"]`);
-                    if (el) renderQRCode(el, sigCreated);
+                    if (el) renderQRCode(el, rec.created_by_name);
                 }
-                if (sigApproved) {
+                if (rec.approved_by_name) {
                     const el = document.querySelector(`[data-type="approved-m4-${idx}"]`);
-                    if (el) renderQRCode(el, sigApproved);
+                    if (el) renderQRCode(el, rec.approved_by_name);
                 }
             });
         }, 200);
     }
 
-    // Helper: format tanggal ke "2026/10/05"
+    function shortName(fullName) {
+        if (!fullName) return '';
+        const words = String(fullName).trim().split(/\s+/);
+        return words.slice(0, 2).join(' ');
+    }
+
     function formatDateSlash(d) {
         if (!d) return '';
         const date = new Date(d);
@@ -8627,7 +8555,7 @@
     }
 
     // ============================================================
-    // AUTO-DETECT DOKUMEN PENDUKUNG (v2 — card informatif)
+    // AUTO-DETECT DOKUMEN PENDUKUNG
     // ============================================================
     async function checkTaskDocs(task) {
         if (!task) {
@@ -8655,7 +8583,6 @@
     }
 
     function resetDocCards() {
-        // Lembar Point 4M
         $('#docBody4m').html(`
             <div class="doc-empty-state">
                 <i class="ti ti-cloud-upload"></i>
@@ -8667,7 +8594,6 @@
         `);
         $('.doc-upload-card[data-doc-type="lembar_point_4m"]').removeClass('doc-filled');
 
-        // Record 4M
         $('#docBodyLogbook').html(`
             <div class="doc-empty-state">
                 <i class="ti ti-inbox"></i>
@@ -8677,7 +8603,6 @@
         `);
         $('.doc-upload-card[data-doc-type="four_m"]').removeClass('doc-filled');
 
-        // Nursecall
         $('#docBodyNursecall').html(`
             <div class="doc-empty-state">
                 <i class="ti ti-inbox"></i>
@@ -8692,7 +8617,7 @@
 
     function renderDocCards(res) {
         // ═══════════════════════════════════════════════════
-        // 1. LEMBAR POINT 4M (UPLOAD) — tetap seperti sebelumnya
+        // 1. LEMBAR POINT 4M (UPLOAD)
         // ═══════════════════════════════════════════════════
         const lp = res.lembar_point_4m || {};
         const $cardLp = $('.doc-upload-card[data-doc-type="lembar_point_4m"]');
@@ -8736,7 +8661,7 @@
         }
 
         // ═══════════════════════════════════════════════════
-        // 2. RECORD PERUBAHAN 4M — tampilkan items langsung
+        // 2. RECORD PERUBAHAN 4M 
         // ═══════════════════════════════════════════════════
         const m4 = res.four_m || {};
         const $cardM4 = $('.doc-upload-card[data-doc-type="four_m"]');
@@ -8794,7 +8719,7 @@
         }
 
         // ═══════════════════════════════════════════════════
-        // 3. NURSECALL — tampilkan items langsung
+        // 3. NURSECALL
         // ═══════════════════════════════════════════════════
         const nc = res.nursecall || {};
         const $cardNc = $('.doc-upload-card[data-doc-type="nursecall"]');
@@ -8881,7 +8806,6 @@
         const taskId = parseInt($('#taskId').val() || '0', 10);
         if (!taskId) return;
 
-        // Validasi
         if (file.size > 5 * 1024 * 1024) {
             showAlert('warning', 'File Terlalu Besar', 'Maksimal 5 MB. Ukuran Anda: ' + formatFileSize(file.size));
             return;
@@ -8892,7 +8816,6 @@
             return;
         }
 
-        // UI loading
         const $body = $('#docBody4m');
         const original = $body.html();
         $body.html(`
@@ -8927,7 +8850,6 @@
                 try { res = JSON.parse(xhr.responseText); } catch {}
                 if (xhr.status >= 200 && xhr.status < 300 && res && res.success) {
                     showToast('File berhasil diupload', 'success');
-                    // Refresh card
                     const task = state.tasks.find(t => t.id === taskId) || { id: taskId };
                     checkTaskDocs(task);
                 } else {
@@ -9011,7 +8933,6 @@
         const original = document.getElementById('srReportContainer');
         if (!original) return;
 
-        // Convert QR canvas to img (biar aman saat di-render html2canvas)
         const qrCanvases = original.querySelectorAll('.signature-qrcode canvas');
         qrCanvases.forEach(canvas => {
             try {
@@ -9023,7 +8944,6 @@
             } catch (e) { console.warn(e); }
         });
 
-        // Wrapper untuk render off-screen
         const wrapper = document.createElement('div');
         wrapper.style.cssText = [
             'position: absolute',
@@ -9114,7 +9034,6 @@
 
                 if (!openSupport) return;
 
-                // Delay sampai semua script Support siap
                 var attempts = 0;
                 var maxAttempts = 20;
 
@@ -9123,11 +9042,9 @@
                     if (typeof window.openSupportModal === 'function') {
                         clearInterval(tryOpen);
 
-                        // Buka Support Modal
                         try {
                             window.openSupportModal();
 
-                            // Set tab yang diminta
                             var tab = params.get('tab');
                             if (tab === '4m' && typeof window.switchSupportTab === 'function') {
                                 setTimeout(function () { window.switchSupportTab('4m'); }, 200);
@@ -9135,13 +9052,11 @@
                                 setTimeout(function () { window.switchSupportTab('nursecall'); }, 200);
                             }
 
-                            // Sembunyikan elemen PDCA yang tidak perlu
                             var $hide = document.querySelectorAll('.header, .navbar, nav, .sidebar, .footer');
                             for (var i = 0; i < $hide.length; i++) {
                                 $hide[i].style.display = 'none';
                             }
 
-                            // Sembunyikan tombol close modal Support (biar user tidak bisa close dari dalam)
                             setTimeout(function () {
                                 var closeBtns = document.querySelectorAll('#supportModal .modal-close, #supportModal [data-bs-dismiss="modal"]');
                                 for (var j = 0; j < closeBtns.length; j++) {
