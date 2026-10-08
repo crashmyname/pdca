@@ -557,7 +557,7 @@ class TaskController extends BaseController
             AuditService::log(
                 'tasks',
                 (int) $id,
-                'approve',
+                'update',
                 $oldSnapShot,
                 $newSnapShot,
                 ['notes' => 'Task DiApprove: '.($newSnapShot['task_code'] ?? '')]
@@ -640,11 +640,21 @@ class TaskController extends BaseController
             $userRole = strtolower($user->role);
             $oldStatus = $task->status;
 
+            $oldSnapShot = AuditService::snapshot(Task::class,$id);
             $task->update([
                 'status'            => 'cancelled',
                 'status_updated_at' => Date::Now(),
                 'status_updated_by' => $user->id ?? null,
             ]);
+            $newSnapShot = AuditService::snapshot(Task::class,$id);
+            AuditService::log(
+                'tasks',
+                (int) $id,
+                'update',
+                $oldSnapShot,
+                $newSnapShot,
+                ['notes'=>'Task dicancel: '.$newSnapShot['task_code']]
+            );
 
             TaskHistory::create([
                 'task_id'         => $task->id,

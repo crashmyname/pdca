@@ -6,6 +6,7 @@ use App\Models\NursecallRecord;
 use App\Models\NursecallItem;
 use App\Models\Record4m;
 use App\Models\Record4mItem;
+use App\Services\AuditService;
 use Bpjs\Framework\Helpers\BaseController;
 use Bpjs\Framework\Core\Request;
 
@@ -143,9 +144,6 @@ class SupportController extends BaseController
         }
     }
 
-    // ═══════════════════════════════════════════════════════
-    // NURSECALL — STORE (upsert, pakai insertBatch)
-    // ═══════════════════════════════════════════════════════
     public function storeNursecall(Request $request)
     {
         try {
@@ -215,10 +213,28 @@ class SupportController extends BaseController
 
             if ($existingId) {
                 $record = NursecallRecord::findOrFail($existingId);
+
+                // ===== AUDIT LOG: UPDATE =====
+                $oldSnapShot = AuditService::snapshot(NursecallRecord::class, $existingId);
+
                 $record->update($headerData);
+
+                $newSnapShot = AuditService::snapshot(NursecallRecord::class, $existingId);
+
+                AuditService::log(
+                    'nursecall_records',
+                    (int) $existingId,
+                    'update',
+                    $oldSnapShot,
+                    $newSnapShot,
+                    ['notes' => 'Nursecall Record Update: ' . ($newSnapShot['id'] ?? $existingId)]
+                );
+                // =============================
+
                 $recordId = $existingId;
 
                 NursecallItem::deleteWhere(['record_id' => $existingId]);
+
             } else {
                 $headerData['created_by'] = $user->id ?? null;
 
@@ -233,6 +249,22 @@ class SupportController extends BaseController
                         ->get(\PDO::FETCH_ASSOC);
                     $recordId = !empty($newRows) ? (int) $newRows[0]['id'] : 0;
                 }
+
+                // ===== AUDIT LOG: CREATE =====
+                if ($recordId) {
+                    $newSnapShot = AuditService::snapshot(NursecallRecord::class, $recordId);
+
+                    AuditService::log(
+                        'nursecall_records',
+                        (int) $recordId,
+                        'create',
+                        null,
+                        $newSnapShot,
+                        ['notes' => 'Nursecall Record Create: ' . ($newSnapShot['id'] ?? $recordId)]
+                    );
+                }
+                // =============================
+
                 $isNew = true;
             }
 
@@ -504,10 +536,28 @@ class SupportController extends BaseController
 
             if ($existingId) {
                 $record = Record4m::findOrFail($existingId);
+
+                // ===== AUDIT LOG: UPDATE =====
+                $oldSnapShot = AuditService::snapshot(Record4m::class, $existingId);
+
                 $record->update($headerData);
+
+                $newSnapShot = AuditService::snapshot(Record4m::class, $existingId);
+
+                AuditService::log(
+                    'record4m',
+                    (int) $existingId,
+                    'update',
+                    $oldSnapShot,
+                    $newSnapShot,
+                    ['notes' => 'Record 4M Update: ' . ($newSnapShot['id'] ?? $existingId)]
+                );
+                // =============================
+
                 $recordId = $existingId;
 
                 Record4mItem::deleteWhere(['record_id' => $existingId]);
+
             } else {
                 $headerData['created_by'] = $user->id ?? null;
 
@@ -522,6 +572,22 @@ class SupportController extends BaseController
                         ->get(\PDO::FETCH_ASSOC);
                     $recordId = !empty($newRows) ? (int) $newRows[0]['id'] : 0;
                 }
+
+                // ===== AUDIT LOG: CREATE =====
+                if ($recordId) {
+                    $newSnapShot = AuditService::snapshot(Record4m::class, $recordId);
+
+                    AuditService::log(
+                        'record4m',
+                        (int) $recordId,
+                        'create',
+                        null,
+                        $newSnapShot,
+                        ['notes' => 'Record 4M Create: ' . ($newSnapShot['id'] ?? $recordId)]
+                    );
+                }
+                // =============================
+
                 $isNew = true;
             }
 
