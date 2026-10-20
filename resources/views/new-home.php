@@ -3894,7 +3894,8 @@
         setQuickDate('today');
         await loadSections();
         if (urlSection) {
-            $('#sectionFilter').val(urlSection);
+            const targetSec = urlSection.toUpperCase();
+            $('#sectionFilter').val(targetSec);
         }
         await loadTasks();
     });
@@ -4028,11 +4029,6 @@
             $sel.empty().append(`<option value="${cfg.placeholderValue}">${cfg.placeholder}</option>`);
 
             Object.entries(grouped).forEach(([dept, items]) => {
-                const filteredItems = urlSection 
-                    ? items.filter(i => i.kode === urlSection) 
-                    : items;
-                    
-                if (filteredItems.length === 0) return;
                 $sel.append(`<optgroup label="${escapeHtml(dept)}">`);
                 items.forEach(item => {
                     $sel.append(`<option value="${escapeHtml(item.kode)}">${escapeHtml(item.kode)}</option>`);
