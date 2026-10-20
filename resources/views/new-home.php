@@ -3625,11 +3625,13 @@
     // ============================================================
     // STATE
     // ============================================================
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSection = urlParams.get('section');
     let state = {
         tasks: [],
         currentUser: null,
         searchQuery: '',
-        sectionFilter: 'all',
+        sectionFilter: urlSection ? urlSection : 'all',
         dateFrom: null,
         dateTo: null,
     };
@@ -3835,7 +3837,9 @@
         if ($picSel.data('select2')) $picSel.trigger('change.select2');
 
         try {
-            const res  = await api('/endpoint/employee');
+            const res  = await api('/endpoint/employee', {
+                query: { section: urlSection || '' }
+            });
             const list = res?.data?.data || res?.data || (Array.isArray(res) ? res : []);
             employeeList = Array.isArray(list) ? list : [];
 
@@ -3889,6 +3893,9 @@
         updateUserInterface();
         setQuickDate('today');
         await loadSections();
+        if (urlSection) {
+            $('#sectionFilter').val(urlSection);
+        }
         await loadTasks();
     });
 
@@ -4021,6 +4028,11 @@
             $sel.empty().append(`<option value="${cfg.placeholderValue}">${cfg.placeholder}</option>`);
 
             Object.entries(grouped).forEach(([dept, items]) => {
+                const filteredItems = urlSection 
+                    ? items.filter(i => i.kode === urlSection) 
+                    : items;
+                    
+                if (filteredItems.length === 0) return;
                 $sel.append(`<optgroup label="${escapeHtml(dept)}">`);
                 items.forEach(item => {
                     $sel.append(`<option value="${escapeHtml(item.kode)}">${escapeHtml(item.kode)}</option>`);
@@ -4729,6 +4741,13 @@
 
         setSelect2Value($('#operatorName'), '', '');
         setSelect2Value($('#pic'), '', '');
+
+         if (urlSection) {
+            $('#section').val(urlSection);
+            if ($('#section').data('select2')) {
+                $('#section').trigger('change.select2');
+            }
+        }
 
         loadEmployees();
         loadSections();
