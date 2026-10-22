@@ -3622,7 +3622,7 @@
     // ============================================================
     const API_BASE = '<?=url()?>';
     const LOGO = '<?= asset("logo/ISE.png")?>'
-    const LANE_API_BASE = 'http://localhost/jouhou-be/api/v1/lane';
+    const LANE_API_BASE = 'http://10.203.68.57:85/jouhou-be/api/v1/lane';
 
     const SwalToast = Swal.mixin({
         toast: true,
