@@ -32,8 +32,12 @@ class TaskController extends BaseController
             $query->where('status','=',$request->status);
         }
 
-        if ($request->section_id) {
-            $query->where('section','=',$request->section);
+        if ($request->section && $request->section !== 'all') {
+            $query->where('section', '=', $request->section);
+        }
+
+        if ($request->lane) {
+            $query->where('lane', '=', $request->lane);
         }
 
         $search = $request->search;
@@ -78,6 +82,10 @@ class TaskController extends BaseController
                 $query->where('section', '=', $request->section);
             }
 
+            if ($request->lane && $request->lane !== 'all') {
+                $query->where('lane', '=', $request->lane);
+            }
+
             $tasks = $query->orderBy('task_date', 'desc')
                         ->orderBy('created_at', 'desc')
                         ->limit((int) ($request->limit ?? 500))
@@ -90,6 +98,7 @@ class TaskController extends BaseController
                     'operatorName'    => $t['operator_name']     ?? '',
                     'date'            => $t['task_date']         ?? '',
                     'section'         => $t['section']           ?? '',
+                    'lane'            => $t['lane']              ?? '',
                     'category'        => strtolower($t['category']    ?? ''),
                     'picSection'      => strtolower($t['pic_section'] ?? ''),
                     'problem'         => $t['problem']           ?? '',
@@ -143,6 +152,7 @@ class TaskController extends BaseController
                         'operator_name'    => $request->operator_name,
                         'task_date'        => $request->task_date,
                         'section'          => $request->section,
+                        'lane'             => $request->lane ?: null,
                         'problem'          => $request->problem,
                         'category'         => $canEdit ? ($request->category    ?: null) : null,
                         'pic_section'      => $canEdit ? ($request->pic_section ?: null) : null,
@@ -241,7 +251,7 @@ class TaskController extends BaseController
         }
 
         $trackedFields = [
-            'operator_name', 'task_date', 'section', 'problem',
+            'operator_name', 'task_date', 'section','lane', 'problem',
             'category', 'pic_section',
             'temporary_action', 'permanent_action', 'deadline', 'pic',
             'nurse_leader',
@@ -269,6 +279,7 @@ class TaskController extends BaseController
         if ($request->operator_name) $payload['operator_name'] = $request->operator_name;
         if ($request->task_date)     $payload['task_date']     = $request->task_date;
         if ($request->section)       $payload['section']       = $request->section;
+        $payload['lane'] = $request->lane ?: null;
         if ($request->problem)       $payload['problem']       = $request->problem;
 
         $oldSnapShot = AuditService::snapshot(Task::class,$id);
@@ -760,6 +771,9 @@ class TaskController extends BaseController
             if ($request->section && $request->section !== 'all') {
                 $query->where('section', '=', $request->section);
             }
+            if ($request->lane && $request->lane !== 'all') {
+                $query->where('lane', '=', $request->lane);
+            }
             if ($request->stage && $request->stage !== 'all') {
                 $query->where('stage', '=', $request->stage);
             }
@@ -793,6 +807,7 @@ class TaskController extends BaseController
                     'operatorName'    => $t['operator_name']   ?? '',
                     'date'            => $t['task_date']       ?? '',
                     'section'         => $t['section']         ?? '',
+                    'lane'            => $t['lane']            ?? '',
                     'category'        => $t['category']        ?? '',
                     'picSection'      => $t['pic_section']     ?? '',
                     'problem'         => $t['problem']         ?? '',
@@ -830,20 +845,24 @@ class TaskController extends BaseController
         }
     }
 
-    public function buildMonthlyStats()
+    public function buildMonthlyStats(?string $lane = null)
     {
         $startOfMonth = Date::parse(Date::Now())->format('Y-m-01');
         $endOfMonth   = Date::parse(Date::Now())->format('Y-m-t');
 
         $base = Task::query()->whereBetween('task_date', $startOfMonth, $endOfMonth);
 
+        if ($lane) {
+            $base->where('lane', '=', $lane);
+        }
+
         $stats = [
             'total' => (clone $base)->count(),
             'by_stage' => [
                 'plan'  => (clone $base)->where('stage', '=', 'PLAN')->count(),
-                'do'    => (clone $base)->where('stage', '=', 'DO')->count(),  
+                'do'    => (clone $base)->where('stage', '=', 'DO')->count(),
                 'check' => (clone $base)->where('stage', '=', 'CHECK')->count(),
-                'act'   => (clone $base)->where('stage', '=', 'ACT')->count(), 
+                'act'   => (clone $base)->where('stage', '=', 'ACT')->count(),
             ],
             'by_status' => [
                 'open'        => (clone $base)->where('status', '=', 'OPEN')->count(),
@@ -851,6 +870,7 @@ class TaskController extends BaseController
                 'done'        => (clone $base)->where('status', '=', 'DONE')->count(),
                 'cancelled'   => (clone $base)->where('status', '=', 'CANCELLED')->count(),
             ],
+            'lane'   => $lane,       // ⬅ sertakan lane di response
             'period' => [
                 'type'  => 'monthly',
                 'label' => Date::parse(Date::Now())->format('F Y'),
@@ -874,17 +894,20 @@ class TaskController extends BaseController
     }
 
     // GET /api/tasks/stats - Get statistics
-    public function stats()
+    public function stats(Request $request)
     {
-        return $this->json($this->buildMonthlyStats(),200);
+        $lane = $request->get('lane') ?? null;
+        return $this->json($this->buildMonthlyStats($lane), 200);
     }
 
-    public function broadcastPdcaStats(): void
+    public function broadcastPdcaStats(?string $lane = null): void
     {
+        $stats = $this->buildMonthlyStats($lane);
+
         $ch = curl_init('http://10.203.68.47:3002/broadcast');
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => json_encode($this->buildMonthlyStats()),
+            CURLOPT_POSTFIELDS     => json_encode($stats),
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'X-Broadcast-Secret: abogobogahesoyam',

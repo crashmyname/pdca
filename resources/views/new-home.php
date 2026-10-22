@@ -2532,6 +2532,15 @@
                                     <option value="">Pilih Seksi</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label class="form-label">Lane</label>
+                                <select class="form-select" id="lane">
+                                    <option value="">-- Ketik atau pilih lane --</option>
+                                </select>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Opsional — dipakai untuk cek dokumen pendukung
+                                </small>
+                            </div>
                             <div class="form-group full-width">
                                 <label class="form-label required">Masalah</label>
                                 <textarea class="form-textarea" id="problem" required placeholder="Deskripsikan masalah yang terjadi..."></textarea>
@@ -3077,28 +3086,32 @@
                             <tr>
                                 <td class="tr-label">Seksi</td>
                                 <td class="tr-value" id="trSection">-</td>
+                                <td class="tr-label">Lane</td>
+                                <td class="tr-value" id="trLane">-</td>
+                            </tr>
+                            <tr>
                                 <td class="tr-label">PIC</td>
                                 <td class="tr-value" id="trPic">-</td>
-                            </tr>
-
-                            <tr>
                                 <td class="tr-label">Category</td>
                                 <td class="tr-value" id="trCategory">-</td>
+                            </tr>
+                            <tr>
                                 <td class="tr-label">PIC Section</td>
                                 <td class="tr-value" id="trPicSection">-</td>
-                            </tr>
-
-                            <tr>
                                 <td class="tr-label">Stage</td>
                                 <td class="tr-value" id="trStage">-</td>
-                                <td class="tr-label">Status</td>
-                                <td class="tr-value" id="trStatus">-</td>
                             </tr>
                             <tr>
+                                <td class="tr-label">Status</td>
+                                <td class="tr-value" id="trStatus">-</td>
                                 <td class="tr-label">Deadline</td>
                                 <td class="tr-value" id="trDeadline">-</td>
+                            </tr>
+                            <tr>
                                 <td class="tr-label">Dibuat</td>
                                 <td class="tr-value" id="trCreatedAt">-</td>
+                                <td class="tr-label"></td>
+                                <td class="tr-value"></td>
                             </tr>
                         </table>
                     </div>
@@ -3609,6 +3622,7 @@
     // ============================================================
     const API_BASE = '<?=url()?>';
     const LOGO = '<?= asset("logo/ISE.png")?>'
+    const LANE_API_BASE = 'http://localhost/jouhou-be/api/v1/lane';
 
     const SwalToast = Swal.mixin({
         toast: true,
@@ -3627,11 +3641,12 @@
     // ============================================================
     const urlParams = new URLSearchParams(window.location.search);
     const urlSection = urlParams.get('section');
+    const urlLane    = urlParams.get('lane');
     let state = {
         tasks: [],
         currentUser: null,
         searchQuery: '',
-        sectionFilter: urlSection ? urlSection : 'all',
+        sectionFilter: 'all',
         dateFrom: null,
         dateTo: null,
     };
@@ -3752,6 +3767,7 @@
             operatorName: t.operator_name || '',
             date: t.task_date || '',
             section: t.section || '',
+            lane: t.lane || t.no_lane || '',
             category: (t.category || '').toLowerCase(),
             picSection: (t.pic_section || '').toLowerCase(),
             problem: t.problem || '',
@@ -3790,7 +3806,7 @@
             allowClear: true,
             width: '100%',
             dropdownParent: $('#taskModal'),
-            minimumResultsForSearch: 0,   // paksa search box selalu muncul
+            minimumResultsForSearch: 0,
             language: {
                 noResults:     function () { return 'Data tidak ditemukan'; },
                 searching:     function () { return 'Mencari...'; },
@@ -3804,6 +3820,21 @@
 
         $('#pic').select2($.extend({}, commonOpts, {
             placeholder: '-- Pilih PIC --',
+        }));
+
+        $('#lane').select2($.extend({}, commonOpts, {
+            placeholder: '-- Ketik atau pilih lane --',
+            tags: true,
+            tokenSeparators: [],
+            createTag: function (params) {
+                const term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term + ' (baru)', newTag: true };
+            },
+            language: {
+                noResults: function () { return 'Tidak ada lane. Ketik lalu tekan Enter untuk membuat baru.'; },
+                searching: function () { return 'Mencari...'; },
+            },
         }));
 
         select2Inited = true;
@@ -3894,8 +3925,28 @@
         setQuickDate('today');
         await loadSections();
         if (urlSection) {
-            const targetSec = urlSection.toUpperCase();
-            $('#sectionFilter').val(targetSec);
+            const target  = String(urlSection).toUpperCase();
+            const $filter = $('#sectionFilter');
+
+            // Cari option yang dept-nya cocok (PO/SMT/EVA/LA) atau singkatan cocok
+            let matchedVal = null;
+            $filter.find('option').each(function () {
+                const dept  = String($(this).data('dept')      || '').toUpperCase();
+                const singk = String($(this).data('singkatan') || '').toUpperCase();
+                if (dept === target || singk === target) {
+                    matchedVal = $(this).val();
+                    return false;
+                }
+            });
+
+            if (matchedVal) {
+                $filter.val(matchedVal);
+                state.sectionFilter = matchedVal;
+            } else {
+                // Tidak ada match → biarkan "all", jangan filter apa pun
+                $filter.val('all');
+                state.sectionFilter = 'all';
+            }
         }
         await loadTasks();
     });
@@ -3967,11 +4018,29 @@
 
         $(document).on('change', '#section', function () {
             const section = $(this).val();
-            const date    = $('#taskDate').val();
-            if (!section || !date) return;
 
-            const fakeTask = { section: section, date: date };
-            checkTaskDocs(fakeTask);
+            const code = getSectionCodeForApi();
+            if (code) loadTaskLanes(code);
+
+            const date = $('#taskDate').val();
+            if (!section || !date) return;
+            checkTaskDocs({ section: section, lane: $('#lane').val() || '', date: date });
+        });
+
+        $(document).on('change', '#lane', function () {
+            const lane    = $(this).val();
+            const section = $('#section').val();
+            const date    = $('#taskDate').val();
+            if (!date) return;
+            checkTaskDocs({ section: section || '', lane: lane || '', date: date });
+        });
+
+        $(document).on('change', '#lane', function () {
+            const lane    = $(this).val();
+            const section = $('#section').val();
+            const date    = $('#taskDate').val();
+            if (!date) return;
+            checkTaskDocs({ section: section || '', lane: lane || '', date: date });
         });
     }
 
@@ -4031,7 +4100,13 @@
             Object.entries(grouped).forEach(([dept, items]) => {
                 $sel.append(`<optgroup label="${escapeHtml(dept)}">`);
                 items.forEach(item => {
-                    $sel.append(`<option value="${escapeHtml(item.kode)}">${escapeHtml(item.kode)}</option>`);
+                    const singk = String(item.singkatan || '').trim();
+                    $sel.append(
+                        `<option value="${escapeHtml(item.kode)}"` +
+                        ` data-dept="${escapeHtml(dept)}"` +
+                        ` data-singkatan="${escapeHtml(singk)}">` +
+                        `${escapeHtml(item.kode)}</option>`
+                    );
                 });
                 $sel.append('</optgroup>');
             });
@@ -4040,6 +4115,106 @@
                 $sel.val(currentVal);
             }
         });
+    }
+
+    // ============================================================
+    // LANE LOADER (dari API jouhou-be)
+    // ============================================================
+    async function loadTaskLanes(section = null, forceReload = false) {
+        const sec = String(section ?? $('#section').val() ?? '').toLowerCase().trim();
+        const $sel = $('#lane');
+        const current = $sel.val();
+
+        if (!sec) {
+            $sel.empty().append('<option value="">-- Pilih Seksi dulu --</option>');
+            if ($sel.data('select2')) $sel.trigger('change.select2');
+            return;
+        }
+
+        window._taskLaneCache = window._taskLaneCache || {};
+        if (!forceReload && Array.isArray(window._taskLaneCache[sec])) {
+            populateLaneSelect($sel, window._taskLaneCache[sec], current);
+            return;
+        }
+
+        $sel.empty().append('<option value="">-- Memuat lane... --</option>');
+        if ($sel.data('select2')) $sel.trigger('change.select2');
+
+        try {
+            const url = `${LANE_API_BASE}/${encodeURIComponent(sec)}`;
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            const json = await res.json();
+
+            let raw = [];
+            if (Array.isArray(json))                  raw = json;
+            else if (Array.isArray(json.data))        raw = json.data;
+            else if (Array.isArray(json.lanes))       raw = json.lanes;
+            else if (Array.isArray(json.results))     raw = json.results;
+            else if (Array.isArray(json.data?.lanes)) raw = json.data.lanes;
+            else if (Array.isArray(json.data?.items)) raw = json.data.items;
+
+            const lanes = raw
+                .map(x => {
+                    if (x == null) return '';
+                    if (typeof x === 'string') return x.trim();
+                    return String(
+                        x.noLane ?? x.no_lane ?? x.lane ?? x.lane_name ??
+                        x.name ?? x.kode ?? x.code ?? x.value ?? ''
+                    ).trim();
+                })
+                .filter(Boolean);
+
+            const unique = [...new Set(lanes)].sort();
+            window._taskLaneCache[sec] = unique;
+            populateLaneSelect($sel, unique, current);
+
+        } catch (err) {
+            console.error('[loadTaskLanes]', err);
+            $sel.empty().append('<option value="">-- Gagal memuat lane --</option>');
+            if (current) {
+                $sel.append(`<option value="${escapeHtml(current)}">${escapeHtml(current)}</option>`);
+                $sel.val(current);
+            }
+            if ($sel.data('select2')) $sel.trigger('change.select2');
+        }
+    }
+
+    function populateLaneSelect($sel, lanes, current) {
+        $sel.empty().append('<option value="">-- Ketik atau pilih lane --</option>');
+        (lanes || []).forEach(l => {
+            $sel.append(`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`);
+        });
+        if (current) {
+            if (!$sel.find(`option[value="${escapeHtml(current)}"]`).length) {
+                $sel.append(`<option value="${escapeHtml(current)}">${escapeHtml(current)}</option>`);
+            }
+            $sel.val(current);
+        }
+        if ($sel.data('select2')) $sel.trigger('change.select2');
+    }
+
+    /**
+     * Kode section untuk API lane.
+     * Prioritas: urlSection dari Jouhou (PO/SMT/EVA/LA) → data-singkatan → data-dept → fallback
+     */
+    function getSectionCodeForApi() {
+        // Prioritas 1: option #section yang terpilih (user sudah pilih manual)
+        const $opt  = $('#section').find('option:selected');
+        const singk = String($opt.data('singkatan') || '').trim();
+        const dept  = String($opt.data('dept')      || '').trim();
+
+        if (singk) return singk.toLowerCase();
+        if (dept)  return dept.toLowerCase();
+
+        // Prioritas 2: fallback urlSection (saat baru buka modal & option belum punya data)
+        if (typeof urlSection !== 'undefined' && urlSection) {
+            return String(urlSection).trim().toLowerCase();
+        }
+
+        // Prioritas 3: nilai #section apa adanya
+        return String($('#section').val() || '').trim().toLowerCase();
     }
 
     // ══════════════════════════════════════════════════════════════
@@ -4072,6 +4247,11 @@
     // LOAD TASKS
     // ============================================================
     async function loadTasks() {
+        const $filter = $('#sectionFilter');
+        if ($filter.length) {
+            const currentVal = $filter.val();
+            state.sectionFilter = (currentVal && currentVal !== '') ? currentVal : 'all';
+        }
         const loadingMsg = state.dateFrom && state.dateTo
             ? `Mengambil data ${formatDate(state.dateFrom)} — ${formatDate(state.dateTo)}...`
             : 'Mengumpulkan data...';
@@ -4700,7 +4880,7 @@
     // ============================================================
     // TASK CRUD
     // ============================================================
-    function openTaskModal() {
+    async function openTaskModal() {
         const isLeader = canEdit();
 
         $('#modalTitle').text(isLeader ? 'Tambah Task Baru (Leader)' : 'Tambah Task Baru (Operator)');
@@ -4725,9 +4905,7 @@
         $('input[name="category"], input[name="pic_section"]').prop('disabled', !isLeader);
         $('input[name^="doc_status_"]').prop('disabled', !isLeader);
 
-        // Panggil helper visibility SETELAH semua set value/disabled
         applyPhaseVisibility('plan', { isLeader });
-
         renderApprovalSection(null);
 
         $('#historyTaskBtn').hide();
@@ -4737,16 +4915,51 @@
 
         setSelect2Value($('#operatorName'), '', '');
         setSelect2Value($('#pic'), '', '');
+        setSelect2Value($('#lane'), '', '');
 
-         if (urlSection) {
-            $('#section').val(urlSection);
-            if ($('#section').data('select2')) {
-                $('#section').trigger('change.select2');
+        // Pastikan opsi #section sudah ter-load (karena mungkin belum di-init)
+        loadEmployees();
+        await loadSections();
+
+        // Kalau dari Jouhou ada ?section=PO → set dropdown kalau bisa match,
+        // tapi tetap tidak wajib karena kode API diambil dari urlSection langsung
+        if (urlSection) {
+            const target = String(urlSection).toUpperCase();
+            const $sec   = $('#section');
+            let matched  = null;
+
+            $sec.find('option').each(function () {
+                const dept  = String($(this).data('dept')      || '').toUpperCase();
+                const singk = String($(this).data('singkatan') || '').toUpperCase();
+                if (dept === target || singk === target) {
+                    matched = $(this).val();
+                    return false;
+                }
+            });
+
+            if (matched) {
+                $sec.val(matched);
+                if ($sec.data('select2')) $sec.trigger('change.select2');
             }
         }
 
-        loadEmployees();
-        loadSections();
+        // ═══ LOAD LANE PAKAI KODE API (po/smt/…) ═══
+        const sectionCode = getSectionCodeForApi();
+        console.log('[openTaskModal] load lane untuk kode:', sectionCode);
+
+        await loadTaskLanes(sectionCode);
+
+        // ═══ AUTO-PILIH LANE DARI JOUHOU (?lane=MPO-62) ═══
+        if (urlLane) {
+            const exists = $('#lane').find(`option[value="${urlLane}"]`).length > 0;
+            if (exists) {
+                setSelect2Value($('#lane'), urlLane, urlLane);
+            } else {
+                // Lane belum ada di response API → tetap tambahkan supaya tidak hilang
+                setSelect2Value($('#lane'), urlLane, urlLane + ' (dari Jouhou)');
+            }
+        }
+
         openModal('taskModal');
         setTimeout(() => updateApproveButtonState(), 50);
     }
@@ -4762,6 +4975,7 @@
             operator_name: $('#operatorName').val() ? $('#operatorName').val().trim() : '',
             task_date:     $('#taskDate').val(),
             section:       $('#section').val(),
+            lane:          $('#lane').val() ? $('#lane').val().trim() : '',
             problem:       $('#problem').val() ? $('#problem').val().trim() : '',
         };
 
@@ -4808,6 +5022,7 @@
                     operator_name: basePayload.operator_name,
                     task_date:     basePayload.task_date,
                     section:       basePayload.section,
+                    lane:          basePayload.lane,
                     problem:       basePayload.problem,
                     ...(isLeader ? {
                         category:         category,
@@ -4887,6 +5102,11 @@
         }
         $sec.val(sec);
         if ($sec.data('select2')) $sec.trigger('change.select2');
+
+        // Pakai kode dari URL atau dari data-singkatan/dept option
+        const editCode = getSectionCodeForApi() || sec;
+        await loadTaskLanes(editCode);
+        setSelect2Value($('#lane'), task.lane || '', task.lane || '');
 
         $('#taskDate').val(task.date);
         $('#problem').val(task.problem);
@@ -5603,6 +5823,7 @@
         $('#trOperatorName').text(task.operatorName || '-');
         $('#trTaskDate').text(task.date ? formatDateLong(task.date) : '-');
         $('#trSection').text(task.section || '-');
+        $('#trLane').text(task.lane || '-');
         $('#trPic').text(task.pic || '-');
         $('#trCategory').html(
             task.category
@@ -5881,6 +6102,7 @@
                 <tr><td style="padding:4px 0;color:#6b7280">Operator</td><td>${escapeHtml(task.operatorName)}</td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Tanggal</td><td>${escapeHtml(task.date)}</td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Seksi</td><td><span style="background:#f3f4f6;padding:2px 8px;border-radius:6px">${escapeHtml(task.section)}</span></td></tr>
+                <tr><td style="padding:4px 0;color:#6b7280">Lane</td><td>${escapeHtml(task.lane || '-')}</td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Stage</td><td><strong>${stageDisplay(task.stage)}</strong></td></tr>
                 <tr><td style="padding:4px 0;color:#6b7280">Status</td><td><strong>${task.status.toUpperCase()}</strong></td></tr>
             </table>
@@ -6076,6 +6298,7 @@
                         ${task.category ? `<span class="card-tag cat-${task.category}">${escapeHtml(CATEGORY_LABEL[task.category] || task.category)}</span>` : ''}
                         ${task.picSection ? `<span class="picsec-badge">${escapeHtml(PIC_SECTION_LABEL[task.picSection] || task.picSection)}</span>` : ''}
                         <span class="card-tag">${escapeHtml(task.section)}</span>
+                        ${task.lane ? `<span class="card-tag"><i class="ti ti-route"></i> ${escapeHtml(task.lane)}</span>` : ''}
                         ${task.pic ? `<span class="card-tag">PIC: ${escapeHtml(task.pic)}</span>` : ''}
                     </div>
                     <div class="card-footer">
@@ -8582,7 +8805,7 @@
             return;
         }
 
-        const noLane    = task.section || '';
+        const noLane    = task.lane || task.section || '';
         const monthYear = (task.date || '').slice(0, 7);
         const taskId    = task.id    || parseInt($('#taskId').val() || '0', 10) || 0;
 

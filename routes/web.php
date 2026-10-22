@@ -116,6 +116,28 @@ Route::get('/csrf-token', function () {
     exit;
 });
 
+Route::get('/pdca-stats', function (\Bpjs\Framework\Core\Request $request) {
+    $base = rtrim(env('PDCA_BASE_URL', 'http://10.203.68.47:85/pdca'), '/');
+    $lane = $request->get('lane') ?? '';
+
+    $url = $base . '/tasks/stats' . ($lane ? '?lane=' . urlencode($lane) : '');
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 5,
+        CURLOPT_HTTPHEADER     => ['Accept: application/json'],
+    ]);
+    $body = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return \Bpjs\Framework\Helpers\Response::json(
+        json_decode($body, true) ?: ['error' => 'invalid response'],
+        $code ?: 200
+    );
+})->name('pdca.stats');
+
 // ============================================================
 // PROTECTED ROUTES AUTH
 // ============================================================
