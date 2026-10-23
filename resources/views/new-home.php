@@ -7646,6 +7646,7 @@
                     doc_type:   docType,
                     no_lane:    noLane    || '',
                     month_year: monthYear || '',
+                    section:    typeof urlSection !== 'undefined' ? (urlSection || '') : '',
                 }
             });
 

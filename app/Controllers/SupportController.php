@@ -1179,11 +1179,12 @@ class SupportController extends BaseController
             $docType   = trim((string) ($request->doc_type   ?? 'nursecall'));
             $noLane    = trim((string) ($request->no_lane    ?? ''));
             $monthYear = trim((string) ($request->month_year ?? ''));
+            $section   = trim((string) ($request->section    ?? ''));   // ⬅ TAMBAH
 
             $isNc = ($docType === 'nursecall');
 
             // ═══════════════════════════════════════════════════
-            // 1. Ambil record ID untuk lane + bulan ini
+            // 1. Record ID untuk lane + bulan ini
             // ═══════════════════════════════════════════════════
             $recordId = null;
             if ($noLane && $monthYear) {
@@ -1204,7 +1205,7 @@ class SupportController extends BaseController
             }
 
             // ═══════════════════════════════════════════════════
-            // 2. Task yang sudah ada di RECORD INI (untuk refresh)
+            // 2. Task yang sudah ada di RECORD INI
             // ═══════════════════════════════════════════════════
             $taskIdsInThisRecord = [];
             if ($recordId) {
@@ -1226,7 +1227,7 @@ class SupportController extends BaseController
             }
 
             // ═══════════════════════════════════════════════════
-            // 3. Task yang sudah dipakai di RECORD LAIN (doc_type sama)
+            // 3. Task yang sudah dipakai di RECORD LAIN
             // ═══════════════════════════════════════════════════
             if ($isNc) {
                 $allAssigned = NursecallItem::query()
@@ -1249,27 +1250,37 @@ class SupportController extends BaseController
             $taskIdsInOtherRecords = array_values(array_unique($taskIdsInOtherRecords));
 
             // ═══════════════════════════════════════════════════
-            // 4. Ambil data task ON-PROGRESS (belum done/cancelled)
-            //    ⭐ FILTER UTAMA: exclude done + cancelled
+            // 4. Ambil task ON-PROGRESS — DENGAN FILTER SECTION
             // ═══════════════════════════════════════════════════
-            $onProgress = \App\Models\Task::query()
+            $onProgressQuery = \App\Models\Task::query()
                 ->where(function ($q) {
                     $q->where('status', '!=', 'done')
                     ->where('status', '!=', 'cancelled');
-                })
+                });
+
+            // Filter by section (kalau dikirim)
+            if ($section !== '') {
+                $onProgressQuery->where('section', '=', $section);
+            }
+
+            $onProgress = $onProgressQuery
                 ->orderBy('task_date', 'desc')
                 ->limit(500)
                 ->get(\PDO::FETCH_ASSOC);
 
             // ═══════════════════════════════════════════════════
-            // 5. Ambil data task yang ADA DI RECORD INI
-            //    (walau sudah done — untuk keperluan refresh data)
+            // 5. Task di RECORD INI (juga filter by section)
             // ═══════════════════════════════════════════════════
             $tasksInRecord = [];
             if (!empty($taskIdsInThisRecord)) {
-                $tasksInRecord = \App\Models\Task::query()
-                    ->whereIn('id', $taskIdsInThisRecord)
-                    ->get(\PDO::FETCH_ASSOC);
+                $inRecordQuery = \App\Models\Task::query()
+                    ->whereIn('id', $taskIdsInThisRecord);
+
+                if ($section !== '') {
+                    $inRecordQuery->where('section', '=', $section);
+                }
+
+                $tasksInRecord = $inRecordQuery->get(\PDO::FETCH_ASSOC);
             }
 
             // ═══════════════════════════════════════════════════
@@ -1278,7 +1289,6 @@ class SupportController extends BaseController
             $result = [];
             $seen   = [];
 
-            // Prioritas 1: task yang sudah ada di record ini (kiri tanda 🔵)
             foreach ($tasksInRecord as $t) {
                 $id = (int) $t['id'];
                 if (isset($seen[$id])) continue;
@@ -1287,12 +1297,9 @@ class SupportController extends BaseController
                 $result[] = $this->normalizeTaskRef($t);
             }
 
-            // Prioritas 2: task on-progress yang belum di-assign ke record lain
             foreach ($onProgress as $t) {
                 $id = (int) $t['id'];
                 if (isset($seen[$id])) continue;
-
-                // Skip kalau sudah dipakai di record LAIN
                 if (in_array($id, $taskIdsInOtherRecords, true)) continue;
 
                 $seen[$id] = true;
