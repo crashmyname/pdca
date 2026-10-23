@@ -416,12 +416,12 @@ class TaskController extends BaseController
                 ], 422);
             }
 
-            if (($task->doc_nursecall_status ?? 'belum') !== 'sudah') {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Dokumen Nursecall belum terisi, tidak bisa approve',
-                ], 422);
-            }
+            // if (($task->doc_nursecall_status ?? 'belum') !== 'sudah') {
+            //     return $this->json([
+            //         'success' => false,
+            //         'message' => 'Dokumen Nursecall belum terisi, tidak bisa approve',
+            //     ], 422);
+            // }
 
             // Validasi DO → CHECK butuh tindakan
             if ($oldStage === 'DO' && $newStage === 'CHECK') {
