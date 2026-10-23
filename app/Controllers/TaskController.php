@@ -416,6 +416,13 @@ class TaskController extends BaseController
                 ], 422);
             }
 
+            if (($task->doc_nursecall_status ?? 'belum') !== 'sudah') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Dokumen Nursecall belum terisi, tidak bisa approve',
+                ], 422);
+            }
+
             // Validasi DO → CHECK butuh tindakan
             if ($oldStage === 'DO' && $newStage === 'CHECK') {
                 if (empty($task->category) && empty($task->pic_section)) {
@@ -430,8 +437,8 @@ class TaskController extends BaseController
 
                 $missing = [];
 
-                if (($task->doc_4m_status        ?? 'belum') !== 'sudah') $missing[] = 'Dokumen 4M';
-                if (($task->doc_logbook_status   ?? 'belum') !== 'sudah') $missing[] = 'Dokumen Logbook';
+                // if (($task->doc_4m_status        ?? 'belum') !== 'sudah') $missing[] = 'Dokumen 4M';
+                // if (($task->doc_logbook_status   ?? 'belum') !== 'sudah') $missing[] = 'Dokumen Logbook';
                 if (($task->doc_nursecall_status ?? 'belum') !== 'sudah') $missing[] = 'Dokumen Nursecall';
 
                 $required = [

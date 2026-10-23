@@ -2606,7 +2606,7 @@
                     <div class="form-section" id="documentsSection">
                         <div class="form-section-title">
                             <i class="ti ti-paperclip"></i> Dokumen Pendukung
-                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Semua wajib terisi untuk approve</span>
+                            <span class="lock-icon"><i class="ti ti-info-circle"></i> Nursecall wajib terisi untuk approve</span>
                         </div>
 
                         <div class="doc-upload-grid">
@@ -4727,8 +4727,8 @@
                 .filter(r => !task[r.key] || String(task[r.key]).trim() === '')
                 .map(r => r.label);
 
-            if (task.doc4mStatus !== 'sudah')        missing.push('Dokumen 4M');
-            if (task.docLogbookStatus !== 'sudah')   missing.push('Dokumen Logbook');
+            // if (task.doc4mStatus !== 'sudah')        missing.push('Dokumen 4M');
+            // if (task.docLogbookStatus !== 'sudah')   missing.push('Dokumen Logbook');
             if (task.docNursecallStatus !== 'sudah') missing.push('Dokumen Nursecall');
 
             if (missing.length > 0) {
@@ -5202,12 +5202,12 @@
 
         const missing = [];
 
-        if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
-            missing.push('Lembar Point 4M');
-        }
-        if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
-            missing.push('Record Perubahan 4M');
-        }
+        // if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
+        //     missing.push('Lembar Point 4M');
+        // }
+        // if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
+        //     missing.push('Record Perubahan 4M');
+        // }
         if (!$('.doc-upload-card[data-doc-type="nursecall"]').hasClass('doc-filled')) {
             missing.push('Nursecall');
         }
@@ -5221,8 +5221,8 @@
                 missing.map(m => `<li><strong>${m}</strong></li>`).join('') +
                 '</ul>' +
                 '<small style="color:#6b7280;display:block;margin-top:8px">' +
-                '• <strong>Lembar Point 4M</strong>: upload file via tombol Upload<br>' +
-                '• <strong>Record Perubahan 4M</strong>: isi lewat tombol "Report Support" → tab 4M<br>' +
+                // '• <strong>Lembar Point 4M</strong>: upload file via tombol Upload<br>' +
+                // '• <strong>Record Perubahan 4M</strong>: isi lewat tombol "Report Support" → tab 4M<br>' +
                 '• <strong>Nursecall</strong>: isi lewat tombol "Report Support" → tab Nursecall' +
                 '</small>'
             );
@@ -6369,12 +6369,12 @@
 
         const missing = [];
 
-        if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
-            missing.push('Lembar Point 4M');
-        }
-        if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
-            missing.push('Record Perubahan 4M');
-        }
+        // if (!$('.doc-upload-card[data-doc-type="lembar_point_4m"]').hasClass('doc-filled')) {
+        //     missing.push('Lembar Point 4M');
+        // }
+        // if (!$('.doc-upload-card[data-doc-type="four_m"]').hasClass('doc-filled')) {
+        //     missing.push('Record Perubahan 4M');
+        // }
         if (!$('.doc-upload-card[data-doc-type="nursecall"]').hasClass('doc-filled')) {
             missing.push('Nursecall');
         }
@@ -6431,14 +6431,12 @@
 
         $empty.show();
 
-        const docOk = task.doc4mStatus === 'sudah'
-                && task.docLogbookStatus === 'sudah'
-                && task.docNursecallStatus === 'sudah';
+        const docOk = task.docNursecallStatus === 'sudah';
 
         const checks = [
             { label: 'Phase 1: Data Operator + Klasifikasi lengkap',
             done: !!(task.operatorName && task.date && task.section && task.problem && task.category && task.picSection) },
-            { label: 'Phase 2: Semua dokumen ditandai "Sudah"',  done: docOk },
+            { label: 'Dokumen Nursecall sudah terisi',  done: docOk },
             { label: 'Phase 3: Tindakan & PIC terisi',
             done: !!(task.tempAction || task.permAction) && !!task.pic },
             { label: 'Task berada di stage ACT',                 done: task.stage === 'act' },
