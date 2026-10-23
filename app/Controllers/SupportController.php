@@ -1179,7 +1179,7 @@ class SupportController extends BaseController
             $docType   = trim((string) ($request->doc_type   ?? 'nursecall'));
             $noLane    = trim((string) ($request->no_lane    ?? ''));
             $monthYear = trim((string) ($request->month_year ?? ''));
-            $section   = trim((string) ($request->section    ?? ''));   // ⬅ TAMBAH
+            $section   = trim((string) ($request->section    ?? ''));
 
             $isNc = ($docType === 'nursecall');
 
@@ -1205,7 +1205,7 @@ class SupportController extends BaseController
             }
 
             // ═══════════════════════════════════════════════════
-            // 2. Task yang sudah ada di RECORD INI
+            // 2. Task di RECORD INI (jangan difilter — sudah assigned)
             // ═══════════════════════════════════════════════════
             $taskIdsInThisRecord = [];
             if ($recordId) {
@@ -1250,7 +1250,7 @@ class SupportController extends BaseController
             $taskIdsInOtherRecords = array_values(array_unique($taskIdsInOtherRecords));
 
             // ═══════════════════════════════════════════════════
-            // 4. Ambil task ON-PROGRESS — DENGAN FILTER SECTION
+            // 4. Ambil task ON-PROGRESS — FILTER BY LANE
             // ═══════════════════════════════════════════════════
             $onProgressQuery = \App\Models\Task::query()
                 ->where(function ($q) {
@@ -1258,8 +1258,11 @@ class SupportController extends BaseController
                     ->where('status', '!=', 'cancelled');
                 });
 
-            // Filter by section (kalau dikirim)
-            if ($section !== '') {
+            // ⬇ PRIORITAS: filter by LANE (lebih akurat)
+            if ($noLane !== '') {
+                $onProgressQuery->where('lane', '=', $noLane);
+            } elseif ($section !== '') {
+                // Fallback: kalau tidak ada lane, coba section
                 $onProgressQuery->where('section', '=', $section);
             }
 
@@ -1269,18 +1272,15 @@ class SupportController extends BaseController
                 ->get(\PDO::FETCH_ASSOC);
 
             // ═══════════════════════════════════════════════════
-            // 5. Task di RECORD INI (juga filter by section)
+            // 5. Task di RECORD INI — TIDAK difilter
+            //    (yang sudah assigned harus tetap muncul,
+            //     supaya edit record tidak kehilangan baris)
             // ═══════════════════════════════════════════════════
             $tasksInRecord = [];
             if (!empty($taskIdsInThisRecord)) {
-                $inRecordQuery = \App\Models\Task::query()
-                    ->whereIn('id', $taskIdsInThisRecord);
-
-                if ($section !== '') {
-                    $inRecordQuery->where('section', '=', $section);
-                }
-
-                $tasksInRecord = $inRecordQuery->get(\PDO::FETCH_ASSOC);
+                $tasksInRecord = \App\Models\Task::query()
+                    ->whereIn('id', $taskIdsInThisRecord)
+                    ->get(\PDO::FETCH_ASSOC);
             }
 
             // ═══════════════════════════════════════════════════
