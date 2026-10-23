@@ -29,19 +29,38 @@ class UtilsController extends BaseController
 
             $data = $this->loadKaryawan();
 
-            if ($section !== '' && isset($data[$section])) {
-                $rows = array_map(
-                    fn($r) => array_merge($r, ['section' => $section]),
-                    $data[$section]
-                );
-            } elseif ($section !== '') {
-                $rows = [];   // section tidak dikenal
-            } else {
-                // Tanpa section → gabungkan semua dengan field section
+            // Section yang bisa dipilih user di dropdown filter
+            $validSections = ['PO', 'LA', 'SMT', 'EVA'];
+
+            // Section yang datanya selalu ikut di setiap request (cross-section PIC)
+            $picSections = ['PE'];
+
+            if ($section === '') {
+                // Tanpa filter → gabungkan semua
                 $rows = [];
                 foreach ($data as $sec => $items) {
                     foreach ($items as $r) {
                         $rows[] = array_merge($r, ['section' => $sec]);
+                    }
+                }
+            } elseif (!in_array($section, $validSections, true)) {
+                // Section tidak dikenal → kosong
+                $rows = [];
+            } else {
+                // Data sesuai section yang diminta
+                $rows = [];
+                if (isset($data[$section])) {
+                    foreach ($data[$section] as $r) {
+                        $rows[] = array_merge($r, ['section' => $section]);
+                    }
+                }
+
+                // Tambahkan PE (PIC cross-section) ke setiap section
+                foreach ($picSections as $pic) {
+                    if (isset($data[$pic])) {
+                        foreach ($data[$pic] as $r) {
+                            $rows[] = array_merge($r, ['section' => $pic]);
+                        }
                     }
                 }
             }
