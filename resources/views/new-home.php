@@ -2594,6 +2594,7 @@
                                 <label class="radio-card"><input type="radio" name="pic_section" value="pe"><div class="radio-card-content"><span class="radio-label">PE</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="pc"><div class="radio-card-content"><span class="radio-label">PC</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="inj"><div class="radio-card-content"><span class="radio-label">INJ</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="smt"><div class="radio-card-content"><span class="radio-label">SMT</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="st"><div class="radio-card-content"><span class="radio-label">ST</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="qc"><div class="radio-card-content"><span class="radio-label">QC</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="whp"><div class="radio-card-content"><span class="radio-label">WHP</span></div></label>
