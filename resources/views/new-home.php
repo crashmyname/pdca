@@ -2600,6 +2600,8 @@
                                 <label class="radio-card"><input type="radio" name="pic_section" value="whp"><div class="radio-card-content"><span class="radio-label">WHP</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="prc"><div class="radio-card-content"><span class="radio-label">PRC</span></div></label>
                                 <label class="radio-card"><input type="radio" name="pic_section" value="log"><div class="radio-card-content"><span class="radio-label">LOG</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="maint"><div class="radio-card-content"><span class="radio-label">MAINT</span></div></label>
+                                <label class="radio-card"><input type="radio" name="pic_section" value="la"><div class="radio-card-content"><span class="radio-label">LA</span></div></label>
                             </div>
                         </div>
                     </div>
@@ -6331,6 +6333,7 @@
     const PIC_SECTION_LABEL = {
         mdf: 'MDF', pe: 'PE', pc: 'PC', inj: 'INJ',
         st:  'ST',  qc: 'QC', whp: 'WHP', prc: 'PRC', log: 'LOG',
+        smt: 'SMT', maint: 'MAINT', la: 'LA',
     };
     const DOC_LABEL = { '4m': '4M', 'logbook': 'Logbook', 'nursecall': 'Nursecall' };
     // const DOC_MAX_SIZE = 4 * 1024 * 1024;
