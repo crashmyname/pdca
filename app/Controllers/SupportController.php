@@ -66,6 +66,7 @@ class SupportController extends BaseController
 
         try {
             $noLane    = trim((string) ($request->no_lane    ?? ''));
+            $type      = trim((string) ($request->type       ?? '')); // ⬅ NEW
             $monthYear = trim((string) ($request->month_year ?? ''));
 
             if (!$noLane) {
@@ -74,24 +75,26 @@ class SupportController extends BaseController
 
             $record = null;
 
-            if ($monthYear) {
+            // PRIORITY 1: exact match lane + type + month
+            if ($type && $monthYear) {
                 $exact = NursecallRecord::query()
                     ->where('no_lane',    '=', $noLane)
+                    ->where('type',       '=', $type)
                     ->where('month_year', '=', $monthYear)
                     ->limit(1)
                     ->get(\PDO::FETCH_ASSOC);
-
                 if (!empty($exact)) $record = $exact[0];
             }
 
-            if (!$record) {
+            // PRIORITY 2: latest record of SAME type (buat prefill header bulan lalu)
+            if (!$record && $type) {
                 $latest = NursecallRecord::query()
                     ->where('no_lane', '=', $noLane)
+                    ->where('type',    '=', $type)
                     ->orderBy('month_year', 'desc')
                     ->orderBy('date_created', 'desc')
                     ->limit(1)
                     ->get(\PDO::FETCH_ASSOC);
-
                 if (!empty($latest)) $record = $latest[0];
             }
 
@@ -388,44 +391,37 @@ class SupportController extends BaseController
     public function byLaneRecord4m(Request $request)
     {
         $this->closeSessionEarly();
-
         try {
             $noLane    = trim((string) ($request->no_lane    ?? ''));
+            $type      = trim((string) ($request->type       ?? ''));
             $monthYear = trim((string) ($request->month_year ?? ''));
 
-            if (!$noLane) {
-                return $this->json(null, 200);
-            }
+            if (!$noLane) return $this->json(null, 200);
 
             $record = null;
 
-            if ($monthYear) {
+            if ($type && $monthYear) {
                 $exact = Record4m::query()
                     ->where('no_lane',    '=', $noLane)
+                    ->where('type',       '=', $type)
                     ->where('month_year', '=', $monthYear)
-                    ->limit(1)
-                    ->get(\PDO::FETCH_ASSOC);
-
+                    ->limit(1)->get(\PDO::FETCH_ASSOC);
                 if (!empty($exact)) $record = $exact[0];
             }
 
-            if (!$record) {
+            if (!$record && $type) {
                 $latest = Record4m::query()
                     ->where('no_lane', '=', $noLane)
+                    ->where('type',    '=', $type)
                     ->orderBy('month_year', 'desc')
-                    ->orderBy('date', 'desc')
-                    ->limit(1)
-                    ->get(\PDO::FETCH_ASSOC);
-
+                    ->orderBy('date',       'desc')
+                    ->limit(1)->get(\PDO::FETCH_ASSOC);
                 if (!empty($latest)) $record = $latest[0];
             }
 
-            if (!$record) {
-                return $this->json(null, 200);
-            }
+            if (!$record) return $this->json(null, 200);
 
             $recordId = (int) $record['id'];
-
             $items = Record4mItem::query()
                 ->where('record_id', '=', $recordId)
                 ->orderBy('row_no', 'asc')
@@ -436,7 +432,6 @@ class SupportController extends BaseController
                 'items'         => $items ?: [],
                 'is_same_month' => $monthYear && $record['month_year'] === $monthYear,
             ], 200);
-
         } catch (\Throwable $e) {
             error_log('[byLaneRecord4m] ' . $e->getMessage());
             return $this->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -1186,20 +1181,21 @@ class SupportController extends BaseController
             // ═══════════════════════════════════════════════════
             // 1. Record ID untuk lane + bulan ini
             // ═══════════════════════════════════════════════════
+            $type = trim((string) ($request->type ?? ''));
             $recordId = null;
             if ($noLane && $monthYear) {
                 if ($isNc) {
-                    $rows = NursecallRecord::query()
+                    $q = NursecallRecord::query()
                         ->where('no_lane',    '=', $noLane)
-                        ->where('month_year', '=', $monthYear)
-                        ->limit(1)
-                        ->get(\PDO::FETCH_ASSOC);
+                        ->where('month_year', '=', $monthYear);
+                    if ($type) $q->where('type', '=', $type);
+                    $rows = $q->limit(1)->get(\PDO::FETCH_ASSOC);
                 } else {
-                    $rows = Record4m::query()
+                    $q = Record4m::query()
                         ->where('no_lane',    '=', $noLane)
-                        ->where('month_year', '=', $monthYear)
-                        ->limit(1)
-                        ->get(\PDO::FETCH_ASSOC);
+                        ->where('month_year', '=', $monthYear);
+                    if ($type) $q->where('type', '=', $type);
+                    $rows = $q->limit(1)->get(\PDO::FETCH_ASSOC);
                 }
                 if (!empty($rows)) $recordId = (int) $rows[0]['id'];
             }
@@ -1311,6 +1307,54 @@ class SupportController extends BaseController
 
         } catch (\Throwable $e) {
             error_log('[referenceTasks] ' . $e->getMessage());
+            return $this->json([], 200);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // NURSECALL — LIST TYPES (untuk datalist)
+    // ═══════════════════════════════════════════════════════
+    public function listNursecallTypes(Request $request)
+    {
+        $this->closeSessionEarly();
+        try {
+            $noLane = trim((string) ($request->no_lane ?? ''));
+            $q = NursecallRecord::query();
+            if ($noLane) $q->where('no_lane', '=', $noLane);
+            $rows = $q->get(\PDO::FETCH_ASSOC);
+
+            $types = [];
+            foreach ($rows as $r) {
+                $t = trim((string) ($r['type'] ?? ''));
+                if ($t !== '' && !in_array($t, $types, true)) $types[] = $t;
+            }
+            sort($types);
+            return $this->json($types, 200);
+        } catch (\Throwable $e) {
+            return $this->json([], 200);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════
+    // 4M — LIST TYPES (untuk datalist)
+    // ═══════════════════════════════════════════════════════
+    public function listRecord4mTypes(Request $request)
+    {
+        $this->closeSessionEarly();
+        try {
+            $noLane = trim((string) ($request->no_lane ?? ''));
+            $q = Record4m::query();
+            if ($noLane) $q->where('no_lane', '=', $noLane);
+            $rows = $q->get(\PDO::FETCH_ASSOC);
+
+            $types = [];
+            foreach ($rows as $r) {
+                $t = trim((string) ($r['type'] ?? ''));
+                if ($t !== '' && !in_array($t, $types, true)) $types[] = $t;
+            }
+            sort($types);
+            return $this->json($types, 200);
+        } catch (\Throwable $e) {
             return $this->json([], 200);
         }
     }

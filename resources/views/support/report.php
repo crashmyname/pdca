@@ -894,12 +894,12 @@
     // NURSECALL REPORT
     // ============================================================
     function renderNursecallReport(list) {
+        const PER_PAGE = 15;
+
         const html = list.map((entry, idx) => {
             const rec    = entry.record;
             const items  = entry.items || [];
-            const sigKey = 'nc';
 
-            // Bulan / Tahun
             let monthLabel = rec.month_year || '-';
             if (rec.month_year && rec.month_year.length === 7) {
                 const [y, m] = rec.month_year.split('-');
@@ -915,77 +915,8 @@
 
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
-
             const sigGroupLeader    = rec.footer_created_name  || '';
             const sigSectionManager = rec.footer_approved_name || '';
-
-            // Tabel content
-            const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
-            const minRows = 15;
-            let rowsHtml = '';
-
-            for (let i = 0; i < minRows; i++) {
-                const it = items[i];
-                if (it) {
-                    const sumber = String(it.source || '').toLowerCase();
-                    const sumberCells = sumberCols.map(col => {
-                        const checked = sumber === col;
-                        return `<td class="check">${checked ? '✓' : '&ndash;'}</td>`;
-                    }).join('');
-
-                    const statusVal = String(it.status || '').toUpperCase();
-                    const judgeVal  = String(it.judgement || '').toUpperCase();
-
-                    rowsHtml += `
-                        <tr>
-                            <td style="text-align:center">${it.date ? formatDateSlash(it.date) : ''}</td>
-                            <td style="text-align:center">${it.time ? String(it.time).slice(0, 5) : ''}</td>
-                            <td>${escapeHtml(it.problem || '')}</td>
-                            ${sumberCells}
-                            <td>${escapeHtml(it.action || '')}</td>
-                            <td style="text-align:center">${escapeHtml(shortName(it.nurse_leader))}</td>
-                            <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
-                            <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
-                            <td style="text-align:center">${escapeHtml(shortName(it.group_leader))}</td>
-                        </tr>
-                    `;
-                } else {
-                    rowsHtml += `
-                        <tr>
-                            <td>&nbsp;</td><td></td><td></td>
-                            <td></td><td></td><td></td><td></td><td></td><td></td>
-                            <td></td><td></td><td></td><td></td><td></td>
-                        </tr>
-                    `;
-                }
-            }
-
-            const tableHtml = `
-                <table class="sr-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" class="col-tgl">TGL</th>
-                            <th rowspan="2" class="col-jam">JAM</th>
-                            <th rowspan="2" class="col-masalah">MASALAH</th>
-                            <th colspan="6">SUMBER MASALAH</th>
-                            <th rowspan="2" class="col-tindakan">TINDAKAN</th>
-                            <th rowspan="2" class="col-nurse">NURSE<br>LEADER</th>
-                            <th rowspan="2" class="col-status">STATUS</th>
-                            <th rowspan="2" class="col-judge">JUDGEMENT</th>
-                            <th rowspan="2" class="col-gleader">GROUP<br>LEADER</th>
-                        </tr>
-                        <tr>
-                            <th class="col-sumber sr-sumber-header">PART</th>
-                            <th class="col-sumber sr-sumber-header">MACHINE</th>
-                            <th class="col-sumber sr-sumber-header">MAN<br>POWER</th>
-                            <th class="col-sumber sr-sumber-header">TOOL</th>
-                            <th class="col-sumber sr-sumber-header">MATERIAL</th>
-                            <th class="col-sumber sr-sumber-header">DLL</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rowsHtml}</tbody>
-                </table>
-            `;
 
             const keterangan = `
                 <div class="sr-bottom-left">
@@ -1003,112 +934,210 @@
             const komentarText = rec.footer_comment || '';
             const komentarDate = rec.footer_date || '';
 
-            const signatureBlock = `
-                <div class="sr-signature-section">
-                    <div class="sr-signature-header">
-                        <div>KOMENTAR :</div>
-                        <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
-                    </div>
+            const chunks = [];
+            if (items.length === 0) {
+                chunks.push([]);
+            } else {
+                for (let i = 0; i < items.length; i += PER_PAGE) {
+                    chunks.push(items.slice(i, i + PER_PAGE));
+                }
+            }
 
-                    <div class="sr-signature-content">
-                        <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+            return chunks.map((chunk, chunkIdx) => {
+                const uniqueSigKey = `nc-${idx}-${chunkIdx}`;
+                const isContinuation = chunkIdx > 0;
 
-                        <div class="sr-ttd-container">
-                            <div class="sr-ttd-box">
-                                <div class="sr-sig-header">GROUP LEADER</div>
-                                <div class="signature-qrcode" data-type="footer-left-${sigKey}-${idx}" data-signature=""></div>
-                                <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
+                let rowsHtml = '';
+
+                for (let i = 0; i < PER_PAGE; i++) {
+                    const it = chunk[i];
+                    if (it) {
+                        const sumber = String(it.source || '').toLowerCase();
+                        const sumberCells = sumberCols.map(col => {
+                            const checked = sumber === col;
+                            return `<td class="check">${checked ? '✓' : '&ndash;'}</td>`;
+                        }).join('');
+
+                        const statusVal = String(it.status || '').toUpperCase();
+                        const judgeVal  = String(it.judgement || '').toUpperCase();
+
+                        rowsHtml += `
+                            <tr>
+                                <td style="text-align:center">${it.date ? formatDateSlash(it.date) : ''}</td>
+                                <td style="text-align:center">${it.time ? String(it.time).slice(0, 5) : ''}</td>
+                                <td>${escapeHtml(it.problem || '')}</td>
+                                ${sumberCells}
+                                <td>${escapeHtml(it.action || '')}</td>
+                                <td style="text-align:center">${escapeHtml(shortName(it.nurse_leader))}</td>
+                                <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
+                                <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
+                                <td style="text-align:center">${escapeHtml(shortName(it.group_leader))}</td>
+                            </tr>
+                        `;
+                    } else {
+                        rowsHtml += `
+                            <tr>
+                                <td>&nbsp;</td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                const tableHtml = `
+                    <table class="sr-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="col-tgl">TGL</th>
+                                <th rowspan="2" class="col-jam">JAM</th>
+                                <th rowspan="2" class="col-masalah">MASALAH</th>
+                                <th colspan="6">SUMBER MASALAH</th>
+                                <th rowspan="2" class="col-tindakan">TINDAKAN</th>
+                                <th rowspan="2" class="col-nurse">NURSE<br>LEADER</th>
+                                <th rowspan="2" class="col-status">STATUS</th>
+                                <th rowspan="2" class="col-judge">JUDGEMENT</th>
+                                <th rowspan="2" class="col-gleader">GROUP<br>LEADER</th>
+                            </tr>
+                            <tr>
+                                <th class="col-sumber sr-sumber-header">PART</th>
+                                <th class="col-sumber sr-sumber-header">MACHINE</th>
+                                <th class="col-sumber sr-sumber-header">MAN<br>POWER</th>
+                                <th class="col-sumber sr-sumber-header">TOOL</th>
+                                <th class="col-sumber sr-sumber-header">MATERIAL</th>
+                                <th class="col-sumber sr-sumber-header">DLL</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                `;
+
+                const signatureBlock = `
+                    <div class="sr-signature-section">
+                        <div class="sr-signature-header">
+                            <div>KOMENTAR :</div>
+                            <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
+                        </div>
+                        <div class="sr-signature-content">
+                            <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+                            <div class="sr-ttd-container">
+                                <div class="sr-ttd-box">
+                                    <div class="sr-sig-header">GROUP LEADER</div>
+                                    <div class="signature-qrcode" data-type="footer-left-${uniqueSigKey}" data-signature=""></div>
+                                    <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                                </div>
+                                <div class="sr-ttd-box">
+                                    <div class="sr-sig-header">SECTION MANAGER</div>
+                                    <div class="signature-qrcode" data-type="footer-right-${uniqueSigKey}" data-signature=""></div>
+                                    <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                                </div>
                             </div>
-                            <div class="sr-ttd-box">
-                                <div class="sr-sig-header">SECTION MANAGER</div>
-                                <div class="signature-qrcode" data-type="footer-right-${sigKey}-${idx}" data-signature=""></div>
-                                <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <div class="sr-page">
+                        <div class="sr-top">
+                            <div class="sr-top-logo">
+                                <img src="${LOGO}" alt="Logo" onerror="this.style.display='none'">
+                            </div>
+                            <div class="sr-top-title">
+                                <div class="sr-main-title">CATATAN FREKUENSI NURSE CALL</div>
+                                <div class="sr-sub-title">BULAN / TAHUN : ${escapeHtml(monthLabel)}</div>
+                            </div>
+                            <div class="sr-top-sig">
+                                <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
+                                <table>
+                                    <tr>
+                                        <td class="sr-sig-header">DIBUAT</td>
+                                        <td class="sr-sig-header">DISETUJUI</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="created-${uniqueSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                        </td>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="approved-${uniqueSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                    </div>
-                </div>
-            `;
 
-            return `
-                <div class="sr-page">
-                    <div class="sr-top">
-                        <div class="sr-top-logo">
-                            <img src="${LOGO}"
-                                alt="Logo"
-                                onerror="this.style.display='none'">
+                        <div class="sr-info-row">
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">NO LANE</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
+                            </div>
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">TYPE</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
+                            </div>
+                            ${isContinuation ? `
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">HALAMAN</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${chunkIdx + 1} dari ${chunks.length}</span>
+                            </div>` : ''}
                         </div>
-                        <div class="sr-top-title">
-                            <div class="sr-main-title">CATATAN FREKUENSI NURSE CALL</div>
-                            <div class="sr-sub-title">BULAN / TAHUN : ${escapeHtml(monthLabel)}</div>
+
+                        ${tableHtml}
+
+                        <div class="sr-bottom">
+                            ${keterangan}
+                            ${signatureBlock}
                         </div>
-                        <div class="sr-top-sig">
-                            <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
-                            <table>
-                                <tr>
-                                    <td class="sr-sig-header">DIBUAT</td>
-                                    <td class="sr-sig-header">DISETUJUI</td>
-                                </tr>
-                                <tr>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
-                                    </td>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
-                                    </td>
-                                </tr>
-                            </table>
+
+                        <div class="sr-form-code">
+                            Q-108-ISE-001-FORM-001-REV.0${isContinuation ? ' (cont. ' + (chunkIdx + 1) + ')' : ''}
                         </div>
                     </div>
-
-                    <div class="sr-info-row">
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">NO LANE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
-                        </div>
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">TYPE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
-                        </div>
-                    </div>
-
-                    ${tableHtml}
-
-                    <div class="sr-bottom">
-                        ${keterangan}
-                        ${signatureBlock}
-                    </div>
-
-                    <div class="sr-form-code">Q-108-ISE-001-FORM-001-REV.0</div>
-                </div>
-            `;
+                `;
+            }).join('');
         }).join('');
 
         $('#srReportContainer').html(html);
 
         setTimeout(() => {
             list.forEach((entry, idx) => {
-                const rec = entry.record;
+                const rec   = entry.record;
+                const items = entry.items || [];
 
-                if (rec.created_by_name) {
-                    const el = document.querySelector(`[data-type="created-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.created_by_name);
+                const chunks = [];
+                if (items.length === 0) {
+                    chunks.push([]);
+                } else {
+                    for (let i = 0; i < items.length; i += PER_PAGE) {
+                        chunks.push(items.slice(i, i + PER_PAGE));
+                    }
                 }
-                if (rec.approved_by_name) {
-                    const el = document.querySelector(`[data-type="approved-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.approved_by_name);
-                }
-                if (rec.footer_created_name) {
-                    const el = document.querySelector(`[data-type="footer-left-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.footer_created_name);
-                }
-                if (rec.footer_approved_name) {
-                    const el = document.querySelector(`[data-type="footer-right-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.footer_approved_name);
-                }
+
+                chunks.forEach((_, chunkIdx) => {
+                    const uniqueSigKey = `nc-${idx}-${chunkIdx}`;
+
+                    if (rec.created_by_name) {
+                        const el = document.querySelector(`[data-type="created-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.created_by_name);
+                    }
+                    if (rec.approved_by_name) {
+                        const el = document.querySelector(`[data-type="approved-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.approved_by_name);
+                    }
+                    if (rec.footer_created_name) {
+                        const el = document.querySelector(`[data-type="footer-left-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.footer_created_name);
+                    }
+                    if (rec.footer_approved_name) {
+                        const el = document.querySelector(`[data-type="footer-right-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.footer_approved_name);
+                    }
+                });
             });
         }, 200);
     }

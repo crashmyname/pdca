@@ -59,6 +59,9 @@ Route::get('/support/reference-tasks', [SupportController::class, 'referenceTask
 Route::get('/support/report/nursecall', [SupportController::class, 'pageReportNursecall']);
 Route::get('/support/report/4m',        [SupportController::class, 'pageReport4m']);
 
+Route::get('/support/nursecall/types',[SupportController::class,'listNursecallTypes']);
+Route::get('/support/4m/types',[SupportController::class,'listRecord4mTypes']);
+
 // Route::get('/debug/test-nursecall', function () {
 //     try {
 //         $record = \App\Models\NursecallRecord::create([

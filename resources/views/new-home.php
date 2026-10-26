@@ -1616,18 +1616,63 @@
         /* ═══════════════════════════════════════════════════ */
         /* SUPPORT REPORT — Style Form Resmi (Stanley-like)    */
         /* ═══════════════════════════════════════════════════ */
+        /* ── Halaman report — preview UI (screen) ── */
+        #srReportContainer {
+            counter-reset: srpage;
+        }
+
         .sr-page {
             background: #ffffff;
             padding: 5mm 5mm;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-family: Arial, 'Helvetica Neue', sans-serif;
             color: #000;
             page-break-after: always;
+            break-after: page;
             box-sizing: border-box;
+            position: relative;
+            counter-increment: srpage;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
+
         .sr-page:last-child {
-            page-break-after: auto;
             margin-bottom: 0;
+            page-break-after: auto;
+            break-after: auto;
+        }
+
+        /* Badge halaman — hanya muncul di UI */
+        .page-badge {
+            position: absolute;
+            top: -10px;
+            right: 12px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+            z-index: 2;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+        }
+
+        /* Sembunyikan saat print */
+        @media print {
+            .page-badge {
+                display: none !important;
+            }
+        }
+
+        /* Sembunyikan saat export PDF */
+        body.is-exporting .page-badge {
+            display: none !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
         }
 
         /* ── TOP HEADER ── */
@@ -2017,15 +2062,23 @@
                 padding: 0 !important;
             }
             body.print-support-report #srReportContainer {
-                border: none !important;
+                background: #ffffff !important;
                 padding: 0 !important;
-                background: #fff !important;
+                border: none !important;
                 border-radius: 0 !important;
             }
             .sr-page {
                 padding: 0 !important;
                 margin: 0 !important;
                 border: none !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
+            .sr-page:last-child {
+                page-break-after: auto !important;
+                break-after: auto !important;
             }
             * {
                 -webkit-print-color-adjust: exact !important;
@@ -3336,7 +3389,12 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Type</label>
-                                <input type="text" class="form-input" id="ncType" required placeholder="Contoh: Inspeksi">
+                                <select class="form-select" id="ncType" required>
+                                    <option value="">-- Ketik atau pilih type --</option>
+                                </select>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Pilih type dulu — header & content beda per type
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Bulan / Tahun</label>
@@ -3455,7 +3513,12 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Type</label>
-                                <input type="text" class="form-input" id="m4Type" required>
+                                <select class="form-select" id="m4type" required>
+                                    <option value="">-- Ketik atau pilih type --</option>
+                                </select>
+                                <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                                    <i class="ti ti-info-circle"></i> Pilih type dulu — header & content beda per type
+                                </small>
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Bulan / Tahun</label>
@@ -3576,7 +3639,7 @@
                 </div>
 
                 <!-- Report Content -->
-                <div id="srReportContainer" style="background:white;padding:20px;border:1px solid #e5e7eb;border-radius:8px">
+                <div id="srReportContainer" style="background:#e5e7eb;padding:24px 20px;border:1px solid #d1d5db;border-radius:8px">
                     <div style="text-align:center;color:#9ca3af;padding:40px">
                         <i class="ti ti-inbox" style="font-size:42px;display:block;margin-bottom:10px;opacity:0.4"></i>
                         <div>Pilih filter lalu klik "Tampilkan"</div>
@@ -3838,6 +3901,32 @@
                 noResults: function () { return 'Tidak ada lane. Ketik lalu tekan Enter untuk membuat baru.'; },
                 searching: function () { return 'Mencari...'; },
             },
+        }));
+
+        // ── Select2 TAGS untuk Type ──
+        const typeOpts = {
+            placeholder: '-- Ketik atau pilih type --',
+            allowClear: true,
+            width: '100%',
+            dropdownParent: $('#supportModal'),
+            tags: true,
+            tokenSeparators: [],
+            createTag: function (params) {
+                const term = $.trim(params.term);
+                if (term === '') return null;
+                return { id: term, text: term + ' (baru)', newTag: true };
+            },
+            language: {
+                noResults: () => 'Tidak ada type. Ketik lalu tekan Enter untuk membuat baru.',
+                searching: () => 'Mencari...',
+            },
+        };
+
+        $('#ncType').select2($.extend({}, typeOpts, {
+            placeholder: '-- Ketik atau pilih type --',
+        }));
+        $('#m4Type').select2($.extend({}, typeOpts, {
+            placeholder: '-- Ketik atau pilih type --',
         }));
 
         select2Inited = true;
@@ -7186,6 +7275,8 @@
         resetHeader('m4');
 
         populateLaneOptions();
+        populateTypeOptions('nc', '');
+        populateTypeOptions('m4', '');
 
         populateReferenceSelects();
         populateReferenceSelects();
@@ -7234,19 +7325,34 @@
                 clearFormExceptLane('nc');
             }
 
-            setTimeout(() => checkByLane('nc', noLane), 100);
+            populateTypeOptions('nc', noLane);
+
+            const type = $('#ncType').val().trim();
+            if (type) {
+                setTimeout(() => checkByLane('nc', noLane), 100);
+            } else {
+                updateModeBadge('nc', 'need-type');
+                document.getElementById('ncContentBody').innerHTML = '';
+                renderEmptyState('nc');
+                ncExistingRecordId = null;
+            }
         });
 
+        // Sama untuk m4
         $('#m4NoLane').on('select2:select', function (e) {
             const noLane = $(this).val();
             if (!noLane) return;
-
             const isNewTag = !!(e.params?.data?.newTag);
-            if (isNewTag) {
-                clearFormExceptLane('m4');
+            if (isNewTag) clearFormExceptLane('m4');
+            populateTypeOptions('m4', noLane);
+            const type = $('#m4Type').val().trim();
+            if (type) setTimeout(() => checkByLane('m4', noLane), 100);
+            else {
+                updateModeBadge('m4', 'need-type');
+                document.getElementById('m4ContentBody').innerHTML = '';
+                renderEmptyState('m4');
+                m4ExistingRecordId = null;
             }
-
-            setTimeout(() => checkByLane('m4', noLane), 100);
         });
 
         $('#ncNoLane').on('select2:clear', function () {
@@ -7256,6 +7362,40 @@
         $('#m4NoLane').on('select2:clear', function () {
             clearFormExceptLane('m4');
             updateModeBadge('m4', 'empty');
+        });
+
+        $('#ncType').on('select2:select', function () {
+            const noLane = $('#ncNoLane').val();
+            const type   = $(this).val();
+            if (!noLane || !type) {
+                updateModeBadge('nc', 'need-type');
+                return;
+            }
+            setTimeout(() => checkByLane('nc', noLane), 100);
+        });
+
+        $('#ncType').on('select2:clear', function () {
+            updateModeBadge('nc', 'need-type');
+            document.getElementById('ncContentBody').innerHTML = '';
+            renderEmptyState('nc');
+            ncExistingRecordId = null;
+        });
+
+        $('#m4Type').on('select2:select', function () {
+            const noLane = $('#m4NoLane').val();
+            const type   = $(this).val();
+            if (!noLane || !type) {
+                updateModeBadge('m4', 'need-type');
+                return;
+            }
+            setTimeout(() => checkByLane('m4', noLane), 100);
+        });
+
+        $('#m4Type').on('select2:clear', function () {
+            updateModeBadge('m4', 'need-type');
+            document.getElementById('m4ContentBody').innerHTML = '';
+            renderEmptyState('m4');
+            m4ExistingRecordId = null;
         });
 
         laneSelect2Inited = true;
@@ -7309,17 +7449,28 @@
 
         const isNc = which === 'nc';
         const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
-        const endpoint  = isNc
+        const type      = isNc ? $('#ncType').val() : $('#m4Type').val();
+
+        if (!type) {
+            updateModeBadge(which, 'need-type');
+            const tbodyId = isNc ? 'ncContentBody' : 'm4ContentBody';
+            document.getElementById(tbodyId).innerHTML = '';
+            renderEmptyState(which);
+            if (isNc) { ncExistingRecordId = null; } else { m4ExistingRecordId = null; }
+            return;
+        }
+
+        const endpoint = isNc
             ? '/support/nursecall/by-lane'
             : '/support/4m/by-lane';
 
         try {
             const res = await api(endpoint, {
-                query: { no_lane: noLane, month_year: monthYear || '' }
+                query: { no_lane: noLane, type: type, month_year: monthYear || '' }
             });
 
             if (!res || !res.record) {
-                clearFormExceptLane(which);
+                clearFormExceptLane(which, { keepType: true });
                 updateModeBadge(which, 'new-lane');
                 return;
             }
@@ -7329,15 +7480,15 @@
             const sameMonth = !!res.is_same_month;
 
             if (isNc) {
-                if (rec.type)                 $('#ncType').val(rec.type);
-                if (rec.created_by_name)      $('#ncCreatedName').val(rec.created_by_name);
-                if (rec.approved_by_name)     $('#ncApprovedName').val(rec.approved_by_name);
+                if (rec.type) setSelect2Value($('#ncType'), rec.type, rec.type);
+                if (rec.created_by_name)  $('#ncCreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name) $('#ncApprovedName').val(rec.approved_by_name);
                 if (rec.footer_created_name)  $('#ncFooterCreatedName').val(rec.footer_created_name);
                 if (rec.footer_approved_name) $('#ncFooterApprovedName').val(rec.footer_approved_name);
             } else {
-                if (rec.type)                 $('#m4Type').val(rec.type);
-                if (rec.created_by_name)      $('#m4CreatedName').val(rec.created_by_name);
-                if (rec.approved_by_name)     $('#m4ApprovedName').val(rec.approved_by_name);
+                if (rec.type)             $('#m4Type').val(rec.type);
+                if (rec.created_by_name)  $('#m4CreatedName').val(rec.created_by_name);
+                if (rec.approved_by_name) $('#m4ApprovedName').val(rec.approved_by_name);
             }
 
             if (sameMonth) {
@@ -7345,26 +7496,18 @@
                     if (rec.date_created)   $('#ncDateCreated').val(rec.date_created);
                     if (rec.footer_comment) $('#ncComment').val(rec.footer_comment);
                     if (rec.footer_date)    $('#ncFooterDate').val(rec.footer_date);
-
                     renderNursecallItems(items);
                     ncExistingRecordId = rec.id;
                     updateModeBadge('nc', 'edit', items.length);
                 } else {
                     if (rec.date) $('#m4Date').val(rec.date);
-
                     renderRecord4mItems(items);
                     m4ExistingRecordId = rec.id;
                     updateModeBadge('m4', 'edit', items.length);
                 }
-
-                showToast(
-                    `Lane ${noLane} ditemukan — ${items.length} baris content dimuat`,
-                    'info'
-                );
-
+                showToast(`Lane ${noLane} / Type ${type} — ${items.length} baris dimuat`, 'info');
             } else {
                 const today = new Date().toISOString().split('T')[0];
-
                 if (isNc) {
                     $('#ncMonthYear').val(monthYear);
                     $('#ncDateCreated').val(today);
@@ -7379,12 +7522,8 @@
                     document.getElementById('m4ContentBody').innerHTML = '';
                     renderEmptyState('m4');
                 }
-
                 updateModeBadge(which, 'new-month', rec.month_year);
-                showToast(
-                    `Lane ${noLane} sudah ada (bulan ${rec.month_year}). Siap buat record bulan ${monthYear}.`,
-                    'info'
-                );
+                showToast(`Lane ${noLane} Type ${type} ada di bulan ${rec.month_year}. Buat record baru ${monthYear}.`, 'info');
             }
             populateReferenceSelects(which);
         } catch (err) {
@@ -7400,7 +7539,8 @@
         if (which === 'nc') {
             // ── Header ──
             setSelect2Value($('#ncNoLane'), '', '');
-            $('#ncType').val('');
+            setSelect2Value($('#ncType'),   '', '');
+            $('#ncTypeList').empty();
             $('#ncMonthYear').val(currentMonth);
             $('#ncDateCreated').val(today);
             $('#ncCreatedName').val(userName);
@@ -7423,7 +7563,8 @@
         } else {
             // ── Header 4M ──
             setSelect2Value($('#m4NoLane'), '', '');
-            $('#m4Type').val('');
+            setSelect2Value($('#m4Type'),   '', '');
+            $('#m4TypeList').empty();
             $('#m4MonthYear').val(currentMonth);
             $('#m4Date').val(today);
             $('#m4CreatedName').val(userName);
@@ -7636,10 +7777,16 @@
         const isNc = which === 'nc';
         const noLane    = isNc ? $('#ncNoLane').val()    : $('#m4NoLane').val();
         const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
+        const type      = isNc ? $('#ncType').val() : $('#m4Type').val();
         const docType   = isNc ? 'nursecall' : '4m';
         const $select   = isNc ? $('#ncReferenceTask') : $('#m4ReferenceTask');
 
         if (!$select.length) return;
+
+        if (!noLane || !type) {
+            $select.html('<option value="">-- Pilih Lane & Type dulu --</option>');
+            return;
+        }
 
         $select.html('<option value="">-- Memuat task PDCA... --</option>');
 
@@ -7648,6 +7795,7 @@
                 query: {
                     doc_type:   docType,
                     no_lane:    noLane    || '',
+                    type:       type, 
                     month_year: monthYear || '',
                     section:    typeof urlSection !== 'undefined' ? (urlSection || '') : '',
                 }
@@ -7996,6 +8144,35 @@
         }
     }
 
+    async function populateTypeOptions(which, noLane) {
+        const isNc = which === 'nc';
+        const endpoint = isNc ? '/support/nursecall/types' : '/support/4m/types';
+        const $sel = isNc ? $('#ncType') : $('#m4Type');
+
+        try {
+            const res = await api(endpoint, { query: { no_lane: noLane || '' } });
+            const types = Array.isArray(res) ? res : (res?.data || []);
+            const current = $sel.val();
+
+            $sel.empty().append('<option value="">-- Ketik atau pilih type --</option>');
+            types.forEach(t => {
+                $sel.append(`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`);
+            });
+
+            // Pertahankan nilai yang sedang aktif (mis. tag baru yang baru diketik)
+            if (current) {
+                if (!$sel.find(`option[value="${escapeHtml(current)}"]`).length) {
+                    $sel.append(`<option value="${escapeHtml(current)}">${escapeHtml(current)}</option>`);
+                }
+                $sel.val(current);
+            }
+            if ($sel.data('select2')) $sel.trigger('change.select2');
+
+        } catch (err) {
+            console.warn('[populateTypeOptions]', err);
+        }
+    }
+
     function updateModeBadge(which, mode, extra = null) {
         const id = which === 'nc' ? '#ncModeIndicator' : '#m4ModeIndicator';
         if (!id) return;
@@ -8003,6 +8180,11 @@
         let html = '';
 
         switch (mode) {
+            case 'need-type':
+                html = `<span class="record-mode-badge mode-empty">
+                    <i class="ti ti-info-circle"></i> Pilih / ketik <strong>Type</strong> dulu untuk memuat header
+                </span>`;
+            break;
             case 'empty':
                 html = `<span class="record-mode-badge mode-empty">
                     <i class="ti ti-info-circle"></i> Pilih / ketik No Lane dulu
@@ -8173,15 +8355,20 @@
             showAlert('error', 'Gagal Menyimpan', err.message);
         }
     }
-    function clearFormExceptLane(which) {
+    function clearFormExceptLane(which, opts = {}) {
+        const { keepType = false } = opts;
         const today = new Date().toISOString().split('T')[0];
         const currentMonth = today.slice(0, 7);
         const userName = state.currentUser?.name || '';
 
         if (which === 'nc') {
             const currentLane = $('#ncNoLane').val();
+            const currentType = keepType ? $('#ncType').val() : '';
 
-            $('#ncType').val('');
+            if (!keepType) {
+                setSelect2Value($('#ncType'), '', '');
+            }
+
             $('#ncMonthYear').val(currentMonth);
             $('#ncDateCreated').val(today);
             $('#ncCreatedName').val(userName);
@@ -8197,14 +8384,17 @@
 
             ncExistingRecordId = null;
 
-            if (currentLane) {
-                setSelect2Value($('#ncNoLane'), currentLane, currentLane);
-            }
+            if (currentLane) setSelect2Value($('#ncNoLane'), currentLane, currentLane);
+            if (keepType && currentType) setSelect2Value($('#ncType'), currentType, currentType);
 
         } else {
             const currentLane = $('#m4NoLane').val();
+            const currentType = keepType ? $('#m4Type').val() : '';
 
-            $('#m4Type').val('');
+            if (!keepType) {
+                setSelect2Value($('#m4Type'), '', '');
+            }
+
             $('#m4MonthYear').val(currentMonth);
             $('#m4Date').val(today);
             $('#m4CreatedName').val(userName);
@@ -8215,9 +8405,8 @@
 
             m4ExistingRecordId = null;
 
-            if (currentLane) {
-                setSelect2Value($('#m4NoLane'), currentLane, currentLane);
-            }
+            if (currentLane) setSelect2Value($('#m4NoLane'), currentLane, currentLane);
+            if (keepType && currentType) setSelect2Value($('#m4Type'), currentType, currentType);
         }
     }
 
@@ -8339,12 +8528,12 @@
     }
 
     function renderNursecallReport(list) {
+        const PER_PAGE = 15;
+
         const html = list.map((entry, idx) => {
             const rec    = entry.record;
             const items  = entry.items || [];
-            const sigKey = 'nc';
 
-            // ── Bulan / Tahun ──
             let monthLabel = rec.month_year || '-';
             if (rec.month_year && rec.month_year.length === 7) {
                 const [y, m] = rec.month_year.split('-');
@@ -8358,83 +8547,11 @@
                 ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
                 : '';
 
-            // Signature ATAS
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
-
-            // Signature BAWAH
             const sigGroupLeader    = rec.footer_created_name  || '';
             const sigSectionManager = rec.footer_approved_name || '';
 
-            // ── Tabel content ──
-            const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
-            const minRows = 15;
-            let rowsHtml = '';
-
-            for (let i = 0; i < minRows; i++) {
-                const it = items[i];
-                if (it) {
-                    const sumber = String(it.source || '').toLowerCase();
-                    const sumberCells = sumberCols.map(col => {
-                        const checked = sumber === col;
-                        return `<td class="check">${checked ? '✓' : '&ndash;'}</td>`;
-                    }).join('');
-
-                    const statusVal = String(it.status || '').toUpperCase();
-                    const judgeVal  = String(it.judgement || '').toUpperCase();
-
-                    rowsHtml += `
-                        <tr>
-                            <td style="text-align:center">${it.date ? formatDateSlash(it.date) : ''}</td>
-                            <td style="text-align:center">${it.time ? String(it.time).slice(0, 5) : ''}</td>
-                            <td>${escapeHtml(it.problem || '')}</td>
-                            ${sumberCells}
-                            <td>${escapeHtml(it.action || '')}</td>
-                            <td style="text-align:center">${escapeHtml(shortName(it.nurse_leader))}</td>
-                            <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
-                            <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
-                            <td style="text-align:center">${escapeHtml(shortName(it.group_leader))}</td>
-                        </tr>
-                    `;
-                } else {
-                    rowsHtml += `
-                        <tr>
-                            <td>&nbsp;</td><td></td><td></td>
-                            <td></td><td></td><td></td><td></td><td></td><td></td>
-                            <td></td><td></td><td></td><td></td><td></td>
-                        </tr>
-                    `;
-                }
-            }
-
-            const tableHtml = `
-                <table class="sr-table">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" class="col-tgl">TGL</th>
-                            <th rowspan="2" class="col-jam">JAM</th>
-                            <th rowspan="2" class="col-masalah">MASALAH</th>
-                            <th colspan="6">SUMBER MASALAH</th>
-                            <th rowspan="2" class="col-tindakan">TINDAKAN</th>
-                            <th rowspan="2" class="col-nurse">NURSE<br>LEADER</th>
-                            <th rowspan="2" class="col-status">STATUS</th>
-                            <th rowspan="2" class="col-judge">JUDGEMENT</th>
-                            <th rowspan="2" class="col-gleader">GROUP<br>LEADER</th>
-                        </tr>
-                        <tr>
-                            <th class="col-sumber sr-sumber-header">PART</th>
-                            <th class="col-sumber sr-sumber-header">MACHINE</th>
-                            <th class="col-sumber sr-sumber-header">MAN<br>POWER</th>
-                            <th class="col-sumber sr-sumber-header">TOOL</th>
-                            <th class="col-sumber sr-sumber-header">MATERIAL</th>
-                            <th class="col-sumber sr-sumber-header">DLL</th>
-                        </tr>
-                    </thead>
-                    <tbody>${rowsHtml}</tbody>
-                </table>
-            `;
-
-            // ⭐ Kolom KIRI: KETERANGAN (tanpa <br> di poin 5)
             const keterangan = `
                 <div class="sr-bottom-left">
                     <div class="sr-keterangan-title">KETERANGAN :</div>
@@ -8451,120 +8568,211 @@
             const komentarText = rec.footer_comment || '';
             const komentarDate = rec.footer_date || '';
 
-            // ⭐ Kolom KANAN: KOMENTAR + TTD (satu section)
-            const signatureBlock = `
-                <div class="sr-signature-section">
-                    <!-- Header: KOMENTAR (kiri) | TANGGAL (kanan, tanpa kotak) -->
-                    <div class="sr-signature-header">
-                        <div>KOMENTAR :</div>
-                        <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
-                    </div>
+            const chunks = [];
+            if (items.length === 0) {
+                chunks.push([]);
+            } else {
+                for (let i = 0; i < items.length; i += PER_PAGE) {
+                    chunks.push(items.slice(i, i + PER_PAGE));
+                }
+            }
 
-                    <!-- Isi: komentar (kiri) + 2 TTD (kanan, border menyatu) -->
-                    <div class="sr-signature-content">
-                        <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+            return chunks.map((chunk, chunkIdx) => {
+                const uniqueSigKey = `nc-${idx}-${chunkIdx}`;
+                const isContinuation = chunkIdx > 0;
 
-                        <div class="sr-ttd-container">
-                            <div class="sr-ttd-box">
-                                <div class="sr-sig-header">GROUP LEADER</div>
-                                <div class="signature-qrcode" data-type="footer-left-${sigKey}-${idx}" data-signature=""></div>
-                                <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                const sumberCols = ['part', 'machine', 'man_power', 'tool', 'material', 'dll'];
+                let rowsHtml = '';
+
+                for (let i = 0; i < PER_PAGE; i++) {
+                    const it = chunk[i];
+                    if (it) {
+                        const sumber = String(it.source || '').toLowerCase();
+                        const sumberCells = sumberCols.map(col => {
+                            const checked = sumber === col;
+                            return `<td class="check">${checked ? '✓' : '&ndash;'}</td>`;
+                        }).join('');
+
+                        const statusVal = String(it.status || '').toUpperCase();
+                        const judgeVal  = String(it.judgement || '').toUpperCase();
+
+                        rowsHtml += `
+                            <tr>
+                                <td style="text-align:center">${it.date ? formatDateSlash(it.date) : ''}</td>
+                                <td style="text-align:center">${it.time ? String(it.time).slice(0, 5) : ''}</td>
+                                <td>${escapeHtml(it.problem || '')}</td>
+                                ${sumberCells}
+                                <td>${escapeHtml(it.action || '')}</td>
+                                <td style="text-align:center">${escapeHtml(shortName(it.nurse_leader))}</td>
+                                <td style="text-align:center" class="sr-status-${statusVal === 'O' ? 'o' : (statusVal === 'X' ? 'x' : '')}">${escapeHtml(statusVal || '')}</td>
+                                <td style="text-align:center" class="sr-status-${judgeVal === 'O' ? 'o' : (judgeVal === 'X' ? 'x' : '')}">${escapeHtml(judgeVal || '')}</td>
+                                <td style="text-align:center">${escapeHtml(shortName(it.group_leader))}</td>
+                            </tr>
+                        `;
+                    } else {
+                        rowsHtml += `
+                            <tr>
+                                <td>&nbsp;</td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td><td></td>
+                                <td></td><td></td><td></td><td></td><td></td>
+                            </tr>
+                        `;
+                    }
+                }
+
+                const tableHtml = `
+                    <table class="sr-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="col-tgl">TGL</th>
+                                <th rowspan="2" class="col-jam">JAM</th>
+                                <th rowspan="2" class="col-masalah">MASALAH</th>
+                                <th colspan="6">SUMBER MASALAH</th>
+                                <th rowspan="2" class="col-tindakan">TINDAKAN</th>
+                                <th rowspan="2" class="col-nurse">NURSE<br>LEADER</th>
+                                <th rowspan="2" class="col-status">STATUS</th>
+                                <th rowspan="2" class="col-judge">JUDGEMENT</th>
+                                <th rowspan="2" class="col-gleader">GROUP<br>LEADER</th>
+                            </tr>
+                            <tr>
+                                <th class="col-sumber sr-sumber-header">PART</th>
+                                <th class="col-sumber sr-sumber-header">MACHINE</th>
+                                <th class="col-sumber sr-sumber-header">MAN<br>POWER</th>
+                                <th class="col-sumber sr-sumber-header">TOOL</th>
+                                <th class="col-sumber sr-sumber-header">MATERIAL</th>
+                                <th class="col-sumber sr-sumber-header">DLL</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHtml}</tbody>
+                    </table>
+                `;
+
+                const signatureBlock = `
+                    <div class="sr-signature-section">
+                        <div class="sr-signature-header">
+                            <div>KOMENTAR :</div>
+                            <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
+                        </div>
+                        <div class="sr-signature-content">
+                            <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+                            <div class="sr-ttd-container">
+                                <div class="sr-ttd-box">
+                                    <div class="sr-sig-header">GROUP LEADER</div>
+                                    <div class="signature-qrcode" data-type="footer-left-${uniqueSigKey}" data-signature=""></div>
+                                    <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                                </div>
+                                <div class="sr-ttd-box">
+                                    <div class="sr-sig-header">SECTION MANAGER</div>
+                                    <div class="signature-qrcode" data-type="footer-right-${uniqueSigKey}" data-signature=""></div>
+                                    <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                                </div>
                             </div>
-                            <div class="sr-ttd-box">
-                                <div class="sr-sig-header">SECTION MANAGER</div>
-                                <div class="signature-qrcode" data-type="footer-right-${sigKey}-${idx}" data-signature=""></div>
-                                <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <div class="sr-page">
+                    <div class="page-badge">Halaman ${chunkIdx + 1} / ${chunks.length}</div>
+                        <div class="sr-top">
+                            <div class="sr-top-logo">
+                                <img src="${LOGO}" alt="Logo" onerror="this.style.display='none'">
+                            </div>
+                            <div class="sr-top-title">
+                                <div class="sr-main-title">CATATAN FREKUENSI NURSE CALL</div>
+                                <div class="sr-sub-title">BULAN / TAHUN : ${escapeHtml(monthLabel)}</div>
+                            </div>
+                            <div class="sr-top-sig">
+                                <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
+                                <table>
+                                    <tr>
+                                        <td class="sr-sig-header">DIBUAT</td>
+                                        <td class="sr-sig-header">DISETUJUI</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="created-${uniqueSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                        </td>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="approved-${uniqueSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                    </div>
-                </div>
-            `;
 
-            return `
-                <div class="sr-page">
-                    <!-- TOP HEADER -->
-                    <div class="sr-top">
-                        <div class="sr-top-logo">
-                            <img src="${LOGO}"
-                                alt="Logo"
-                                onerror="this.style.display='none'">
+                        <div class="sr-info-row">
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">NO LANE</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
+                            </div>
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">TYPE</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
+                            </div>
+                            ${isContinuation ? `
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">HALAMAN</span>
+                                <span class="sr-info-sep">:</span>
+                                <span class="sr-info-value">${chunkIdx + 1} dari ${chunks.length}</span>
+                            </div>` : ''}
                         </div>
-                        <div class="sr-top-title">
-                            <div class="sr-main-title">CATATAN FREKUENSI NURSE CALL</div>
-                            <div class="sr-sub-title">BULAN / TAHUN : ${escapeHtml(monthLabel)}</div>
+
+                        ${tableHtml}
+
+                        <div class="sr-bottom">
+                            ${keterangan}
+                            ${signatureBlock}
                         </div>
-                        <div class="sr-top-sig">
-                            <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
-                            <table>
-                                <tr>
-                                    <td class="sr-sig-header">DIBUAT</td>
-                                    <td class="sr-sig-header">DISETUJUI</td>
-                                </tr>
-                                <tr>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
-                                    </td>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
-                                    </td>
-                                </tr>
-                            </table>
+
+                        <div class="sr-form-code">
+                            Q-108-ISE-001-FORM-001-REV.0${isContinuation ? ' (cont. ' + (chunkIdx + 1) + ')' : ''}
                         </div>
                     </div>
-
-                    <!-- INFO ROW — NO LANE atas, TYPE bawah -->
-                    <div class="sr-info-row">
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">NO LANE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
-                        </div>
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">TYPE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
-                        </div>
-                    </div>
-
-                    <!-- MAIN TABLE -->
-                    ${tableHtml}
-
-                    <!-- BOTTOM — KETERANGAN (kiri) + KOMENTAR + TTD (kanan) -->
-                    <div class="sr-bottom">
-                        ${keterangan}
-                        ${signatureBlock}
-                    </div>
-
-                    <div class="sr-form-code">Q-108-ISE-001-FORM-001-REV.0</div>
-                </div>
-            `;
+                `;
+            }).join('');
         }).join('');
 
         $('#srReportContainer').html(html);
 
-        // Render QR — 4 signature
         setTimeout(() => {
             list.forEach((entry, idx) => {
-                const rec = entry.record;
+                const rec   = entry.record;
+                const items = entry.items || [];
 
-                if (rec.created_by_name) {
-                    const el = document.querySelector(`[data-type="created-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.created_by_name);
+                const chunks = [];
+                if (items.length === 0) {
+                    chunks.push([]);
+                } else {
+                    for (let i = 0; i < items.length; i += PER_PAGE) {
+                        chunks.push(items.slice(i, i + PER_PAGE));
+                    }
                 }
-                if (rec.approved_by_name) {
-                    const el = document.querySelector(`[data-type="approved-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.approved_by_name);
-                }
-                if (rec.footer_created_name) {
-                    const el = document.querySelector(`[data-type="footer-left-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.footer_created_name);
-                }
-                if (rec.footer_approved_name) {
-                    const el = document.querySelector(`[data-type="footer-right-nc-${idx}"]`);
-                    if (el) renderQRCode(el, rec.footer_approved_name);
-                }
+
+                chunks.forEach((_, chunkIdx) => {
+                    const uniqueSigKey = `nc-${idx}-${chunkIdx}`;
+
+                    if (rec.created_by_name) {
+                        const el = document.querySelector(`[data-type="created-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.created_by_name);
+                    }
+                    if (rec.approved_by_name) {
+                        const el = document.querySelector(`[data-type="approved-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.approved_by_name);
+                    }
+                    if (rec.footer_created_name) {
+                        const el = document.querySelector(`[data-type="footer-left-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.footer_created_name);
+                    }
+                    if (rec.footer_approved_name) {
+                        const el = document.querySelector(`[data-type="footer-right-${uniqueSigKey}"]`);
+                        if (el) renderQRCode(el, rec.footer_approved_name);
+                    }
+                });
             });
         }, 200);
     }
@@ -9178,6 +9386,7 @@
         const original = document.getElementById('srReportContainer');
         if (!original) return;
 
+        document.body.classList.add('is-exporting');
         const qrCanvases = original.querySelectorAll('.signature-qrcode canvas');
         qrCanvases.forEach(canvas => {
             try {
@@ -9267,6 +9476,7 @@
             console.error('[exportSupportPDF]', err);
             showAlert('error', 'Gagal Export PDF', err.message);
         } finally {
+            document.body.classList.remove('is-exporting');
             if (wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
         }
     }
