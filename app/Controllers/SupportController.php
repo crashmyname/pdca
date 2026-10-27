@@ -1565,7 +1565,7 @@ class SupportController extends BaseController
     {
         if (!$user || !isset($user->role)) return false;
         return in_array(strtolower($user->role),
-            ['TEAM_LEADER', 'GROUP_LEADER', 'MANAGER', 'ADMIN'], true);
+            ['team_leader', 'group_leader', 'manager', 'admin'], true);
     }
 
     private function enumOrNull($value, array $allowed)
