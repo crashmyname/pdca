@@ -207,7 +207,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task created by ' . $userName . ' (' . $userRole . ')',
             ]);
 
-            $this->broadcastPdcaStats();
+            $this->broadcastPdcaStats($task->lane ?? null);
             return $this->json($task, 201);
 
         } catch (\Throwable $e) {
@@ -387,7 +387,15 @@ class TaskController extends BaseController
             }
         }
 
-        $this->broadcastPdcaStats();
+        // $this->broadcastPdcaStats($task->lane ?? null);
+        $oldLaneForBroadcast = $oldValues['lane'] ?? null;
+        $newLaneForBroadcast = $task->lane ?? null;
+
+        if ($oldLaneForBroadcast && $oldLaneForBroadcast !== $newLaneForBroadcast) {
+            // lane berubah → broadcast ke lane lama juga
+            $this->broadcastPdcaStats($oldLaneForBroadcast);
+        }
+        $this->broadcastPdcaStats($newLaneForBroadcast);
         return $this->json($task, 200);
     }
 
@@ -516,7 +524,7 @@ class TaskController extends BaseController
                 'notes'           => "Stage: {$oldStage} → {$newStage}, Status: {$oldStatus} → {$newStatus}",
             ]);
 
-            $this->broadcastPdcaStats();
+            $this->broadcastPdcaStats($task->lane ?? null);
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
@@ -594,7 +602,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task approved by ' . ($user->name ?? 'Leader'),
             ]);
 
-            $this->broadcastPdcaStats();
+            $this->broadcastPdcaStats($task->lane ?? null);
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
@@ -635,7 +643,7 @@ class TaskController extends BaseController
             ['notes' => 'Task Dihapus: '.($snapshot['task_code'] ?? '')]
         );
 
-        $this->broadcastPdcaStats();
+        $this->broadcastPdcaStats($snapshot['lane'] ?? null);
         return $this->json([
             'message' => 'Task deleted successfully'
         ],200);
@@ -687,7 +695,7 @@ class TaskController extends BaseController
                 'notes'           => 'Task cancelled by ' . ($user->name ?? 'Leader'),
             ]);
 
-            $this->broadcastPdcaStats();
+            $this->broadcastPdcaStats($task->lane ?? null);
             return $this->json($task, 200);
 
         } catch (\Throwable $e) {
