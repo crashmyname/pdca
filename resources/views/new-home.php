@@ -2443,8 +2443,8 @@
                     <span class="search-icon"><i class="ti ti-search"></i></span>
                     <input type="text" class="search-input" id="searchInput" placeholder="Cari task..." oninput="handleSearch(this.value)">
                 </div>
-                <select class="filter-select" id="sectionFilter" onchange="handleFilter()">
-                    <option value="all">Semua Seksi</option>
+                <select class="filter-select" id="laneFilter" onchange="handleFilter()">
+                    <option value="all">Semua Lane</option>
                 </select>
                 <input type="date" class="date-input" id="dateFrom" onchange="handleFilter()" title="Dari Tanggal">
                 <input type="date" class="date-input" id="dateTo" onchange="handleFilter()" title="Sampai Tanggal">
@@ -3712,10 +3712,12 @@
         tasks: [],
         currentUser: null,
         searchQuery: '',
-        sectionFilter: 'all',
+        laneFilter: 'all',
         dateFrom: null,
         dateTo: null,
     };
+    const laneCache = new Set();
+    let laneFilterInitialized = false;
     let employeeList    = [];
     let employeeLoaded  = false;
     let employeeLoading = false;
@@ -4014,33 +4016,23 @@
         setupEventListeners();
         restoreUser();
         updateUserInterface();
-        setQuickDate('today');
+
         await loadSections();
-        if (urlSection) {
-            const target  = String(urlSection).toUpperCase();
-            const $filter = $('#sectionFilter');
 
-            // Cari option yang dept-nya cocok (PO/SMT/EVA/LA) atau singkatan cocok
-            let matchedVal = null;
-            $filter.find('option').each(function () {
-                const dept  = String($(this).data('dept')      || '').toUpperCase();
-                const singk = String($(this).data('singkatan') || '').toUpperCase();
-                if (dept === target || singk === target) {
-                    matchedVal = $(this).val();
-                    return false;
-                }
-            });
+        const todayStr = fmtDate(new Date());
+        $('#dateFrom').val(todayStr);
+        $('#dateTo').val(todayStr);
+        state.dateFrom = todayStr;
+        state.dateTo   = todayStr;
+        setActiveQuickDate('today');
 
-            if (matchedVal) {
-                $filter.val(matchedVal);
-                state.sectionFilter = matchedVal;
-            } else {
-                // Tidak ada match → biarkan "all", jangan filter apa pun
-                $filter.val('all');
-                state.sectionFilter = 'all';
-            }
-        }
         await loadTasks();
+
+        await populateLaneFilterOnce();
+
+        if (state.laneFilter !== 'all') {
+            await loadTasks();
+        }
     });
 
     function setupEventListeners() {
@@ -4339,27 +4331,32 @@
     // LOAD TASKS
     // ============================================================
     async function loadTasks() {
-        const $filter = $('#sectionFilter');
-        if ($filter.length) {
-            const currentVal = $filter.val();
-            state.sectionFilter = (currentVal && currentVal !== '') ? currentVal : 'all';
-        }
         const loadingMsg = state.dateFrom && state.dateTo
             ? `Mengambil data ${formatDate(state.dateFrom)} — ${formatDate(state.dateTo)}...`
             : 'Mengumpulkan data...';
         showBoardLoading(loadingMsg);
+
         try {
             const query = {
                 per_page: 500,
                 date_from: state.dateFrom || '',
                 date_to:   state.dateTo   || '',
-                section:   state.sectionFilter !== 'all' ? state.sectionFilter : '',
+                lane:      state.laneFilter !== 'all' ? state.laneFilter : '',   // ⬅ LANE
                 search:    state.searchQuery || '',
             };
 
-            const res = await api('/tasks', { query });
+            const res  = await api('/tasks', { query });
             const list = Array.isArray(res) ? res : (res?.data || []);
             state.tasks = list.map(normalizeTask);
+
+            // ⬇ Kumpulkan lane dari hasil (tanpa filter) untuk populasi dropdown
+            if (state.laneFilter === 'all') {
+                state.tasks.forEach(t => {
+                    if (t.lane) laneCache.add(t.lane);
+                });
+                renderLaneFilter();
+            }
+
             render();
         } catch (err) {
             if (err.status === 401) {
@@ -4368,8 +4365,8 @@
             } else {
                 showToast('Gagal memuat task: ' + err.message, 'error');
             }
-        } finally{
-            hideBoardLoading()
+        } finally {
+            hideBoardLoading();
         }
     }
 
@@ -4700,7 +4697,7 @@
     }
 
     function handleFilter() {
-        state.sectionFilter = $('#sectionFilter').val();
+        state.laneFilter = $('#laneFilter').val() || 'all';
         state.dateFrom = $('#dateFrom').val() || null;
         state.dateTo = $('#dateTo').val() || null;
         detectActiveQuickDate();
@@ -4709,11 +4706,11 @@
 
     function clearFilters() {
         state.searchQuery = '';
-        state.sectionFilter = 'all';
+        state.laneFilter  = 'all';
         state.dateFrom = null;
         state.dateTo = null;
         $('#searchInput').val('');
-        $('#sectionFilter').val('all');
+        $('#laneFilter').val('all');
         $('#dateFrom').val('');
         $('#dateTo').val('');
         setQuickDate('today');
@@ -4724,28 +4721,23 @@
         return state.tasks.filter(task => {
             if (task.status === 'cancelled') return false;
 
-            // ── Search (cek semua field) ──
+            // Search
             if (state.searchQuery) {
                 const s = [
-                    task.operatorName,
-                    task.section,
-                    task.problem,
-                    task.tempAction,
-                    task.permAction,
-                    task.pic,
-                    task.taskCode,
+                    task.operatorName, task.section, task.problem,
+                    task.tempAction, task.permAction, task.pic,
+                    task.taskCode, task.lane,
                     CATEGORY_LABEL[task.category] || '',
                     PIC_SECTION_LABEL[task.picSection] || '',
-                    task.stage,
-                    task.status,
+                    task.stage, task.status,
                 ].join(' ').toLowerCase();
                 if (!s.includes(state.searchQuery)) return false;
             }
 
-            // ── Filter seksi ──
-            if (state.sectionFilter !== 'all' && task.section !== state.sectionFilter) return false;
+            // ══════ FILTER LANE ══════
+            if (state.laneFilter !== 'all' && task.lane !== state.laneFilter) return false;
 
-            // ── Filter tanggal (selalu aktif) ──
+            // Date filter
             if (state.dateFrom) {
                 if (new Date(task.date) < new Date(state.dateFrom)) return false;
             }
@@ -4757,6 +4749,79 @@
 
             return true;
         });
+    }
+
+    async function populateLaneFilterOnce() {
+        const $sel = $('#laneFilter');
+        if (!$sel.length) return;
+
+        if (typeof urlSection !== 'undefined' && urlSection) {
+            try {
+                const code = String(urlSection).toLowerCase().trim();
+                const url  = `${LANE_API_BASE}/${encodeURIComponent(code)}`;
+                const res  = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                if (res.ok) {
+                    const json = await res.json();
+
+                    let raw = [];
+                    if (Array.isArray(json))                     raw = json;
+                    else if (Array.isArray(json.data))           raw = json.data;
+                    else if (Array.isArray(json.lanes))          raw = json.lanes;
+                    else if (Array.isArray(json.results))        raw = json.results;
+                    else if (Array.isArray(json.data?.lanes))    raw = json.data.lanes;
+                    else if (Array.isArray(json.data?.items))    raw = json.data.items;
+
+                    raw.forEach(x => {
+                        let v = '';
+                        if (typeof x === 'string') v = x.trim();
+                        else if (x && typeof x === 'object') {
+                            v = String(
+                                x.noLane ?? x.no_lane ?? x.lane ?? x.lane_name ??
+                                x.name ?? x.kode ?? x.code ?? x.value ?? ''
+                            ).trim();
+                        }
+                        if (v) laneCache.add(v);
+                    });
+                }
+            } catch (err) {
+                console.warn('[populateLaneFilterOnce] lane API:', err);
+            }
+        }
+
+        if (typeof urlLane !== 'undefined' && urlLane) {
+            laneCache.add(String(urlLane).trim());
+        }
+
+        (state.tasks || []).forEach(t => {
+            if (t.lane) laneCache.add(t.lane);
+        });
+
+        renderLaneFilter();
+    }
+
+    function renderLaneFilter() {
+        const $sel = $('#laneFilter');
+        if (!$sel.length) return;
+
+        const lanes = [...laneCache].sort();
+        const current = $sel.val();
+
+        $sel.empty().append('<option value="all">Semua Lane</option>');
+        lanes.forEach(l => {
+            $sel.append(`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`);
+        });
+
+        // Auto-select dari urlLane (hanya sekali)
+        let preferred = current;
+        if (!laneFilterInitialized && typeof urlLane !== 'undefined' && urlLane) {
+            preferred = String(urlLane).trim();
+        }
+        if (!preferred || preferred === '') preferred = 'all';
+
+        $sel.val(preferred);
+        state.laneFilter = preferred;
+
+        laneFilterInitialized = true;
     }
 
     // ============================================================
@@ -5645,6 +5710,7 @@
                     date_from: $('#reportDateFrom').val() || '',
                     date_to: $('#reportDateTo').val() || '',
                     section: $('#reportSection').val(),
+                    lane:      state.laneFilter !== 'all' ? state.laneFilter : '',
                     stage: $('#reportStage').val(),
                     status: $('#reportStatus').val(),
                 }
@@ -6405,9 +6471,10 @@
     function updateBoardInfo(filtered, isLeader) {
         $('#totalTasks').text(`${state.tasks.length} Task`);
         $('#filteredTasks').text(`${filtered.length} Ditampilkan`);
-        $('#boardSubtitle').text(isLeader
-            ? 'Drag and drop untuk memindahkan task'
-            : 'Login sebagai leader untuk drag & drop');
+        $('#boardSubtitle').text(
+            (state.laneFilter !== 'all' ? `Lane: ${state.laneFilter} · ` : '') +
+            (isLeader ? 'Drag and drop untuk memindahkan task' : 'Login sebagai leader untuk drag & drop')
+        );
     }
 
     // ============================================================
