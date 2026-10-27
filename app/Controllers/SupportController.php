@@ -1175,13 +1175,13 @@ class SupportController extends BaseController
             $noLane    = trim((string) ($request->no_lane    ?? ''));
             $monthYear = trim((string) ($request->month_year ?? ''));
             $section   = trim((string) ($request->section    ?? ''));
+            $type      = trim((string) ($request->type       ?? ''));
 
             $isNc = ($docType === 'nursecall');
 
             // ═══════════════════════════════════════════════════
-            // 1. Record ID untuk lane + bulan ini
+            // 1. Record ID untuk lane + bulan + type INI
             // ═══════════════════════════════════════════════════
-            $type = trim((string) ($request->type ?? ''));
             $recordId = null;
             if ($noLane && $monthYear) {
                 if ($isNc) {
@@ -1223,27 +1223,62 @@ class SupportController extends BaseController
             }
 
             // ═══════════════════════════════════════════════════
-            // 3. Task yang sudah dipakai di RECORD LAIN
+            // 3. Kumpulkan SEMUA record ID dengan lane+bulan+type SAMA
+            //    ── FIX UTAMA ──
+            //    Ini "scope" record saat ini. Task yang sudah ada di salah
+            //    satu record dalam scope ini tidak perlu ditampilkan lagi
+            //    (supaya tidak dobel di laporan yang sama).
+            //
+            //    Task yang ada di record dengan type/bulan/lane BERBEDA
+            //    → tetap ditampilkan (boleh di-add ke record baru).
             // ═══════════════════════════════════════════════════
-            if ($isNc) {
-                $allAssigned = NursecallItem::query()
-                    ->whereNotNull('task_id')
-                    ->get(\PDO::FETCH_ASSOC);
-            } else {
-                $allAssigned = Record4mItem::query()
-                    ->whereNotNull('task_id')
-                    ->get(\PDO::FETCH_ASSOC);
-            }
+            $sameKeyRecordIds = [];
 
-            $taskIdsInOtherRecords = [];
-            foreach ($allAssigned as $it) {
-                $tid = (int) ($it['task_id']  ?? 0);
-                $rid = (int) ($it['record_id'] ?? 0);
-                if ($tid && $rid !== $recordId) {
-                    $taskIdsInOtherRecords[] = $tid;
+            if ($noLane && $monthYear && $type) {
+                if ($isNc) {
+                    $sameKeyRecs = NursecallRecord::query()
+                        ->where('no_lane',    '=', $noLane)
+                        ->where('month_year', '=', $monthYear)
+                        ->where('type',       '=', $type)
+                        ->get(\PDO::FETCH_ASSOC);
+                } else {
+                    $sameKeyRecs = Record4m::query()
+                        ->where('no_lane',    '=', $noLane)
+                        ->where('month_year', '=', $monthYear)
+                        ->where('type',       '=', $type)
+                        ->get(\PDO::FETCH_ASSOC);
+                }
+                foreach ($sameKeyRecs as $r) {
+                    $sameKeyRecordIds[] = (int) $r['id'];
                 }
             }
-            $taskIdsInOtherRecords = array_values(array_unique($taskIdsInOtherRecords));
+
+            // Pastikan record yang sedang dibuka ikut masuk (kalau ada)
+            if ($recordId) {
+                $sameKeyRecordIds[] = $recordId;
+            }
+            $sameKeyRecordIds = array_values(array_unique($sameKeyRecordIds));
+
+            // Cari task yang sudah terdaftar di record dengan SCOPE SAMA
+            $taskIdsInSameScope = [];
+            if (!empty($sameKeyRecordIds)) {
+                if ($isNc) {
+                    $rows = NursecallItem::query()
+                        ->whereIn('record_id', $sameKeyRecordIds)
+                        ->whereNotNull('task_id')
+                        ->get(\PDO::FETCH_ASSOC);
+                } else {
+                    $rows = Record4mItem::query()
+                        ->whereIn('record_id', $sameKeyRecordIds)
+                        ->whereNotNull('task_id')
+                        ->get(\PDO::FETCH_ASSOC);
+                }
+                foreach ($rows as $r) {
+                    $tid = (int) ($r['task_id'] ?? 0);
+                    if ($tid) $taskIdsInSameScope[] = $tid;
+                }
+                $taskIdsInSameScope = array_values(array_unique($taskIdsInSameScope));
+            }
 
             // ═══════════════════════════════════════════════════
             // 4. Ambil task ON-PROGRESS — FILTER BY LANE
@@ -1254,11 +1289,9 @@ class SupportController extends BaseController
                     ->where('status', '!=', 'cancelled');
                 });
 
-            // ⬇ PRIORITAS: filter by LANE (lebih akurat)
             if ($noLane !== '') {
                 $onProgressQuery->where('lane', '=', $noLane);
             } elseif ($section !== '') {
-                // Fallback: kalau tidak ada lane, coba section
                 $onProgressQuery->where('section', '=', $section);
             }
 
@@ -1269,8 +1302,8 @@ class SupportController extends BaseController
 
             // ═══════════════════════════════════════════════════
             // 5. Task di RECORD INI — TIDAK difilter
-            //    (yang sudah assigned harus tetap muncul,
-            //     supaya edit record tidak kehilangan baris)
+            //    (yang sudah assigned harus tetap muncul supaya
+            //     edit record tidak kehilangan baris)
             // ═══════════════════════════════════════════════════
             $tasksInRecord = [];
             if (!empty($taskIdsInThisRecord)) {
@@ -1281,10 +1314,15 @@ class SupportController extends BaseController
 
             // ═══════════════════════════════════════════════════
             // 6. Gabungkan — no duplicate
+            //    ── FIX UTAMA ──
+            //    Exclude HANYA task yang sudah ada di record dengan
+            //    scope sama (lane+bulan+type). Task dari scope lain
+            //    tetap tampil.
             // ═══════════════════════════════════════════════════
             $result = [];
             $seen   = [];
 
+            // Prioritas 1: task dari record yang sedang dibuka (tandai _in_record = true)
             foreach ($tasksInRecord as $t) {
                 $id = (int) $t['id'];
                 if (isset($seen[$id])) continue;
@@ -1293,10 +1331,13 @@ class SupportController extends BaseController
                 $result[] = $this->normalizeTaskRef($t);
             }
 
+            // Prioritas 2: task on-progress lain (tandai _in_record = false)
             foreach ($onProgress as $t) {
                 $id = (int) $t['id'];
                 if (isset($seen[$id])) continue;
-                if (in_array($id, $taskIdsInOtherRecords, true)) continue;
+
+                // ← HANYA skip kalau sudah ada di record scope sama
+                if (in_array($id, $taskIdsInSameScope, true)) continue;
 
                 $seen[$id] = true;
                 $t['_in_record'] = false;
@@ -1382,6 +1423,7 @@ class SupportController extends BaseController
             'createdAt'       => $t['created_at']        ?? null,
             'createdByName'   => $t['created_by_name']   ?? '',
             'inRecord'        => (bool) ($t['_in_record'] ?? false),
+            'otherRecord'   => $t['_other_record'] ?? null,
         ];
     }
 

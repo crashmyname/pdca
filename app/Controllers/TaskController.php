@@ -368,7 +368,10 @@ class TaskController extends BaseController
                     ];
 
                     if ($task->category) {
-                        $syncM4Data['category'] = strtolower($task->category);
+                        $catLower = strtolower($task->category);
+                        if (in_array($catLower, ['man', 'machine', 'material', 'methode'], true)) {
+                            $syncM4Data['category'] = $catLower;
+                        }
                     }
 
                     foreach ($m4Items as $row) {
@@ -900,6 +903,8 @@ class TaskController extends BaseController
     private function mapCategoryToSource(?string $category): ?string
     {
         $cat = strtolower(trim((string) $category));
+        if ($cat === 'tidak_ada_4m') return null;
+
         return [
             'man'      => 'man_power',
             'machine'  => 'machine',

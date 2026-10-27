@@ -2340,6 +2340,30 @@
             padding: 5px 10px;
             font-size: 11px;
         }
+        /* ── Wrapper rounded untuk category ── */
+        .category-wrapper {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 12px;
+            background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+            transition: border-color 0.2s;
+        }
+        .category-wrapper:hover {
+            border-color: var(--gray-300);
+        }
+
+        /* ── Badge kategori Tidak Ada 4M ── */
+        .cat-tidak_ada_4m { background: #e5e7eb; color: #4b5563; }
+
+        /* ── Radio-card checked untuk Tidak Ada 4M ── */
+        #categoryGroup .radio-card input[value="tidak_ada_4m"]:checked + .radio-card-content {
+            border-color: #6b7280;
+            background: #f3f4f6;
+        }
+        #categoryGroup .radio-card input[value="tidak_ada_4m"]:checked + .radio-card-content .ti,
+        #categoryGroup .radio-card input[value="tidak_ada_4m"]:checked + .radio-card-content .radio-label {
+            color: #374151;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -2608,35 +2632,44 @@
 
                         <div class="form-group">
                             <label class="form-label required">Category</label>
-                            <div class="radio-card-group" id="categoryGroup">
-                                <label class="radio-card">
-                                    <input type="radio" name="category" value="man">
-                                    <div class="radio-card-content">
-                                        <i class="ti ti-user"></i>
-                                        <span class="radio-label">Man</span>
-                                    </div>
-                                </label>
-                               <label class="radio-card">
-                                    <input type="radio" name="category" value="machine">
-                                    <div class="radio-card-content">
-                                        <i class="ti ti-engine"></i>
-                                        <span class="radio-label">Machine / Jig / Mold</span>
-                                    </div>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="category" value="material">
-                                    <div class="radio-card-content">
-                                        <i class="ti ti-box"></i>
-                                        <span class="radio-label">Material</span>
-                                    </div>
-                                </label>
-                                <label class="radio-card">
-                                    <input type="radio" name="category" value="methode">
-                                    <div class="radio-card-content">
-                                        <i class="ti ti-checklist"></i>
-                                        <span class="radio-label">Methode</span>
-                                    </div>
-                                </label>
+                            <div class="category-wrapper">
+                                <div class="radio-card-group" id="categoryGroup">
+                                    <label class="radio-card">
+                                        <input type="radio" name="category" value="man">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-user"></i>
+                                            <span class="radio-label">Man</span>
+                                        </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="category" value="machine">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-engine"></i>
+                                            <span class="radio-label">Machine / Jig / Mold</span>
+                                        </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="category" value="material">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-box"></i>
+                                            <span class="radio-label">Material</span>
+                                        </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="category" value="methode">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-checklist"></i>
+                                            <span class="radio-label">Methode</span>
+                                        </div>
+                                    </label>
+                                    <label class="radio-card">
+                                        <input type="radio" name="category" value="tidak_ada_4m">
+                                        <div class="radio-card-content">
+                                            <i class="ti ti-circle-x"></i>
+                                            <span class="radio-label">Tidak Ada 4M</span>
+                                        </div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -3513,7 +3546,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Type</label>
-                                <select class="form-select" id="m4type" required>
+                                <select class="form-select" id="m4Type" required>
                                     <option value="">-- Ketik atau pilih type --</option>
                                 </select>
                                 <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
@@ -6498,6 +6531,7 @@
         machine:  'Machine / Jig / Mold',
         material: 'Material',
         methode:  'Methode',
+        tidak_ada_4m:  'Tidak Ada 4M',
     };
     const PIC_SECTION_LABEL = {
         mdf: 'MDF', pe: 'PE', pc: 'PC', inj: 'INJ',
@@ -7897,7 +7931,12 @@
             const opts = ['<option value="">-- Pilih POST IT --</option>'];
             list.forEach(t => {
                 const short = (t.problem || '').slice(0, 55);
-                const flag  = t.inRecord ? ' [ADA]' : '';
+                let flag = '';
+                if (t.inRecord) {
+                    flag = ' [ADA]';
+                } else if (t.otherRecord) {
+                    flag = ` [DI ${t.otherRecord}]`;
+                }
                 opts.push(`<option value="${t.id}">${escapeHtml(
                     `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}${flag}`
                 )}</option>`);
