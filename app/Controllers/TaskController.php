@@ -852,10 +852,17 @@ class TaskController extends BaseController
         }
     }
 
-    public function buildMonthlyStats(?string $lane = null)
+    public function buildMonthlyStats(?string $lane = null, ?string $month = null)
     {
-        $startOfMonth = Date::parse(Date::Now())->format('Y-m-01');
-        $endOfMonth   = Date::parse(Date::Now())->format('Y-m-t');
+        if ($month && preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $startOfMonth = $month . '-01';
+            $endOfMonth   = Date::parse($startOfMonth)->format('Y-m-t');
+            $monthLabel   = Date::parse($startOfMonth)->format('F Y');
+        } else {
+            $startOfMonth = Date::parse(Date::Now())->format('Y-m-01');
+            $endOfMonth   = Date::parse(Date::Now())->format('Y-m-t');
+            $monthLabel   = Date::parse(Date::Now())->format('F Y');
+        }
 
         $base = Task::query()->whereBetween('task_date', $startOfMonth, $endOfMonth);
 
@@ -877,10 +884,11 @@ class TaskController extends BaseController
                 'done'        => (clone $base)->where('status', '=', 'DONE')->count(),
                 'cancelled'   => (clone $base)->where('status', '=', 'CANCELLED')->count(),
             ],
-            'lane'   => $lane,       // ⬅ sertakan lane di response
+            'lane'  => $lane,
+            'month' => $month,
             'period' => [
                 'type'  => 'monthly',
-                'label' => Date::parse(Date::Now())->format('F Y'),
+                'label' => $monthLabel,
                 'from'  => $startOfMonth,
                 'to'    => $endOfMonth,
             ],
@@ -903,13 +911,14 @@ class TaskController extends BaseController
     // GET /api/tasks/stats - Get statistics
     public function stats(Request $request)
     {
-        $lane = $request->get('lane') ?? null;
-        return $this->json($this->buildMonthlyStats($lane), 200);
+        $lane  = $request->lane  ?? null;
+        $month = $request->month ?? null;
+        return $this->json($this->buildMonthlyStats($lane, $month), 200);
     }
 
-    public function broadcastPdcaStats(?string $lane = null): void
+    public function broadcastPdcaStats(?string $lane = null, ?string $month = null): void
     {
-        $stats = $this->buildMonthlyStats($lane);
+        $stats = $this->buildMonthlyStats($lane,$month);
 
         $ch = curl_init('http://10.203.68.47:3002/broadcast');
         curl_setopt_array($ch, [

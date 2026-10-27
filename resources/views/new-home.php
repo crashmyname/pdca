@@ -4019,12 +4019,25 @@
 
         await loadSections();
 
-        const todayStr = fmtDate(new Date());
-        $('#dateFrom').val(todayStr);
-        $('#dateTo').val(todayStr);
-        state.dateFrom = todayStr;
-        state.dateTo   = todayStr;
-        setActiveQuickDate('today');
+        if (typeof urlLane !== 'undefined' && urlLane) {
+            const now      = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay  = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            const fromStr  = fmtDate(firstDay);
+            const toStr    = fmtDate(lastDay);
+            $('#dateFrom').val(fromStr);
+            $('#dateTo').val(toStr);
+            state.dateFrom = fromStr;
+            state.dateTo   = toStr;
+            setActiveQuickDate('month');
+        } else {
+            const todayStr = fmtDate(new Date());
+            $('#dateFrom').val(todayStr);
+            $('#dateTo').val(todayStr);
+            state.dateFrom = todayStr;
+            state.dateTo   = todayStr;
+            setActiveQuickDate('today');
+        }
 
         await loadTasks();
 
