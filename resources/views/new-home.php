@@ -7586,6 +7586,7 @@
             if (!res || !res.record) {
                 clearFormExceptLane(which, { keepType: true });
                 updateModeBadge(which, 'new-lane');
+                populateReferenceSelects(which);
                 return;
             }
 
@@ -7891,12 +7892,13 @@
         const isNc = which === 'nc';
         const noLane    = isNc ? $('#ncNoLane').val()    : $('#m4NoLane').val();
         const monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
-        const type      = isNc ? $('#ncType').val() : $('#m4Type').val();
+        const type      = isNc ? $('#ncType').val()      : $('#m4Type').val();
         const docType   = isNc ? 'nursecall' : '4m';
         const $select   = isNc ? $('#ncReferenceTask') : $('#m4ReferenceTask');
 
         if (!$select.length) return;
 
+        // Reset dropdown kalau lane/type belum lengkap
         if (!noLane || !type) {
             $select.html('<option value="">-- Pilih Lane & Type dulu --</option>');
             return;
@@ -7909,7 +7911,7 @@
                 query: {
                     doc_type:   docType,
                     no_lane:    noLane    || '',
-                    type:       type, 
+                    type:       type,
                     month_year: monthYear || '',
                     section:    typeof urlSection !== 'undefined' ? (urlSection || '') : '',
                 }
@@ -7917,20 +7919,35 @@
 
             const list = Array.isArray(res) ? res : (res?.data || []);
 
+            // Simpan cache untuk applyReference
             if (isNc) {
                 window._refTasksNc = list;
             } else {
                 window._refTasksM4 = list;
             }
 
+            // Kalau kosong, tampilkan pesan & berhenti — TANPA akses opts
             if (list.length === 0) {
                 $select.html('<option value="">-- Tidak ada task tersedia --</option>');
                 return;
             }
 
+            // ═══════════════════════════════════════════════════
+            // Di bawah ini baru opts dideklarasikan (pasti ter-scope)
+            // ═══════════════════════════════════════════════════
+            const CAT_LABEL = {
+                man:          'Man',
+                machine:      'Machine',
+                material:     'Material',
+                methode:      'Methode',
+                tidak_ada_4m: 'Tidak Ada 4M',
+            };
+
             const opts = ['<option value="">-- Pilih POST IT --</option>'];
+
             list.forEach(t => {
-                const short = (t.problem || '').slice(0, 55);
+                const short = (t.problem || '').slice(0, 45);
+                const catLabel = CAT_LABEL[t.category] || (t.category ? t.category : '?');
                 let flag = '';
                 if (t.inRecord) {
                     flag = ' [ADA]';
@@ -7938,13 +7955,14 @@
                     flag = ` [DI ${t.otherRecord}]`;
                 }
                 opts.push(`<option value="${t.id}">${escapeHtml(
-                    `${t.taskCode || '-'} · ${formatDate(t.date)} · ${t.section || '-'} · ${short}${flag}`
+                    `${t.taskCode || '-'} · ${formatDate(t.date)} · [${catLabel}] · ${short}${flag}`
                 )}</option>`);
             });
+
             $select.html(opts.join(''));
 
         } catch (err) {
-            console.error('[populateReferenceSelects]', err);
+            console.error('[populateReferenceSelectsFor]', err);
             $select.html('<option value="">-- Gagal memuat --</option>');
         }
     }
@@ -8044,10 +8062,19 @@
         }
 
         $row.find('.m4-date').val(task.date || '');
-        $row.find('.m4-problem').val(task.problem || '');
-        if (['man','machine','material','methode'].includes(task.category)) {
-            $row.find('.m4-category').val(task.category);
+
+        // ── FIX: handle tidak_ada_4m ──
+        if (task.category === 'tidak_ada_4m') {
+            // problem biarkan kosong agar render report menampilkan "Tidak Ada 4M"
+            $row.find('.m4-problem').val('');
+            $row.find('.m4-category').val('tidak_ada_4m');
+        } else {
+            $row.find('.m4-problem').val(task.problem || '');
+            if (['man','machine','material','methode'].includes(task.category)) {
+                $row.find('.m4-category').val(task.category);
+            }
         }
+
         if (task.createdByName)   $row.find('.m4-team-leader').val(task.createdByName);
         if (task.leaderSignature) $row.find('.m4-group-leader').val(task.leaderSignature);
 
@@ -8130,6 +8157,7 @@
                 <option value="machine">Machine</option>
                 <option value="material">Material</option>
                 <option value="methode">Methode</option>
+                <option value="tidak_ada_4m">Tidak Ada 4M</option>
             </select></td>
             <td><input type="text" class="m4-team-leader" placeholder="Nama"></td>
             <td><input type="text" class="m4-group-leader" placeholder="Nama"></td>

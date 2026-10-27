@@ -598,20 +598,21 @@ class SupportController extends BaseController
                 if (!is_array($item)) continue;
 
                 $problem  = trim((string) ($item['problem']  ?? ''));
+                $taskId   = !empty($item['task_id']) ? (int) $item['task_id'] : null;
                 $category = $this->enumOrNull($item['category'] ?? null,
-                                ['man','machine','material','methode']);
+                                ['man','machine','material','methode','tidak_ada_4m']);
 
-                if ($problem === '' && !$category) continue;
+                if ($problem === '' && !$category && !$taskId) continue;
 
                 $itemsData[] = [
                     'record_id'    => $recordId,
-                    'task_id'      => !empty($item['task_id']) ? (int) $item['task_id'] : null,
+                    'task_id'      => $taskId,
                     'row_no'       => $rowNo,
                     'date'         => !empty($item['date']) ? $item['date'] : null,
                     'shift'        => trim((string) ($item['shift'] ?? '')) ?: null,
                     'problem'      => $problem ?: null,
                     'category'     => $category,
-                    'team_leader'  => trim((string) ($item['team_leader'] ?? '')) ?: null,
+                    'team_leader'  => trim((string) ($item['team_leader']  ?? '')) ?: null,
                     'group_leader' => trim((string) ($item['group_leader'] ?? '')) ?: null,
                     'created_at'   => $now,
                     'updated_at'   => $now,
