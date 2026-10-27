@@ -1151,6 +1151,7 @@
             const items  = entry.items || [];
             const sigKey = 'm4';
 
+            // ── Bulan / Tahun ──
             let monthLabel = rec.month_year || '-';
             let yearNum = '', monthNum = '';
             if (rec.month_year && rec.month_year.length === 7) {
@@ -1170,26 +1171,61 @@
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
 
+            const isPlaceholderProblem = (problem) => {
+                const p = String(problem || '').toLowerCase().trim();
+                if (!p) return true;
+                if (p === '-') return true;
+                if (p === 'no') return true;
+                if (p === 'none') return true;
+                if (p === 'tidak') return true;
+                if (p === 'tidak ada') return true;
+                if (/^tidak ada (perubahan|4m)\b/.test(p)) return true;
+                return false;
+            };
+
+            // Group items by date + shift
             const byDate = {};
             items.forEach(it => {
                 if (!it.date) return;
                 const dateKey = String(it.date).split(' ')[0];
-                if (!byDate[it.date]) byDate[it.date] = {};
-                byDate[it.date][String(it.shift || '1')] = it;
+                if (!byDate[dateKey]) byDate[dateKey] = {};
+
+                const shiftKey = String(it.shift || '1');
+                const existing = byDate[dateKey][shiftKey];
+
+                if (!existing) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+
+                const catOf   = x => String(x.category || '').toLowerCase();
+                const hasReal = x => ['man','machine','material','methode'].includes(catOf(x));
+
+                const existingReal = hasReal(existing);
+                const currentReal  = hasReal(it);
+
+                const existingPh   = !existingReal && catOf(existing) !== 'tidak_ada_4m' && isPlaceholderProblem(existing.problem);
+                const currentPh    = !currentReal  && catOf(it)       !== 'tidak_ada_4m' && isPlaceholderProblem(it.problem);
+
+                if (currentReal && !existingReal) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+                if (existingReal) {
+                    return;
+                }
+                if (it.task_id && !existing.task_id) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+                if (existingPh && !currentPh) {
+                    byDate[dateKey][shiftKey] = it;
+                }
             });
 
             let totalDays = 31;
             if (yearNum && monthNum) {
                 totalDays = new Date(parseInt(yearNum, 10), parseInt(monthNum, 10), 0).getDate();
-            }
-
-            const halfPoint = Math.ceil(totalDays / 2);
-            const leftDays  = [];
-            const rightDays = [];
-            for (let d = 1; d <= totalDays; d++) {
-                const dateStr = `${yearNum}-${monthNum}-${String(d).padStart(2, '0')}`;
-                if (d <= halfPoint) leftDays.push({ day: d, dateStr });
-                else                rightDays.push({ day: d, dateStr });
             }
 
             const build4mRows = (days) => {
@@ -1205,23 +1241,31 @@
                             ? `<td class="tgl-num" rowspan="3">${day}</td>`
                             : '';
 
-                        const problemRaw = it ? String(it.problem || '').trim().toLowerCase() : '';
-                        const keywordsNo4M = ['tidak ada 4m', 'tidak ada', 'tidak', '-', 'no', 'none'];
-                        const isTidakAda = !problemRaw || keywordsNo4M.some(k => problemRaw.includes(k));
-                        const problemText = !it
-                            ? ''
-                            : (isTidakAda ? 'Tidak Ada 4M' : 'Ada 4M');
+                        let problemText = '';
+                        let manChk = '', machineChk = '', materialChk = '', methodeChk = '';
+                        let teamLeader = '', groupLeader = '';
 
-                        const cat = it ? String(it.category || '').toLowerCase() : '';
-                        const hasCategory = cat !== '';
+                        if (it) {
+                            const cat = String(it.category || '').toLowerCase();
+                            const isRealCategory = ['man','machine','material','methode'].includes(cat);
+                            const isNo4mCategory = cat === 'tidak_ada_4m';
 
-                        const manChk      = !it ? '' : (hasCategory ? (cat === 'man'      ? '✓' : '&ndash;') : '&ndash;');
-                        const machineChk  = !it ? '' : (hasCategory ? (cat === 'machine'  ? '✓' : '&ndash;') : '&ndash;');
-                        const materialChk = !it ? '' : (hasCategory ? (cat === 'material' ? '✓' : '&ndash;') : '&ndash;');
-                        const methodeChk  = !it ? '' : (hasCategory ? (cat === 'methode'  ? '✓' : '&ndash;') : '&ndash;');
+                            if (isRealCategory) {
+                                problemText = 'Ada 4M';
+                            } else if (isNo4mCategory) {
+                                problemText = 'Tidak Ada 4M';
+                            } else {
+                                problemText = isPlaceholderProblem(it.problem) ? 'Tidak Ada 4M' : 'Ada 4M';
+                            }
 
-                        const teamLeader  = it ? escapeHtml(shortName(it.team_leader))  : '';
-                        const groupLeader = it ? escapeHtml(shortName(it.group_leader)) : '';
+                            manChk      = cat === 'man'      ? '✓' : '&ndash;';
+                            machineChk  = cat === 'machine'  ? '✓' : '&ndash;';
+                            materialChk = cat === 'material' ? '✓' : '&ndash;';
+                            methodeChk  = cat === 'methode'  ? '✓' : '&ndash;';
+
+                            teamLeader  = escapeHtml(shortName(it.team_leader));
+                            groupLeader = escapeHtml(shortName(it.group_leader));
+                        }
 
                         rows += `
                             <tr>
@@ -1257,6 +1301,16 @@
                 </thead>
             `;
 
+            // Bagi 2 kolom (1-15 di kiri, 16-31 di kanan)
+            const halfPoint = Math.ceil(totalDays / 2);
+            const leftDays  = [];
+            const rightDays = [];
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = `${yearNum}-${monthNum}-${String(d).padStart(2, '0')}`;
+                if (d <= halfPoint) leftDays.push({ day: d, dateStr });
+                else                rightDays.push({ day: d, dateStr });
+            }
+
             const leftTable = `
                 <table class="sr-4m-table">
                     ${tableHeader}
@@ -1270,13 +1324,43 @@
                 </table>
             `;
 
+            // ── Blok Komentar & TTD (Diletakkan di bawah tabel kanan) ──
+            const komentarText = rec.footer_comment || '';
+            const komentarDate = rec.footer_date || '';
+            const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
+            const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
+
+            const signatureBlock = `
+                <div style="margin-top: 4px; border: 1px solid #000; display: flex; height: 55px;">
+                    <div style="flex: 1.5; border-right: 1px solid #000; padding: 3px; font-size: 7px; position: relative;">
+                        <div style="font-weight: bold; font-size: 7px;">KOMENTAR :</div>
+                        <div style="font-size: 7px; margin-top: 2px;">${escapeHtml(komentarText)}</div>
+                        <div style="position: absolute; bottom: 3px; right: 4px; font-size: 7px; font-weight: bold;">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column;">
+                        <div style="display: flex; border-bottom: 1px solid #000; font-size: 6.5px; font-weight: bold; text-align: center;">
+                            <div style="flex: 1; border-right: 1px solid #000; padding: 2px 1px;">GROUP LEADER</div>
+                            <div style="flex: 1; padding: 2px 1px;">SECTION MANAGER</div>
+                        </div>
+                        <div style="display: flex; flex: 1;">
+                            <div style="flex: 1; border-right: 1px solid #000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px;">
+                                <div class="signature-qrcode" data-type="footer-left-m4-${idx}" data-signature="" style="width: 22px !important; height: 22px !important; margin: 0 auto;"></div>
+                                <div style="font-size: 6px; font-weight: bold; margin-top: 2px; text-align: center; word-break: break-word; line-height: 1.1; min-height: 7px;">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2px;">
+                                <div class="signature-qrcode" data-type="footer-right-m4-${idx}" data-signature="" style="width: 22px !important; height: 22px !important; margin: 0 auto;"></div>
+                                <div style="font-size: 6px; font-weight: bold; margin-top: 2px; text-align: center; word-break: break-word; line-height: 1.1; min-height: 7px;">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
             return `
                 <div class="sr-page">
                     <div class="sr-top">
                         <div class="sr-top-logo">
-                            <img src="${LOGO}"
-                                alt="Logo"
-                                onerror="this.style.display='none'">
+                            <img src="${LOGO}" alt="Logo" onerror="this.style.display='none'">
                         </div>
                         <div class="sr-top-title">
                             <div class="sr-main-title">RECORD PERUBAHAN 4 M</div>
@@ -1317,9 +1401,15 @@
                         </div>
                     </div>
 
+                    <!-- Grid Kiri (Tabel) & Kanan (Tabel + Komentar) -->
                     <div class="sr-4m-grid">
-                        ${leftTable}
-                        ${rightTable}
+                        <div class="sr-4m-col-left">
+                            ${leftTable}
+                        </div>
+                        <div class="sr-4m-col-right" style="display: flex; flex-direction: column;">
+                            ${rightTable}
+                            ${signatureBlock}
+                        </div>
                     </div>
 
                     <div class="sr-form-code">FORM-4M-001-REV.00</div>
@@ -1332,14 +1422,29 @@
         setTimeout(() => {
             list.forEach((entry, idx) => {
                 const rec = entry.record;
+                const sigKey = 'm4';
 
+                // TTD Atas
                 if (rec.created_by_name) {
-                    const el = document.querySelector(`[data-type="created-m4-${idx}"]`);
+                    const el = document.querySelector(`[data-type="created-${sigKey}-${idx}"]`);
                     if (el) renderQRCode(el, rec.created_by_name);
                 }
                 if (rec.approved_by_name) {
-                    const el = document.querySelector(`[data-type="approved-m4-${idx}"]`);
+                    const el = document.querySelector(`[data-type="approved-${sigKey}-${idx}"]`);
                     if (el) renderQRCode(el, rec.approved_by_name);
+                }
+
+                // TTD Bawah (Komentar)
+                const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
+                const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
+                
+                if (sigGroupLeader) {
+                    const el = document.querySelector(`[data-type="footer-left-m4-${idx}"]`);
+                    if (el) renderQRCode(el, sigGroupLeader);
+                }
+                if (sigSectionManager) {
+                    const el = document.querySelector(`[data-type="footer-right-m4-${idx}"]`);
+                    if (el) renderQRCode(el, sigSectionManager);
                 }
             });
         }, 200);

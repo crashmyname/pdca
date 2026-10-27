@@ -498,7 +498,12 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label required">Type</label>
-                        <input type="text" class="form-input" id="ncType" required>
+                        <select class="form-select" id="ncType" required>
+                            <option value="">-- Ketik atau pilih type --</option>
+                        </select>
+                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                            <i class="ti ti-info-circle"></i> Pilih type dulu — header & content beda per type
+                        </small>
                     </div>
                     <div class="form-group">
                         <label class="form-label required">Bulan / Tahun</label>
@@ -525,7 +530,7 @@
                     <span><i class="ti ti-database-import"></i> Reference Data PDCA</span>
                 </div>
                 <select class="form-select" id="ncReferenceTask" onchange="applyNursecallReference(this.value)">
-                    <option value="">-- Pilih No Lane dulu --</option>
+                    <option value="">-- Pilih Lane & Type dulu --</option>
                 </select>
                 <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
                     <i class="ti ti-info-circle"></i> Pilih POST IT → 1 baris di Content. Pilih ulang untuk update.
@@ -618,7 +623,12 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label required">Type</label>
-                        <input type="text" class="form-input" id="m4Type" required>
+                        <select class="form-select" id="m4Type" required>
+                            <option value="">-- Ketik atau pilih type --</option>
+                        </select>
+                        <small style="color:#6b7280;font-size:11px;display:block;margin-top:4px">
+                            <i class="ti ti-info-circle"></i> Pilih type dulu — header & content beda per type
+                        </small>
                     </div>
                     <div class="form-group">
                         <label class="form-label required">Bulan / Tahun</label>
@@ -645,7 +655,7 @@
                     <span><i class="ti ti-database-import"></i> Reference Data PDCA</span>
                 </div>
                 <select class="form-select" id="m4ReferenceTask" onchange="applyRecord4mReference(this.value)">
-                    <option value="">-- Pilih No Lane dulu --</option>
+                    <option value="">-- Pilih Lane & Type dulu --</option>
                 </select>
                 <small style="color:#6b7280;font-size:11px;display:block;margin-top:6px">
                     <i class="ti ti-info-circle"></i> Pilih POST IT → 1 baris di Content. Pilih ulang untuk update.
@@ -837,7 +847,7 @@
             Swal.fire({ icon: icon, title: title, html: html, confirmButtonColor: '#2563eb' });
         }
 
-        // ── Select2 ──
+        // ── Select2 helper ──
         function setSelect2Value($sel, value, text) {
             if (!value) { $sel.val(null).trigger('change'); return; }
             if (!$sel.find("option[value='" + String(value).replace(/'/g, "\\'") + "']").length) {
@@ -847,10 +857,12 @@
             $sel.val(value).trigger('change');
         }
 
+        // ── Init Select2 (Lane + Type) ──
         function initLaneSelect2() {
             if (laneSelect2Inited || typeof $.fn.select2 === 'undefined') return;
 
-            var opts = {
+            // ── LANE Select2 ──
+            var laneOpts = {
                 placeholder: '-- Ketik atau pilih lane --',
                 allowClear: true,
                 width: '100%',
@@ -866,21 +878,68 @@
                 },
             };
 
-            $('#ncNoLane, #m4NoLane').select2(opts);
+            $('#ncNoLane, #m4NoLane').select2(laneOpts);
 
-            $('#ncNoLane').on('select2:select', function () {
+            // ── TYPE Select2 (tags) ──
+            var typeOpts = {
+                placeholder: '-- Ketik atau pilih type --',
+                allowClear: true,
+                width: '100%',
+                tags: true,
+                tokenSeparators: [],
+                language: {
+                    noResults: function () { return 'Tidak ada type. Ketik lalu Enter untuk buat baru.'; },
+                },
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                    if (term === '') return null;
+                    return { id: term, text: term + ' (baru)', newTag: true };
+                },
+            };
+
+            $('#ncType, #m4Type').select2(typeOpts);
+
+            // ── Lane select handler (NC) ──
+            $('#ncNoLane').on('select2:select', function (e) {
                 var v = $(this).val();
                 if (!v) return;
-                clearFormExceptLane('nc');
-                setTimeout(function () { checkByLane('nc', v); }, 100);
-            });
-            $('#m4NoLane').on('select2:select', function () {
-                var v = $(this).val();
-                if (!v) return;
-                clearFormExceptLane('m4');
-                setTimeout(function () { checkByLane('m4', v); }, 100);
+                var isNewTag = !!(e.params && e.params.data && e.params.data.newTag);
+                if (isNewTag) clearFormExceptLane('nc');
+
+                populateTypeOptions('nc', v);
+
+                var type = $('#ncType').val();
+                if (type) {
+                    setTimeout(function () { checkByLane('nc', v); }, 100);
+                } else {
+                    updateModeBadge('nc', 'need-type');
+                    document.getElementById('ncContentBody').innerHTML = '';
+                    renderEmptyState('nc');
+                    ncExistingRecordId = null;
+                }
             });
 
+            // ── Lane select handler (M4) ──
+            $('#m4NoLane').on('select2:select', function (e) {
+                var v = $(this).val();
+                if (!v) return;
+                var isNewTag = !!(e.params && e.params.data && e.params.data.newTag);
+                if (isNewTag) clearFormExceptLane('m4');
+
+                populateTypeOptions('m4', v);
+
+                var type = $('#m4Type').val();
+                if (type) {
+                    setTimeout(function () { checkByLane('m4', v); }, 100);
+                } else {
+                    updateModeBadge('m4', 'need-type');
+                    document.getElementById('m4ContentBody').innerHTML = '';
+                    renderEmptyState('m4');
+                    m4ExistingRecordId = null;
+                }
+            });
+
+            // ── Lane clear handler ──
             $('#ncNoLane').on('select2:clear', function () {
                 clearFormExceptLane('nc');
                 updateModeBadge('nc', 'empty');
@@ -890,13 +949,63 @@
                 updateModeBadge('m4', 'empty');
             });
 
+            // ── Type select handler (NC) ──
+            $('#ncType').on('select2:select', function () {
+                var noLane = $('#ncNoLane').val();
+                var type = $(this).val();
+                if (!noLane || !type) {
+                    updateModeBadge('nc', 'need-type');
+                    return;
+                }
+                setTimeout(function () { checkByLane('nc', noLane); }, 100);
+            });
+            $('#ncType').on('select2:clear', function () {
+                updateModeBadge('nc', 'need-type');
+                document.getElementById('ncContentBody').innerHTML = '';
+                renderEmptyState('nc');
+                ncExistingRecordId = null;
+            });
+
+            // ── Type select handler (M4) ──
+            $('#m4Type').on('select2:select', function () {
+                var noLane = $('#m4NoLane').val();
+                var type = $(this).val();
+                if (!noLane || !type) {
+                    updateModeBadge('m4', 'need-type');
+                    return;
+                }
+                setTimeout(function () { checkByLane('m4', noLane); }, 100);
+            });
+            $('#m4Type').on('select2:clear', function () {
+                updateModeBadge('m4', 'need-type');
+                document.getElementById('m4ContentBody').innerHTML = '';
+                renderEmptyState('m4');
+                m4ExistingRecordId = null;
+            });
+
             laneSelect2Inited = true;
         }
 
-        function populateLaneOptions() {
-            var url = ACTIVE_TYPE === 'nursecall' ? '/support/nursecall/lanes' : '/support/4m/lanes';
-            api(url).then(function (lanes) {
-                laneCache = (Array.isArray(lanes) ? lanes : []).sort();
+        // ── Populate Lane Options ──
+        function populateLaneOptions(forceReload) {
+            var loadPromise;
+            if (forceReload || !window._laneCache) {
+                loadPromise = Promise.all([
+                    api('/support/nursecall/lanes').catch(function () { return []; }),
+                    api('/support/4m/lanes').catch(function () { return []; }),
+                ]).then(function (results) {
+                    var all = {};
+                    (results[0] || []).forEach(function (l) { all[l] = true; });
+                    (results[1] || []).forEach(function (l) { all[l] = true; });
+                    window._laneCache = Object.keys(all).sort();
+                    return window._laneCache;
+                });
+            } else {
+                loadPromise = Promise.resolve(window._laneCache);
+            }
+
+            loadPromise.then(function (lanes) {
+                laneCache = lanes || [];
                 ['#ncNoLane', '#m4NoLane'].forEach(function (sel) {
                     var $sel = $(sel);
                     var current = $sel.val();
@@ -906,19 +1015,53 @@
                     });
                     if (current) $sel.val(current).trigger('change.select2');
                 });
-            }).catch(function () {});
+            }).catch(function (err) {
+                console.warn('[populateLaneOptions]', err);
+            });
+        }
+
+        // ── Populate Type Options (fetch dari /types) ──
+        function populateTypeOptions(which, noLane) {
+            var isNc = which === 'nc';
+            var endpoint = isNc ? '/support/nursecall/types' : '/support/4m/types';
+            var $sel = isNc ? $('#ncType') : $('#m4Type');
+
+            api(endpoint, { query: { no_lane: noLane || '' } }).then(function (res) {
+                var types = Array.isArray(res) ? res : (res && res.data || []);
+                var current = $sel.val();
+
+                $sel.empty().append('<option value="">-- Ketik atau pilih type --</option>');
+                types.forEach(function (t) {
+                    $sel.append('<option value="' + escapeHtml(t) + '">' + escapeHtml(t) + '</option>');
+                });
+
+                // Pertahankan nilai aktif (misal tag baru yang baru diketik)
+                if (current) {
+                    if (!$sel.find('option[value="' + escapeHtml(current) + '"]').length) {
+                        $sel.append('<option value="' + escapeHtml(current) + '">' + escapeHtml(current) + '</option>');
+                    }
+                    $sel.val(current);
+                }
+                if ($sel.data('select2')) $sel.trigger('change.select2');
+            }).catch(function (err) {
+                console.warn('[populateTypeOptions]', err);
+            });
         }
 
         // ── Mode Badge ──
         function updateModeBadge(which, mode, extra) {
             var id = which === 'nc' ? '#ncModeIndicator' : '#m4ModeIndicator';
             var html = '';
-            if (mode === 'empty') {
+            if (mode === 'need-type') {
+                html = '<span class="record-mode-badge mode-empty"><i class="ti ti-info-circle"></i> Pilih / ketik <strong>Type</strong> dulu untuk memuat header</span>';
+            } else if (mode === 'empty') {
                 html = '<span class="record-mode-badge mode-empty"><i class="ti ti-info-circle"></i> Pilih / ketik No Lane dulu</span>';
             } else if (mode === 'new-lane') {
                 html = '<span class="record-mode-badge mode-new"><i class="ti ti-plus"></i> Lane baru — silakan isi header</span>';
             } else if (mode === 'new-month') {
                 html = '<span class="record-mode-badge mode-new-month"><i class="ti ti-calendar-plus"></i> Lane existing (' + escapeHtml(extra || '') + ') — record baru</span>';
+            } else if (mode === 'new') {
+                html = '<span class="record-mode-badge mode-new"><i class="ti ti-plus"></i> Record baru</span>';
             } else if (mode === 'edit') {
                 html = '<span class="record-mode-badge mode-edit"><i class="ti ti-edit"></i> Melanjutkan record (' + (extra || 0) + ' baris)</span>';
             }
@@ -926,14 +1069,19 @@
         }
 
         // ── Clear Form ──
-        function clearFormExceptLane(which) {
+        function clearFormExceptLane(which, opts) {
+            opts = opts || {};
+            var keepType = !!opts.keepType;
             var today = new Date().toISOString().split('T')[0];
             var currentMonth = today.slice(0, 7);
             var userName = state.currentUser && state.currentUser.name || '';
 
             if (which === 'nc') {
                 var currentLane = $('#ncNoLane').val();
-                $('#ncType').val('');
+                var currentType = keepType ? $('#ncType').val() : '';
+
+                if (!keepType) setSelect2Value($('#ncType'), '', '');
+
                 $('#ncMonthYear').val(currentMonth);
                 $('#ncDateCreated').val(today);
                 $('#ncCreatedName').val(userName);
@@ -945,10 +1093,15 @@
                 ncExistingRecordId = null;
                 document.getElementById('ncContentBody').innerHTML = '';
                 renderEmptyState('nc');
+
                 if (currentLane) setSelect2Value($('#ncNoLane'), currentLane, currentLane);
+                if (keepType && currentType) setSelect2Value($('#ncType'), currentType, currentType);
             } else {
                 var currentLaneM4 = $('#m4NoLane').val();
-                $('#m4Type').val('');
+                var currentTypeM4 = keepType ? $('#m4Type').val() : '';
+
+                if (!keepType) setSelect2Value($('#m4Type'), '', '');
+
                 $('#m4MonthYear').val(currentMonth);
                 $('#m4Date').val(today);
                 $('#m4CreatedName').val(userName);
@@ -956,7 +1109,9 @@
                 m4ExistingRecordId = null;
                 document.getElementById('m4ContentBody').innerHTML = '';
                 renderEmptyState('m4');
+
                 if (currentLaneM4) setSelect2Value($('#m4NoLane'), currentLaneM4, currentLaneM4);
+                if (keepType && currentTypeM4) setSelect2Value($('#m4Type'), currentTypeM4, currentTypeM4);
             }
         }
 
@@ -1021,6 +1176,7 @@
                     '<option value="machine">Machine</option>' +
                     '<option value="material">Material</option>' +
                     '<option value="methode">Methode</option>' +
+                    '<option value="tidak_ada_4m">Tidak Ada 4M</option>' +
                 '</select></td>' +
                 '<td><input type="text" class="m4-team-leader"></td>' +
                 '<td><input type="text" class="m4-group-leader"></td>' +
@@ -1059,13 +1215,14 @@
             var isNc = which === 'nc';
             var noLane    = isNc ? $('#ncNoLane').val()    : $('#m4NoLane').val();
             var monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
+            var type      = isNc ? $('#ncType').val()      : $('#m4Type').val();
             var docType   = isNc ? 'nursecall' : '4m';
             var $select   = isNc ? $('#ncReferenceTask') : $('#m4ReferenceTask');
 
             if (!$select.length) return;
 
-            if (!noLane) {
-                $select.html('<option value="">-- Pilih No Lane dulu --</option>');
+            if (!noLane || !type) {
+                $select.html('<option value="">-- Pilih Lane & Type dulu --</option>');
                 return;
             }
 
@@ -1075,6 +1232,7 @@
                 query: {
                     doc_type:   docType,
                     no_lane:    noLane    || '',
+                    type:       type,
                     month_year: monthYear || '',
                 }
             }).then(function (list) {
@@ -1091,7 +1249,7 @@
                 var opts = ['<option value="">-- Pilih POST IT --</option>'];
                 list.forEach(function (t) {
                     var short = (t.problem || '').slice(0, 55);
-                    var flag  = t.inRecord ? ' [ADA]' : '';
+                    var flag = t.inRecord ? ' [ADA]' : (t.otherRecord ? ' [DI ' + t.otherRecord + ']' : '');
                     opts.push('<option value="' + t.id + '">' +
                         escapeHtml((t.taskCode || '-') + ' · ' + formatDate(t.date) + ' · ' + (t.section || '-') + ' · ' + short + flag) +
                         '</option>');
@@ -1103,7 +1261,7 @@
             });
         }
 
-        // ── Apply Reference ──
+        // ── Apply Reference — NC ──
         function applyNursecallReference(taskId) {
             if (!taskId) return;
             var task = (window._refTasksNc || []).filter(function (t) { return t.id === parseInt(taskId, 10); })[0];
@@ -1132,6 +1290,7 @@
             $row.find('.nc-nurse-leader').val(task.pic || '');
             $row.find('.nc-group-leader').val(task.leaderSignature || '');
 
+            // hanya isi source kalau kategori 4M valid (bukan tidak_ada_4m)
             var map = { machine: 'machine', material: 'material', man: 'man_power', methode: 'dll' };
             if (map[task.category]) $row.find('.nc-source').val(map[task.category]);
 
@@ -1141,6 +1300,7 @@
             toast(isUpdate ? 'Baris di-update' : 'Baris ditambahkan', isUpdate ? 'info' : 'success');
         }
 
+        // ── Apply Reference — 4M ──
         function applyRecord4mReference(taskId) {
             if (!taskId) return;
             var task = (window._refTasksM4 || []).filter(function (t) { return t.id === parseInt(taskId, 10); })[0];
@@ -1158,9 +1318,16 @@
             }
 
             $row.find('.m4-date').val(task.date || '');
-            $row.find('.m4-problem').val(task.problem || '');
-            if (['man', 'machine', 'material', 'methode'].indexOf(task.category) >= 0) {
-                $row.find('.m4-category').val(task.category);
+
+            if (task.category === 'tidak_ada_4m') {
+                // Problem dikosongkan supaya render report menampilkan "Tidak Ada 4M"
+                $row.find('.m4-problem').val('');
+                $row.find('.m4-category').val('tidak_ada_4m');
+            } else {
+                $row.find('.m4-problem').val(task.problem || '');
+                if (['man', 'machine', 'material', 'methode'].indexOf(task.category) >= 0) {
+                    $row.find('.m4-category').val(task.category);
+                }
             }
             if (task.createdByName) $row.find('.m4-team-leader').val(task.createdByName);
             if (task.leaderSignature) $row.find('.m4-group-leader').val(task.leaderSignature);
@@ -1171,16 +1338,31 @@
             toast(isUpdate ? 'Baris di-update' : 'Baris ditambahkan', isUpdate ? 'info' : 'success');
         }
 
-        // ── Check Existing by Lane ──
+        // ── Check Existing by Lane + Type + Month ──
         function checkByLane(which, noLane) {
             if (!noLane) return;
+
             var isNc = which === 'nc';
             var monthYear = isNc ? $('#ncMonthYear').val() : $('#m4MonthYear').val();
+            var type = isNc ? $('#ncType').val() : $('#m4Type').val();
+
+            if (!type) {
+                updateModeBadge(which, 'need-type');
+                var tbodyId = isNc ? 'ncContentBody' : 'm4ContentBody';
+                document.getElementById(tbodyId).innerHTML = '';
+                renderEmptyState(which);
+                if (isNc) ncExistingRecordId = null;
+                else      m4ExistingRecordId = null;
+                return;
+            }
+
             var endpoint = isNc ? '/support/nursecall/by-lane' : '/support/4m/by-lane';
 
-            return api(endpoint, { query: { no_lane: noLane, month_year: monthYear || '' } }).then(function (res) {
+            return api(endpoint, {
+                query: { no_lane: noLane, type: type, month_year: monthYear || '' }
+            }).then(function (res) {
                 if (!res || !res.record) {
-                    clearFormExceptLane(which);
+                    clearFormExceptLane(which, { keepType: true });
                     updateModeBadge(which, 'new-lane');
                     populateReferenceSelects(which);
                     return;
@@ -1190,13 +1372,13 @@
                 var sameMonth = !!res.is_same_month;
 
                 if (isNc) {
-                    if (rec.type) $('#ncType').val(rec.type);
+                    if (rec.type) setSelect2Value($('#ncType'), rec.type, rec.type);
                     if (rec.created_by_name) $('#ncCreatedName').val(rec.created_by_name);
                     if (rec.approved_by_name) $('#ncApprovedName').val(rec.approved_by_name);
                     if (rec.footer_created_name) $('#ncFooterCreatedName').val(rec.footer_created_name);
                     if (rec.footer_approved_name) $('#ncFooterApprovedName').val(rec.footer_approved_name);
                 } else {
-                    if (rec.type) $('#m4Type').val(rec.type);
+                    if (rec.type) setSelect2Value($('#m4Type'), rec.type, rec.type);
                     if (rec.created_by_name) $('#m4CreatedName').val(rec.created_by_name);
                     if (rec.approved_by_name) $('#m4ApprovedName').val(rec.approved_by_name);
                 }
@@ -1217,11 +1399,10 @@
                     }
                     toast('Data dimuat — ' + items.length + ' baris', 'info');
                 } else {
-                    clearFormExceptLane(which);
-                    if (isNc && rec.type) $('#ncType').val(rec.type);
-                    if (!isNc && rec.type) $('#m4Type').val(rec.type);
+                    // clear content but keep type (buat record baru di bulan berbeda)
+                    clearFormExceptLane(which, { keepType: true });
                     updateModeBadge(which, 'new-month', rec.month_year);
-                    toast('Lane sudah ada di bulan ' + rec.month_year + '. Siap buat record baru.', 'info');
+                    toast('Lane + Type sudah ada di bulan ' + rec.month_year + '. Siap buat record baru.', 'info');
                 }
 
                 populateReferenceSelects(which);
@@ -1269,8 +1450,13 @@
         // ── Reset ──
         function resetHeader(which) {
             clearFormExceptLane(which);
+
+            // Reset lane via Select2
             setSelect2Value($('#ncNoLane'), '', '');
             setSelect2Value($('#m4NoLane'), '', '');
+            setSelect2Value($('#ncType'), '', '');
+            setSelect2Value($('#m4Type'), '', '');
+
             updateModeBadge(which, 'empty');
             populateReferenceSelects(which);
             toast('Form direset', 'info');
@@ -1280,10 +1466,13 @@
         function saveNursecall(e) {
             if (e) e.preventDefault();
 
+            var noLaneVal = $('#ncNoLane').val() || '';
+            var typeVal   = $('#ncType').val()   || '';
+
             var header = {
-                record_id: ncExistingRecordId || null, 
-                no_lane: $('#ncNoLane').val() ? $('#ncNoLane').val().trim() : '',
-                type: $('#ncType').val().trim(),
+                record_id: ncExistingRecordId || null,
+                no_lane: noLaneVal.trim(),
+                type: typeVal.trim(),
                 month_year: $('#ncMonthYear').val(),
                 date_created: $('#ncDateCreated').val(),
                 created_by_name: $('#ncCreatedName').val().trim(),
@@ -1328,7 +1517,7 @@
                     Swal.close();
                     toast(res && res.message || 'Disimpan', 'success');
                     ncExistingRecordId = res && res.record_id || null;
-                    populateLaneOptions();
+                    populateLaneOptions(true);
                     populateReferenceSelects('nc');
                 })
                 .catch(function (err) {
@@ -1341,10 +1530,13 @@
         function saveRecord4m(e) {
             if (e) e.preventDefault();
 
+            var noLaneVal = $('#m4NoLane').val() || '';
+            var typeVal   = $('#m4Type').val()   || '';
+
             var header = {
-                record_id: m4ExistingRecordId || null, 
-                no_lane: $('#m4NoLane').val() ? $('#m4NoLane').val().trim() : '',
-                type: $('#m4Type').val().trim(),
+                record_id: m4ExistingRecordId || null,
+                no_lane: noLaneVal.trim(),
+                type: typeVal.trim(),
                 month_year: $('#m4MonthYear').val(),
                 date: $('#m4Date').val(),
                 created_by_name: $('#m4CreatedName').val().trim(),
@@ -1368,6 +1560,7 @@
                     team_leader: $t.find('.m4-team-leader').val().trim(),
                     group_leader: $t.find('.m4-group-leader').val().trim(),
                 };
+                // untuk tidak_ada_4m, problem boleh kosong
                 if (item.problem || item.category) items.push(item);
             });
             if (items.length === 0) { showAlert('warning', 'Content Kosong', 'Isi minimal 1 baris.'); return; }
@@ -1379,7 +1572,7 @@
                     Swal.close();
                     toast(res && res.message || 'Disimpan', 'success');
                     m4ExistingRecordId = res && res.record_id || null;
-                    populateLaneOptions();
+                    populateLaneOptions(true);
                     populateReferenceSelects('m4');
                 })
                 .catch(function (err) {
@@ -1392,6 +1585,8 @@
         $(document).ready(function () {
             initLaneSelect2();
             populateLaneOptions();
+            populateTypeOptions('nc', '');
+            populateTypeOptions('m4', '');
 
             var today = new Date().toISOString().split('T')[0];
             var currentMonth = today.slice(0, 7);
@@ -1416,10 +1611,12 @@
             $('#record4mForm').on('submit', saveRecord4m);
 
             $('#ncMonthYear').on('change', function () {
-                if ($('#ncNoLane').val()) populateReferenceSelects('nc');
+                var noLane = $('#ncNoLane').val();
+                if (noLane) checkByLane('nc', noLane);
             });
             $('#m4MonthYear').on('change', function () {
-                if ($('#m4NoLane').val()) populateReferenceSelects('m4');
+                var noLane = $('#m4NoLane').val();
+                if (noLane) checkByLane('m4', noLane);
             });
         });
     }

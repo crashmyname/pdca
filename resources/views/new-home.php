@@ -8950,17 +8950,60 @@
                 ? new Date(headerDate).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
                 : '';
 
-            // Signature ATAS
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
 
-            // ── Group items by date + shift ──
+            // Helper: deteksi placeholder "Tidak Ada 4M"
+            const isPlaceholderProblem = (problem) => {
+                const p = String(problem || '').toLowerCase().trim();
+                if (!p) return true;
+                if (p === '-') return true;
+                if (p === 'no') return true;
+                if (p === 'none') return true;
+                if (p === 'tidak') return true;
+                if (p === 'tidak ada') return true;
+                if (/^tidak ada (perubahan|4m)\b/.test(p)) return true;
+                return false;
+            };
+
+            // Group items by date + shift (dengan prioritas)
             const byDate = {};
             items.forEach(it => {
                 if (!it.date) return;
                 const dateKey = String(it.date).split(' ')[0];
-                if (!byDate[it.date]) byDate[it.date] = {};
-                byDate[it.date][String(it.shift || '1')] = it;
+                if (!byDate[dateKey]) byDate[dateKey] = {};
+
+                const shiftKey = String(it.shift || '1');
+                const existing = byDate[dateKey][shiftKey];
+
+                if (!existing) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+
+                const catOf   = x => String(x.category || '').toLowerCase();
+                const hasReal = x => ['man','machine','material','methode'].includes(catOf(x));
+
+                const existingReal = hasReal(existing);
+                const currentReal  = hasReal(it);
+
+                const existingPh   = !existingReal && catOf(existing) !== 'tidak_ada_4m' && isPlaceholderProblem(existing.problem);
+                const currentPh    = !currentReal  && catOf(it)       !== 'tidak_ada_4m' && isPlaceholderProblem(it.problem);
+
+                if (currentReal && !existingReal) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+                if (existingReal) {
+                    return;
+                }
+                if (it.task_id && !existing.task_id) {
+                    byDate[dateKey][shiftKey] = it;
+                    return;
+                }
+                if (existingPh && !currentPh) {
+                    byDate[dateKey][shiftKey] = it;
+                }
             });
 
             // Total hari dalam bulan
@@ -8969,16 +9012,7 @@
                 totalDays = new Date(parseInt(yearNum, 10), parseInt(monthNum, 10), 0).getDate();
             }
 
-            // Split: kiri = 1..ceil(half), kanan = ceil(half)+1..totalDays
-            const halfPoint = Math.ceil(totalDays / 2);
-            const leftDays  = [];
-            const rightDays = [];
-            for (let d = 1; d <= totalDays; d++) {
-                const dateStr = `${yearNum}-${monthNum}-${String(d).padStart(2, '0')}`;
-                if (d <= halfPoint) leftDays.push({ day: d, dateStr });
-                else                rightDays.push({ day: d, dateStr });
-            }
-
+            // Helper untuk membangun baris tabel 4M
             const build4mRows = (days) => {
                 let rows = '';
                 days.forEach(({ day, dateStr }) => {
@@ -8992,23 +9026,31 @@
                             ? `<td class="tgl-num" rowspan="3">${day}</td>`
                             : '';
 
-                        const problemRaw = it ? String(it.problem || '').trim().toLowerCase() : '';
-                        const keywordsNo4M = ['tidak ada 4m', 'tidak ada', 'tidak', '-', 'no', 'none'];
-                        const isTidakAda = !problemRaw || keywordsNo4M.some(k => problemRaw.includes(k));
-                        const problemText = !it
-                            ? ''
-                            : (isTidakAda ? 'Tidak Ada 4M' : 'Ada 4M');
+                        let problemText = '';
+                        let manChk = '', machineChk = '', materialChk = '', methodeChk = '';
+                        let teamLeader = '', groupLeader = '';
 
-                        const cat = it ? String(it.category || '').toLowerCase() : '';
-                        const hasCategory = cat !== '';
+                        if (it) {
+                            const cat = String(it.category || '').toLowerCase();
+                            const isRealCategory = ['man','machine','material','methode'].includes(cat);
+                            const isNo4mCategory = cat === 'tidak_ada_4m';
 
-                        const manChk      = !it ? '' : (hasCategory ? (cat === 'man'      ? '✓' : '&ndash;') : '&ndash;');
-                        const machineChk  = !it ? '' : (hasCategory ? (cat === 'machine'  ? '✓' : '&ndash;') : '&ndash;');
-                        const materialChk = !it ? '' : (hasCategory ? (cat === 'material' ? '✓' : '&ndash;') : '&ndash;');
-                        const methodeChk  = !it ? '' : (hasCategory ? (cat === 'methode'  ? '✓' : '&ndash;') : '&ndash;');
+                            if (isRealCategory) {
+                                problemText = 'Ada 4M';
+                            } else if (isNo4mCategory) {
+                                problemText = 'Tidak Ada 4M';
+                            } else {
+                                problemText = isPlaceholderProblem(it.problem) ? 'Tidak Ada 4M' : 'Ada 4M';
+                            }
 
-                        const teamLeader  = it ? escapeHtml(shortName(it.team_leader))  : '';
-                        const groupLeader = it ? escapeHtml(shortName(it.group_leader)) : '';
+                            manChk      = cat === 'man'      ? '✓' : '&ndash;';
+                            machineChk  = cat === 'machine'  ? '✓' : '&ndash;';
+                            materialChk = cat === 'material' ? '✓' : '&ndash;';
+                            methodeChk  = cat === 'methode'  ? '✓' : '&ndash;';
+
+                            teamLeader  = escapeHtml(shortName(it.team_leader));
+                            groupLeader = escapeHtml(shortName(it.group_leader));
+                        }
 
                         rows += `
                             <tr>
@@ -9044,95 +9086,167 @@
                 </thead>
             `;
 
-            const leftTable = `
-                <table class="sr-4m-table">
-                    ${tableHeader}
-                    <tbody>${build4mRows(leftDays)}</tbody>
-                </table>
-            `;
-            const rightTable = `
-                <table class="sr-4m-table">
-                    ${tableHeader}
-                    <tbody>${build4mRows(rightDays)}</tbody>
-                </table>
-            `;
+            // Fungsi membangun satu halaman
+            const buildPage = (startDay, endDay, isLastPage) => {
+                const days = [];
+                for (let d = startDay; d <= endDay; d++) {
+                    const dateStr = `${yearNum}-${monthNum}-${String(d).padStart(2, '0')}`;
+                    days.push({ day: d, dateStr });
+                }
 
-            return `
-                <div class="sr-page">
-                    <!-- TOP HEADER -->
-                    <div class="sr-top">
-                        <div class="sr-top-logo">
-                            <img src="${LOGO}"
-                                alt="Logo"
-                                onerror="this.style.display='none'">
+                const half = Math.ceil(days.length / 2);
+                const leftDays = days.slice(0, half);
+                const rightDays = days.slice(half);
+
+                const leftTable = `
+                    <table class="sr-4m-table">
+                        ${tableHeader}
+                        <tbody>${build4mRows(leftDays)}</tbody>
+                    </table>
+                `;
+                const rightTable = `
+                    <table class="sr-4m-table">
+                        ${tableHeader}
+                        <tbody>${build4mRows(rightDays)}</tbody>
+                    </table>
+                `;
+
+                // Blok tanda tangan hanya untuk halaman terakhir
+                let signatureBlock = '';
+                if (isLastPage) {
+                    const komentarText = rec.footer_comment || '';
+                    const komentarDate = rec.footer_date || '';
+                    const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
+                    const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
+                    const uniqueSigKey = `${sigKey}-${idx}-last`;
+
+                    signatureBlock = `
+                        <div class="sr-signature-section" style="margin-top: 10px;">
+                            <div class="sr-signature-header">
+                                <div>KOMENTAR :</div>
+                                <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
+                            </div>
+                            <div class="sr-signature-content">
+                                <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+                                <div class="sr-ttd-container">
+                                    <div class="sr-ttd-box">
+                                        <div class="sr-sig-header">GROUP LEADER</div>
+                                        <div class="signature-qrcode" data-type="footer-left-${uniqueSigKey}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                                    </div>
+                                    <div class="sr-ttd-box">
+                                        <div class="sr-sig-header">SECTION MANAGER</div>
+                                        <div class="signature-qrcode" data-type="footer-right-${uniqueSigKey}" data-signature=""></div>
+                                        <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sr-top-title">
-                            <div class="sr-main-title">RECORD PERUBAHAN 4 M</div>
+                    `;
+                }
+
+                return `
+                    <div class="sr-page">
+                        <div class="sr-top">
+                            <div class="sr-top-logo">
+                                <img src="${LOGO}" alt="Logo" onerror="this.style.display='none'">
+                            </div>
+                            <div class="sr-top-title">
+                                <div class="sr-main-title">RECORD PERUBAHAN 4 M</div>
+                            </div>
+                            <div class="sr-top-sig">
+                                <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
+                                <table>
+                                    <tr>
+                                        <td class="sr-sig-header">DIBUAT</td>
+                                        <td class="sr-sig-header">DISETUJUI</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                        </td>
+                                        <td class="sr-sig-body">
+                                            <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        <div class="sr-top-sig">
-                            <div class="sr-sig-date">TANGGAL : ${headerDateLabel}</div>
-                            <table>
-                                <tr>
-                                    <td class="sr-sig-header">DIBUAT</td>
-                                    <td class="sr-sig-header">DISETUJUI</td>
-                                </tr>
-                                <tr>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
-                                    </td>
-                                    <td class="sr-sig-body">
-                                        <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
-                                    </td>
-                                </tr>
-                            </table>
+
+                        <div class="sr-info-row info-table">
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">NO LANE</span>
+                                <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
+                            </div>
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">TYPE</span>
+                                <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
+                            </div>
+                            <div class="sr-info-item">
+                                <span class="sr-info-label">BULAN</span>
+                                <span class="sr-info-value">${escapeHtml(monthLabel)}</span>
+                            </div>
                         </div>
+
+                        <div class="sr-4m-grid">
+                            ${leftTable}
+                            ${rightTable}
+                        </div>
+
+                        ${signatureBlock}
+
+                        <div class="sr-form-code">FORM-4M-001-REV.00</div>
                     </div>
+                `;
+            };
 
-                    <!-- INFO ROW — 3 baris vertical -->
-                    <div class="sr-info-row">
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">NO LANE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.no_lane || '-')}</span>
-                        </div>
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">TYPE</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(rec.type || '-')}</span>
-                        </div>
-                        <div class="sr-info-item">
-                            <span class="sr-info-label">BULAN</span>
-                            <span class="sr-info-sep">:</span>
-                            <span class="sr-info-value">${escapeHtml(monthLabel)}</span>
-                        </div>
-                    </div>
+            // Bagi menjadi 2 halaman: 1–15 dan 16–akhir
+            const page1End = 15;
+            const page2Start = 16;
 
-                    <!-- 2 COLUMN TABLE -->
-                    <div class="sr-4m-grid">
-                        ${leftTable}
-                        ${rightTable}
-                    </div>
+            let pagesHtml = buildPage(1, page1End, false);
+            if (totalDays > page1End) {
+                pagesHtml += buildPage(page2Start, totalDays, true);
+            } else {
+                // Jika bulan tidak sampai 15 hari (tidak mungkin), tetap buat 1 halaman
+                pagesHtml = buildPage(1, totalDays, true);
+            }
 
-                    <div class="sr-form-code">FORM-4M-001-REV.00</div>
-                </div>
-            `;
+            return pagesHtml;
         }).join('');
 
         $('#srReportContainer').html(html);
 
+        // Render QR Code
         setTimeout(() => {
             list.forEach((entry, idx) => {
                 const rec = entry.record;
+                const sigKey = 'm4';
 
+                // Tanda tangan atas
                 if (rec.created_by_name) {
-                    const el = document.querySelector(`[data-type="created-m4-${idx}"]`);
+                    const el = document.querySelector(`[data-type="created-${sigKey}-${idx}"]`);
                     if (el) renderQRCode(el, rec.created_by_name);
                 }
                 if (rec.approved_by_name) {
-                    const el = document.querySelector(`[data-type="approved-m4-${idx}"]`);
+                    const el = document.querySelector(`[data-type="approved-${sigKey}-${idx}"]`);
                     if (el) renderQRCode(el, rec.approved_by_name);
+                }
+
+                // Tanda tangan bawah (halaman terakhir)
+                const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
+                const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
+                const uniqueSigKey = `${sigKey}-${idx}-last`;
+
+                if (sigGroupLeader) {
+                    const el = document.querySelector(`[data-type="footer-left-${uniqueSigKey}"]`);
+                    if (el) renderQRCode(el, sigGroupLeader);
+                }
+                if (sigSectionManager) {
+                    const el = document.querySelector(`[data-type="footer-right-${uniqueSigKey}"]`);
+                    if (el) renderQRCode(el, sigSectionManager);
                 }
             });
         }, 200);
