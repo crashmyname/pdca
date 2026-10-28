@@ -3056,7 +3056,7 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0">
-                            <label class="form-label">&nbsp;</label>
+                            <label class="form-label"></label>
                             <button class="btn btn-primary" onclick="loadReportData()">
                                 <i class="ti ti-filter"></i> Terapkan
                             </button>
@@ -3663,7 +3663,7 @@
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:0">
-                            <label class="form-label">&nbsp;</label>
+                            <label class="form-label"></label>
                             <button class="btn btn-primary" onclick="loadSupportReport()">
                                 <i class="ti ti-filter"></i> Tampilkan
                             </button>
@@ -8759,7 +8759,7 @@
                     } else {
                         rowsHtml += `
                             <tr>
-                                <td>&nbsp;</td><td></td><td></td>
+                                <td></td><td></td><td></td>
                                 <td></td><td></td><td></td><td></td><td></td><td></td>
                                 <td></td><td></td><td></td><td></td><td></td>
                             </tr>
@@ -8806,12 +8806,12 @@
                                 <div class="sr-ttd-box">
                                     <div class="sr-sig-header">GROUP LEADER</div>
                                     <div class="signature-qrcode" data-type="footer-left-${uniqueSigKey}" data-signature=""></div>
-                                    <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                                    <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '')}</div>
                                 </div>
                                 <div class="sr-ttd-box">
                                     <div class="sr-sig-header">SECTION MANAGER</div>
                                     <div class="signature-qrcode" data-type="footer-right-${uniqueSigKey}" data-signature=""></div>
-                                    <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                                    <div class="sr-sig-name">${escapeHtml(sigSectionManager || '')}</div>
                                 </div>
                             </div>
                         </div>
@@ -8839,11 +8839,11 @@
                                     <tr>
                                         <td class="sr-sig-body">
                                             <div class="signature-qrcode" data-type="created-${uniqueSigKey}" data-signature=""></div>
-                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '')}</div>
                                         </td>
                                         <td class="sr-sig-body">
                                             <div class="signature-qrcode" data-type="approved-${uniqueSigKey}" data-signature=""></div>
-                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '')}</div>
                                         </td>
                                     </tr>
                                 </table>
@@ -8953,7 +8953,6 @@
             const sigCreated  = rec.created_by_name  || '';
             const sigApproved = rec.approved_by_name || '';
 
-            // Helper: deteksi placeholder "Tidak Ada 4M"
             const isPlaceholderProblem = (problem) => {
                 const p = String(problem || '').toLowerCase().trim();
                 if (!p) return true;
@@ -8966,7 +8965,7 @@
                 return false;
             };
 
-            // Group items by date + shift (dengan prioritas)
+            // Group items by date + shift
             const byDate = {};
             items.forEach(it => {
                 if (!it.date) return;
@@ -8986,33 +8985,20 @@
 
                 const existingReal = hasReal(existing);
                 const currentReal  = hasReal(it);
-
                 const existingPh   = !existingReal && catOf(existing) !== 'tidak_ada_4m' && isPlaceholderProblem(existing.problem);
                 const currentPh    = !currentReal  && catOf(it)       !== 'tidak_ada_4m' && isPlaceholderProblem(it.problem);
 
-                if (currentReal && !existingReal) {
-                    byDate[dateKey][shiftKey] = it;
-                    return;
-                }
-                if (existingReal) {
-                    return;
-                }
-                if (it.task_id && !existing.task_id) {
-                    byDate[dateKey][shiftKey] = it;
-                    return;
-                }
-                if (existingPh && !currentPh) {
-                    byDate[dateKey][shiftKey] = it;
-                }
+                if (currentReal && !existingReal) { byDate[dateKey][shiftKey] = it; return; }
+                if (existingReal) { return; }
+                if (it.task_id && !existing.task_id) { byDate[dateKey][shiftKey] = it; return; }
+                if (existingPh && !currentPh) { byDate[dateKey][shiftKey] = it; }
             });
 
-            // Total hari dalam bulan
             let totalDays = 31;
             if (yearNum && monthNum) {
                 totalDays = new Date(parseInt(yearNum, 10), parseInt(monthNum, 10), 0).getDate();
             }
 
-            // Helper untuk membangun baris tabel 4M
             const build4mRows = (days) => {
                 let rows = '';
                 days.forEach(({ day, dateStr }) => {
@@ -9022,9 +9008,7 @@
 
                     shifts.forEach((shift, sIdx) => {
                         const it = dayData[shift];
-                        const tglCell = sIdx === 0
-                            ? `<td class="tgl-num" rowspan="3">${day}</td>`
-                            : '';
+                        const tglCell = sIdx === 0 ? `<td class="tgl-num" rowspan="3">${day}</td>` : '';
 
                         let problemText = '';
                         let manChk = '', machineChk = '', materialChk = '', methodeChk = '';
@@ -9035,13 +9019,9 @@
                             const isRealCategory = ['man','machine','material','methode'].includes(cat);
                             const isNo4mCategory = cat === 'tidak_ada_4m';
 
-                            if (isRealCategory) {
-                                problemText = 'Ada 4M';
-                            } else if (isNo4mCategory) {
-                                problemText = 'Tidak Ada 4M';
-                            } else {
-                                problemText = isPlaceholderProblem(it.problem) ? 'Tidak Ada 4M' : 'Ada 4M';
-                            }
+                            if (isRealCategory) problemText = 'Ada 4M';
+                            else if (isNo4mCategory) problemText = 'Tidak Ada 4M';
+                            else problemText = isPlaceholderProblem(it.problem) ? 'Tidak Ada 4M' : 'Ada 4M';
 
                             manChk      = cat === 'man'      ? '✓' : '&ndash;';
                             machineChk  = cat === 'machine'  ? '✓' : '&ndash;';
@@ -9086,7 +9066,7 @@
                 </thead>
             `;
 
-            // Fungsi membangun satu halaman
+            // ── Fungsi Membangun Halaman ──
             const buildPage = (startDay, endDay, isLastPage) => {
                 const days = [];
                 for (let d = startDay; d <= endDay; d++) {
@@ -9111,33 +9091,36 @@
                     </table>
                 `;
 
-                // Blok tanda tangan hanya untuk halaman terakhir
+                // Kunci unik per halaman agar QR di halaman 2 tidak tertukar dengan halaman 1
+                const pageSigKey = `${sigKey}-${idx}-p${startDay}`;
+
                 let signatureBlock = '';
                 if (isLastPage) {
                     const komentarText = rec.footer_comment || '';
                     const komentarDate = rec.footer_date || '';
-                    const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
-                    const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
-                    const uniqueSigKey = `${sigKey}-${idx}-last`;
+                    // ── PERBAIKAN: Hapus fallback ke created_by_name, biarkan kosong ──
+                    const sigGroupLeader = rec.footer_created_name || '';
+                    const sigSectionManager = rec.footer_approved_name || '';
+                    const bottomSigKey = `${sigKey}-${idx}-last`;
 
                     signatureBlock = `
-                        <div class="sr-signature-section" style="margin-top: 10px;">
-                            <div class="sr-signature-header">
+                        <div class="sr-signature-section" style="margin-top: 6px; width: 100%;">
+                            <div class="sr-signature-header" style="font-size: 7px;">
                                 <div>KOMENTAR :</div>
                                 <div class="sr-hdr-right">TANGGAL : ${komentarDate ? formatDateSlash(komentarDate) : ''}</div>
                             </div>
-                            <div class="sr-signature-content">
-                                <div class="sr-signature-komentar">${escapeHtml(komentarText)}</div>
+                            <div class="sr-signature-content" style="min-height: 55px; height: 55px;">
+                                <div class="sr-signature-komentar" style="padding: 2px 4px; font-size: 7px;">${escapeHtml(komentarText)}</div>
                                 <div class="sr-ttd-container">
-                                    <div class="sr-ttd-box">
-                                        <div class="sr-sig-header">GROUP LEADER</div>
-                                        <div class="signature-qrcode" data-type="footer-left-${uniqueSigKey}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigGroupLeader || '&nbsp;')}</div>
+                                    <div class="sr-ttd-box" style="padding: 2px;">
+                                        <div class="sr-sig-header" style="font-size: 6.5px; padding-bottom: 1px; margin-bottom: 1px;">GROUP LEADER</div>
+                                        <div class="signature-qrcode footer-qr" data-type="footer-left-${bottomSigKey}" data-signature="" style="width: 22px !important; height: 22px !important; margin: 1px auto !important;"></div>
+                                        <div class="sr-sig-name" style="font-size: 6.5px; min-height: 7px; padding-top: 1px;">${escapeHtml(sigGroupLeader || '')}</div>
                                     </div>
-                                    <div class="sr-ttd-box">
-                                        <div class="sr-sig-header">SECTION MANAGER</div>
-                                        <div class="signature-qrcode" data-type="footer-right-${uniqueSigKey}" data-signature=""></div>
-                                        <div class="sr-sig-name">${escapeHtml(sigSectionManager || '&nbsp;')}</div>
+                                    <div class="sr-ttd-box" style="padding: 2px;">
+                                        <div class="sr-sig-header" style="font-size: 6.5px; padding-bottom: 1px; margin-bottom: 1px;">SECTION MANAGER</div>
+                                        <div class="signature-qrcode footer-qr" data-type="footer-right-${bottomSigKey}" data-signature="" style="width: 22px !important; height: 22px !important; margin: 1px auto !important;"></div>
+                                        <div class="sr-sig-name" style="font-size: 6.5px; min-height: 7px; padding-top: 1px;">${escapeHtml(sigSectionManager || '')}</div>
                                     </div>
                                 </div>
                             </div>
@@ -9163,12 +9146,13 @@
                                     </tr>
                                     <tr>
                                         <td class="sr-sig-body">
-                                            <div class="signature-qrcode" data-type="created-${sigKey}-${idx}" data-signature=""></div>
-                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '&nbsp;')}</div>
+                                            <!-- Gunakan pageSigKey agar unik per halaman -->
+                                            <div class="signature-qrcode" data-type="created-${pageSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigCreated || '')}</div>
                                         </td>
                                         <td class="sr-sig-body">
-                                            <div class="signature-qrcode" data-type="approved-${sigKey}-${idx}" data-signature=""></div>
-                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '&nbsp;')}</div>
+                                            <div class="signature-qrcode" data-type="approved-${pageSigKey}" data-signature=""></div>
+                                            <div class="sr-sig-name">${escapeHtml(sigApproved || '')}</div>
                                         </td>
                                     </tr>
                                 </table>
@@ -9190,28 +9174,28 @@
                             </div>
                         </div>
 
+                        <!-- Grid Kiri & Kanan: TTD diletakkan di dalam col-right -->
                         <div class="sr-4m-grid">
-                            ${leftTable}
-                            ${rightTable}
+                            <div class="sr-4m-col-left">
+                                ${leftTable}
+                            </div>
+                            <div class="sr-4m-col-right" style="display: flex; flex-direction: column; justify-content: flex-start;">
+                                ${rightTable}
+                                ${isLastPage ? signatureBlock : ''}
+                            </div>
                         </div>
-
-                        ${signatureBlock}
 
                         <div class="sr-form-code">FORM-4M-001-REV.00</div>
                     </div>
                 `;
             };
 
-            // Bagi menjadi 2 halaman: 1–15 dan 16–akhir
-            const page1End = 15;
-            const page2Start = 16;
-
-            let pagesHtml = buildPage(1, page1End, false);
-            if (totalDays > page1End) {
-                pagesHtml += buildPage(page2Start, totalDays, true);
-            } else {
-                // Jika bulan tidak sampai 15 hari (tidak mungkin), tetap buat 1 halaman
+            // Bagi menjadi 2 halaman
+            let pagesHtml = '';
+            if (totalDays <= 15) {
                 pagesHtml = buildPage(1, totalDays, true);
+            } else {
+                pagesHtml = buildPage(1, 15, false) + buildPage(16, totalDays, true);
             }
 
             return pagesHtml;
@@ -9225,27 +9209,40 @@
                 const rec = entry.record;
                 const sigKey = 'm4';
 
-                // Tanda tangan atas
-                if (rec.created_by_name) {
-                    const el = document.querySelector(`[data-type="created-${sigKey}-${idx}"]`);
-                    if (el) renderQRCode(el, rec.created_by_name);
-                }
-                if (rec.approved_by_name) {
-                    const el = document.querySelector(`[data-type="approved-${sigKey}-${idx}"]`);
-                    if (el) renderQRCode(el, rec.approved_by_name);
+                // Cek apakah bulan ini punya 2 halaman
+                let totalDays = 31;
+                if (rec.month_year && rec.month_year.length === 7) {
+                    const [y, m] = rec.month_year.split('-');
+                    totalDays = new Date(parseInt(y, 10), parseInt(m, 10), 0).getDate();
                 }
 
-                // Tanda tangan bawah (halaman terakhir)
-                const sigGroupLeader = rec.footer_created_name || rec.created_by_name || '';
-                const sigSectionManager = rec.footer_approved_name || rec.approved_by_name || '';
-                const uniqueSigKey = `${sigKey}-${idx}-last`;
+                const pages = totalDays <= 15 ? [1] : [1, 16];
 
+                // Render TTD Atas untuk SETIAP halaman yang ada
+                pages.forEach(startDay => {
+                    const pageSigKey = `${sigKey}-${idx}-p${startDay}`;
+                    
+                    if (rec.created_by_name) {
+                        const el = document.querySelector(`[data-type="created-${pageSigKey}"]`);
+                        if (el) renderQRCode(el, rec.created_by_name);
+                    }
+                    if (rec.approved_by_name) {
+                        const el = document.querySelector(`[data-type="approved-${pageSigKey}"]`);
+                        if (el) renderQRCode(el, rec.approved_by_name);
+                    }
+                });
+
+                // Render TTD Bawah (hanya ada di halaman terakhir)
+                const bottomSigKey = `${sigKey}-${idx}-last`;
+                const sigGroupLeader = rec.footer_created_name || ''; // Tidak ambil dari header
+                const sigSectionManager = rec.footer_approved_name || ''; // Tidak ambil dari header
+                
                 if (sigGroupLeader) {
-                    const el = document.querySelector(`[data-type="footer-left-${uniqueSigKey}"]`);
+                    const el = document.querySelector(`[data-type="footer-left-${bottomSigKey}"]`);
                     if (el) renderQRCode(el, sigGroupLeader);
                 }
                 if (sigSectionManager) {
-                    const el = document.querySelector(`[data-type="footer-right-${uniqueSigKey}"]`);
+                    const el = document.querySelector(`[data-type="footer-right-${bottomSigKey}"]`);
                     if (el) renderQRCode(el, sigSectionManager);
                 }
             });
